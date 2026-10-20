@@ -29,9 +29,6 @@
 
 ## Conventions
 
-- Add capabilities with `composer require` so Flex recipes configure them; do not hand-edit `config/bundles.php`.
 - Use `bin/console make:* --no-interaction` with all arguments given; makers hang a non-interactive shell otherwise.
-- Real secrets go in `.env.local` (git-ignored); `.env` holds defaults only.
-- Tests live in `tests/`, mirror `src/`, namespace `App\Tests\`.
 - `php` may not be on PATH on this Windows machine; PHP 8.5 lives in `C:\php85`.
-- No commits, CI or remote exist yet. The plan is GitHub Actions auto-deploying to fly on merge to main; define commit conventions with the first commits.
+- No CI exists yet. The plan is GitHub Actions auto-deploying to fly on merge to main.
