@@ -1,6 +1,6 @@
 # Repository Guidelines
 
-"My home library": shared household book collection with per-user ratings and recommendations. Symfony 8.1 on PHP 8.4+, Doctrine ORM on MySQL 8, Twig + AssetMapper + Stimulus/Turbo. Requirements: @context/foundation/prd.md. Stack decisions: @context/foundation/tech-stack.md.
+"My home library": shared household book collection with per-user ratings and recommendations. Symfony 8.1 on PHP 8.4+, Doctrine ORM on MariaDB 10.11 (production: cyberfolks), Twig + AssetMapper + Stimulus/Turbo. Requirements: @context/foundation/prd.md. Stack decisions: @context/foundation/tech-stack.md.
 
 ## Hard rules
 
@@ -21,7 +21,7 @@
 
 ## Commands
 
-- `docker compose up -d database mailer`: MySQL on host port 3307 (matches `DATABASE_URL` in `.env`) and Mailpit.
+- `docker compose up -d database mailer`: MariaDB 10.11 on host port 3307 (matches `DATABASE_URL` in `.env`) and Mailpit.
 - `symfony serve -d`: dev server.
 - `bin/console make:migration`, then `bin/console doctrine:migrations:migrate`: never `doctrine:schema:update`.
 - `bin/phpunit`: tests (`phpunit.dist.xml` fails on deprecations, notices and warnings).

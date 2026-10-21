@@ -1,0 +1,10 @@
+.git
+.idea
+var/
+vendor/
+.env.local*
+context/
+tests/
+.claude/
+compose*.yaml
+Dockerfile
