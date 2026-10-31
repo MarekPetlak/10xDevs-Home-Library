@@ -62,9 +62,9 @@ Rules: least-privilege tokens, secrets only in `fly secrets` / GitHub Secrets / 
 - [x] Windows 11 PowerShell available (this machine); Git installed (`git --version`).
 - [x] Docker Desktop running (`docker version` shows client and server).
 - [x] Repo is on branch `deploy/fly` (commit deploy files there).
-- [ ] Payment card ready for Fly (required).
-- [ ] cyberfolks panel login ready (and the type of panel known: DirectAdmin or WebAs, see 1D).
-- [ ] Domain name chosen and DNS panel access ready (see 1C/1D).
+- [x] Payment card ready for Fly (required). (implied: app created and deployed on 2026-10-21; Fly refuses app creation without a card. Not checked in the billing dashboard.)
+- [x] cyberfolks panel login ready (DB `uwzkfxjtru_homelibrary`, dedicated user created and egress IPs whitelisted in the panel on 2026-10-21). Panel type (DirectAdmin vs WebAs) is not recorded; see 1D.
+- [~] Domain name chosen and DNS panel access ready (see 1C/1D). Not needed now: Phase 6 skipped, app runs on `10xdevs-home-library.fly.dev`. Reopen only if a custom domain is revived.
 - [ ] Password manager ready for: Fly login, DB password, `APP_SECRET`, tokens.
 
 ---
@@ -91,7 +91,7 @@ Rules: least-privilege tokens, secrets only in `fly secrets` / GitHub Secrets / 
 
 - [ ] **HUMAN** Add the payment card in the dashboard (Billing). Fly has no compute free tier *(verified)*.
 - [ ] **HUMAN** Enable 2FA on the account (Account > Security).
-- [ ] Note your **organization slug** (`fly orgs list`); use `--org <slug>` in `fly launch` if you have more than one (`--org` flag *(verified)*).
+- [x] Note your **organization slug** (`fly orgs list`): app owner is `personal` (seen in `fly apps list`); use `--org <slug>` in `fly launch` if you have more than one (`--org` flag *(verified)*).
 - [ ] Check available regions: `fly platform regions` and see whether `waw` and `fra` are listed (see D6).
 - [ ] Decide token strategy (important for agent safety):
   - Your interactive `fly auth login` session has **full account access**. Use it yourself.
@@ -123,7 +123,7 @@ Facts from cyberfolks help *(verified 2026-10-20)*: remote access to MySQL is **
 
 - [ ] Identify your hosting type (DirectAdmin shared hosting vs WebAs) and plan.
 - [x] DB details (no password here): host `s63.cyber-folks.pl` (185.208.164.63, IPv4 only in DNS), port `3308` (TCP reachable from this laptop 2026-10-21), db `uwzkfxjtru_homelibrary`, user `uwzkfxjtru_app` (dedicated app user, created 2026-10-21; password only in local `.env.local`, gitignored status to be confirmed).
-- [ ] Note the MySQL version shown in the panel and charset; put it into `DATABASE_URL` as `serverVersion=` (e.g. `8.0`; MariaDB is written as `10.x.x-MariaDB`). Local dev currently uses MySQL 8.0: check compatibility of migrations.
+- [x] Note the MySQL version shown in the panel and charset; put it into `DATABASE_URL` as `serverVersion=`. Result: server is MariaDB 10.11, `serverVersion=10.11.0-MariaDB`; local dev switched to `mariadb:10.11` (see execution log).
 - [ ] **Check TLS:** ask cyberfolks support (or test with `mysql --ssl-mode=VERIFY_CA ...`) whether the MySQL server supports TLS and which CA certificate to use. **TLS is not mentioned in their help page.** Without TLS, DB credentials and household data cross the public internet in plaintext between Fly and cyberfolks. Decision gate **D7** below.
 - [ ] Ask support (one email, answers go into this file): max connections/`max_user_connections` for this user, backup policy and restore procedure, whether remote connections count against any quota, MySQL port to use.
 - [ ] Plan a **whitelist swap**: the Fly static egress IPv4 **and IPv6** (Phase 4) must both be added in the panel, since machines may connect over IPv6 when the destination supports it *(verified, Fly egress docs)*. cyberfolks help mentions no IPv6 access for some packages, so confirm with support whether an IPv6 whitelist entry is accepted; if not, force IPv4 (e.g. use the host's IPv4 address in `DATABASE_URL`).
@@ -165,7 +165,7 @@ Goal: prove PHP 8.4 + Symfony 8.1 runs in prod mode behind nginx in one containe
 - [x] `GET /healthz` returning `200 ok` without DB/session access; make it public in `security.yaml`; add a test (TDD).
 - [x] `framework.yaml` prod: `trusted_proxies: '%env(TRUSTED_PROXIES)%'` + `trusted_headers: ['x-forwarded-for','x-forwarded-host','x-forwarded-proto','x-forwarded-port']`; value on Fly `REMOTE_ADDR` (trust the immediate peer = Fly proxy; Fly peer behavior *(unverified)*, tested in Phase 5). nginx passes `X-Forwarded-*` request headers to PHP automatically as `HTTP_*` params, so no rewrite is needed; do **not** use `realip` modules unless required.
 - [ ] Sessions in DB: `PdoSessionHandler` via the Doctrine connection + migration for the `sessions` table (keep inside the 5-connection budget: it reuses the same connection).
-- [ ] Doctrine: `serverVersion` in the URL; TLS options only if D7 (a): `driver_options` with `PDO::MYSQL_ATTR_SSL_CA` pointing at `config/certs/<cyberfolks-ca>.pem` (CA certificates are public; do not commit client keys).
+- [x] Doctrine: `serverVersion` in the URL (done, `10.11.0-MariaDB`); TLS enabled in `doctrine.yaml` `when@prod` without cert verification (D7 a; CA pinning still open). Original note: TLS options only if D7 (a): `driver_options` with `PDO::MYSQL_ATTR_SSL_CA` pointing at `config/certs/<cyberfolks-ca>.pem` (CA certificates are public; do not commit client keys).
 - [x] Build/run locally: `docker build -t mhl:test .`, `docker run --rm -p 8080:8080 -e APP_ENV=prod -e APP_SECRET=<random> -e DATABASE_URL=<local-mysql-url> -e TRUSTED_PROXIES=REMOTE_ADDR mhl:test`.
 
 **Verify:** `curl -i http://localhost:8080/healthz` = 200; login page renders with assets; `docker run --rm mhl:test php -v` = 8.4.x; `bin/console about --env=prod` = Symfony 8.1; env vars visible to PHP (`php -r 'echo getenv("APP_ENV");'` via a request, not CLI only); both processes alive (`docker top`); `nginx -t` passes.
@@ -182,7 +182,7 @@ Goal: prove PHP 8.4 + Symfony 8.1 runs in prod mode behind nginx in one containe
 
 ## Phase 3 - Fly app creation and `fly.toml` (AGENT writes, HUMAN creates)
 
-- [ ] **HUMAN/AGENT** `fly launch --no-deploy --name 10xdevs-home-library --region <waw|fra> --no-db --dockerfile Dockerfile` (flags *(verified)*); add `--copy-config` if a `fly.toml` already exists; answer **No** to any offer to create a database, Redis, or overwrite the Dockerfile; use `--no-github-workflow` to avoid a generated workflow (we write our own) *(verified flag)*.
+- [x] **HUMAN/AGENT** (app `10xdevs-home-library` exists, owner personal, region fra; `fly.toml` in repo) `fly launch --no-deploy --name 10xdevs-home-library --region <waw|fra> --no-db --dockerfile Dockerfile` (flags *(verified)*); add `--copy-config` if a `fly.toml` already exists; answer **No** to any offer to create a database, Redis, or overwrite the Dockerfile; use `--no-github-workflow` to avoid a generated workflow (we write our own) *(verified flag)*.
 - [x] Edit `fly.toml` (written to repo root; DEFAULT_URI temporarily the fly.dev host):
 
 ```toml
@@ -239,7 +239,7 @@ primary_region = "fra"   # or "waw" per D6
 - [x] Egress IPs allocated 2026-10-21 for `10xdevs-home-library` in `fra`: IPv4 `209.71.114.192`, IPv6 `2a09:8280:e612:1:0:1c3:35f6:0`.
 - [x] `fly ips list` and record both addresses (above).
 - [x] **HUMAN** In the cyberfolks panel add **both** addresses as hosts for the DB user (1D). Keep your own current IP too so you can run `mysqldump`/Adminer locally. Never use `%`.
-- [ ] Wait a few minutes: new egress IPs may take a short time to apply to existing machines *(verified)*.
+- [x] Wait a few minutes: new egress IPs may take a short time to apply to existing machines *(verified)*. (Release command connected from the egress IP 209.71.114.192 on first deploy.)
 - [x] **HUMAN** Generate `APP_SECRET` (PowerShell: `-join ((1..32) | ForEach-Object { '{0:x2}' -f (Get-Random -Maximum 256) })`).
 - [x] **HUMAN** Set secrets in your own terminal (not in chat): `fly secrets set APP_SECRET=... DATABASE_URL="mysql://USER:PASS@HOST:PORT/DBNAME?serverVersion=8.0&charset=utf8mb4" --stage --app 10xdevs-home-library` (`--stage` skips deployment *(verified)*). URL-encode special characters in the password.
 - [x] `fly secrets list` shows names and digests only.
@@ -259,9 +259,9 @@ primary_region = "fra"   # or "waw" per D6
 ## Phase 5 - First deploy (HUMAN approves, AGENT executes)
 
 Pre-flight (all `[x]`):
-- [ ] Phases 1-4 verified; D7 decision recorded; `php bin/phpunit` green.
-- [ ] DB reachable from your whitelisted IP; egress IPs whitelisted.
-- [ ] Explicit user go-ahead for the production change.
+- [ ] Phases 1-4 verified (open items remain); D7 decision recorded; `php bin/phpunit` green (verified 2026-10-31: 1 test, 2 assertions, OK, local PHP 8.5.11).
+- [x] DB reachable from your whitelisted IP; egress IPs whitelisted (migrations ran on first deploy).
+- [x] Explicit user go-ahead for the production change (deploy executed 2026-10-21).
 
 Steps:
 - [x] `fly deploy --ha=false` (HA default would create spare machines; `--ha=false` is the flag named in infrastructure.md).
@@ -304,7 +304,7 @@ Steps:
 ## Phase 7 - CI/CD: auto-deploy on merge (AGENT writes, HUMAN adds secret)
 
 - [ ] **HUMAN** Add the deploy token as GitHub secret `FLY_API_TOKEN`.
-- [ ] `.github/workflows/deploy.yml`: trigger `push` on `main`; job `test` (setup-php 8.4, `composer install`, MySQL service for tests, `php bin/phpunit`); job `deploy` (`needs: test`, `concurrency: deploy-production`, `cancel-in-progress: false`): `superfly/flyctl-actions/setup-flyctl@master`, then `flyctl deploy --remote-only --ha=false`. Pin action versions/SHAs.
+- [x] `.github/workflows/deploy.yml` (written 2026-10-21, actions pinned by major tag, not SHA): trigger `push` on `main`; job `test` (setup-php 8.4, `composer install`, MySQL service for tests, `php bin/phpunit`); job `deploy` (`needs: test`, `concurrency: deploy-production`, `cancel-in-progress: false`): `superfly/flyctl-actions/setup-flyctl@master`, then `flyctl deploy --remote-only --ha=false`. Pin action versions/SHAs.
 - [ ] Optional GitHub `environment: production` with a required reviewer as the approval gate.
 - [ ] Protect `main` (PR + passing tests).
 - [ ] **Important cyberfolks implication:** CI tests must use a **local** MySQL service container, never the cyberfolks DB (GitHub runners have unpredictable IPs that cannot be whitelisted safely).
