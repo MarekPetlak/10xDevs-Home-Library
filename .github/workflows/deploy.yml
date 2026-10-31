@@ -1,0 +1,67 @@
+name: Test and deploy
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    env:
+      APP_ENV: test
+      # Tests use a local MariaDB service, never the cyberfolks database
+      DATABASE_URL: mysql://app:app@127.0.0.1:3306/app?serverVersion=10.11.0-MariaDB&charset=utf8mb4
+    services:
+      database:
+        image: mariadb:10.11
+        env:
+          MARIADB_DATABASE: app
+          MARIADB_USER: app
+          MARIADB_PASSWORD: app
+          MARIADB_ROOT_PASSWORD: root
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="healthcheck.sh --connect --innodb_initialized"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          extensions: intl, pdo_mysql, zip
+          coverage: none
+          tools: composer:v2
+
+      - name: Install dependencies
+        run: composer install --no-interaction --prefer-dist --no-progress
+
+      - name: Run tests
+        run: php bin/phpunit
+
+  deploy:
+    # Only from main, after tests pass; never from pull requests
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: test
+    runs-on: ubuntu-latest
+    # Add required reviewers to this environment in the repo settings for a manual approval gate
+    environment: production
+    concurrency:
+      group: deploy-production
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: superfly/flyctl-actions/setup-flyctl@master
+
+      - name: Deploy to Fly.io
+        run: flyctl deploy --remote-only --ha=false -a 10xdevs-home-library
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}

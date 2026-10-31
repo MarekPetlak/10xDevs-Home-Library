@@ -226,7 +226,7 @@ primary_region = "fra"   # decided in D6
 
   *(All keys verified against docs.fly.io/reference/configuration.)* No `[[mounts]]`: the DB is external, the machine stays stateless.
 - [x] `fly config validate` (valid, 2026-10-21).
-- [ ] Create the **scoped deploy token** now (Phase 1B strategy): `fly tokens create deploy -a 10xdevs-home-library -x 720h` (HUMAN runs it; store in GitHub secret and password manager).
+- [x] (created by user 2026-10-31, 720h expiry; renew before about 2026-11-30) Create the **scoped deploy token** now (Phase 1B strategy): `fly tokens create deploy -a 10xdevs-home-library -x 720h` (HUMAN runs it; store in GitHub secret and password manager).
 
 **Verify:** `fly apps list` shows the app; `fly ips list` shows shared IPv4/IPv6 only; `fly config validate` OK.
 
@@ -303,11 +303,11 @@ Steps:
 
 ## Phase 7 - CI/CD: auto-deploy on merge (AGENT writes, HUMAN adds secret)
 
-- [ ] **HUMAN** Add the deploy token as GitHub secret `FLY_API_TOKEN`.
+- [x] **HUMAN** Add the deploy token as GitHub secret `FLY_API_TOKEN`. (done by user 2026-10-31; not verified by the agent, `gh` not logged in)
 - [x] `.github/workflows/deploy.yml` (written 2026-10-21, actions pinned by major tag, not SHA): trigger `push` on `main`; job `test` (setup-php 8.4, `composer install`, MySQL service for tests, `php bin/phpunit`); job `deploy` (`needs: test`, `concurrency: deploy-production`, `cancel-in-progress: false`): `superfly/flyctl-actions/setup-flyctl@master`, then `flyctl deploy --remote-only --ha=false`. Pin action versions/SHAs.
 - [ ] Optional GitHub `environment: production` with a required reviewer as the approval gate.
-- [ ] Protect `main` (PR + passing tests).
-- [ ] **Important cyberfolks implication:** CI tests must use a **local** MySQL service container, never the cyberfolks DB (GitHub runners have unpredictable IPs that cannot be whitelisted safely).
+- [x] Protect `main` (PR + passing tests). (applied 2026-10-31 via `gh api`: PR required with 0 approvals, required check `test`, enforced for admins, no force pushes or deletions. The `test` check has never run yet; if the first PR cannot merge, confirm the check name in the PR checks list.)
+- [x] (verified in `deploy.yml` 2026-10-31: `mariadb:10.11` service, local `DATABASE_URL`, no cyberfolks credentials) **Important cyberfolks implication:** CI tests must use a **local** MySQL service container, never the cyberfolks DB (GitHub runners have unpredictable IPs that cannot be whitelisted safely).
 
 **Verify:** a trivial PR merge triggers test then deploy; `fly releases` shows the new release; smoke tests 1-3 pass.
 
