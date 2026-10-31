@@ -3,7 +3,7 @@ project: 10xdevs-home-library
 planned_at: 2026-10-20
 revised_at: 2026-10-20
 platform: Fly.io
-status: DEPLOYED to https://10xdevs-home-library.fly.dev on 2026-10-21 (Phases 2-5 done). Open: custom domain (6), CI (7), first user, backups (9)
+status: DEPLOYED to https://10xdevs-home-library.fly.dev (Phases 2-5 done 2026-10-21; CI auto-deploy working since 2026-10-31, release v10). Open: custom domain (6, skipped), first user, backups (9)
 inputs: context/foundation/infrastructure.md, context/foundation/tech-stack.md
 app_name: 10xdevs-home-library
 primary_region: fra   # decided 2026-10-31, see D6 (waw does not exist on Fly)
@@ -310,6 +310,8 @@ Steps:
 - [x] (verified in `deploy.yml` 2026-10-31: `mariadb:10.11` service, local `DATABASE_URL`, no cyberfolks credentials) **Important cyberfolks implication:** CI tests must use a **local** MySQL service container, never the cyberfolks DB (GitHub runners have unpredictable IPs that cannot be whitelisted safely).
 
 **Verify:** a trivial PR merge triggers test then deploy; `fly releases` shows the new release; smoke tests 1-3 pass.
+- [x] Merge triggers test then deploy (2026-10-31: PR #3, run 41202014043, `test` 34 s then `deploy` 1m18s). `fly releases` shows v10 complete (v9 failed, see execution log).
+- [~] Smoke tests: `/healthz` 200 and http -> https 301 confirmed; the https URL check on the login page is still open (no login route found at `/login`, authentication not built yet).
 
 **Support steps:** `No access token available` = secret name or expired token (recreate with `-x`); forked PRs get no secrets (deploy only from `main`); builder flakiness: re-run the job.
 
@@ -382,3 +384,4 @@ Data at risk: household ratings and read-status.
 
 - 2026-10-21: first deploy OK (release 8, machine 9080dd6df22d08, fra). Learned: (1) DATABASE_URL percent-encoding breaks `%env(resolve:...)%`, now plain `%env(DATABASE_URL)%`; (2) DB is MariaDB 10.11 -> `serverVersion=10.11.0-MariaDB`; (3) release-command machine does use the app egress IP 209.71.114.192; (4) `fly launch --yes` created a stray app when the name existed (delete `10xdevs-home-library-quiet-harborbird-9424`, human). Smoke: /healthz 200 in 0.13 s, http -> https 301, check passing. Not yet done: login-page/https URL check, session survives restart (sessions still file-based), first user, TLS handshake not confirmed.
 - 2026-10-21 (later): stray app deleted by user. Custom domain skipped (Phase 6), `*.fly.dev` stays. Local dev switched to `mariadb:10.11` (`compose.yaml`, new volume `mariadb_data`; old `database_data` volume with MySQL 8 files left untouched), `.env` serverVersion=10.11.0-MariaDB, AGENTS.md updated. CI MySQL service in Phase 7 must also be `mariadb:10.11`.
+- 2026-10-31: CI deploy brought up through PRs #1-#3 (`main` protected: PR + required check `test`, enforced for admins). Two failures only a clean CI checkout exposed, both fixed: (1) `assets/vendor/` is gitignored, so `asset-map:compile` failed in the image build -> Dockerfile now runs `importmap:install` first (run 41201152547); (2) Git on Windows stored `bin/console` as 100644, so the release command exited 126 -> `chmod +x bin/console` in the Dockerfile and mode 100755 in git (run 41201682138, release v9 failed, v8 kept serving). Third run succeeded: release v10, `/healthz` 200 in 0.38 s. Lesson: local `fly deploy` uploads ignored and mode-less working-tree files, so a CI run is the real test of the build context. Also: remote `main` started with an unrelated LICENSE commit, merged with `--allow-unrelated-histories`.
