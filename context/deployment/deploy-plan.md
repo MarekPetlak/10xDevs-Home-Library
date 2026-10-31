@@ -319,11 +319,11 @@ Steps:
 
 ## Phase 8 - Operations, access boundary, cost
 
-- [ ] Agent may run unattended: `fly deploy --ha=false`, `fly logs --no-tail`, `fly releases --image`, `fly status`, `fly secrets list`.
+- [x] Agent may run unattended: `fly deploy --ha=false`, `fly logs --no-tail`, `fly releases --image`, `fly status`, `fly secrets list`. (verified 2026-10-31: all ran fine; deploy is proven by the CI runs.)
 - [ ] Human only: `fly secrets set/unset` for `APP_SECRET`/`DATABASE_URL`, `fly apps destroy`, `fly ips release-egress`, `fly certs remove`, DB drops, token creation/revocation, DNS changes, cyberfolks whitelist edits.
-- [ ] CLI only for production; no `fly mcp` (experimental).
+- [x] CLI only for production; no `fly mcp` (experimental). (verified 2026-10-31: no `.mcp.json` in the repo and no Fly entry in `.claude\*.json`; user-level settings not checked.)
 - [ ] Propose a runbook in `AGENTS.md` through `/10x-agents-md` or `/10x-lesson` (not edited silently).
-- [ ] After week 1: check Fly billing (expect about $7/month: machine + egress IPv4); `fly machines list` shows exactly 1.
+- [~] After week 1: check Fly billing (expect about $7/month: machine + egress IPv4); `fly machines list` shows exactly 1. (2026-10-31: `fly machines list` shows exactly 1 machine, `shared-cpu-1x:512MB`, `fra`, release v12; billing cannot be read from the CLI, check the dashboard.)
 - [ ] Optional external uptime ping on `/healthz`.
 
 ---
