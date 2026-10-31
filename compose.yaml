@@ -1,0 +1,28 @@
+
+services:
+###> doctrine/doctrine-bundle ###
+  database:
+    # Matches production (cyberfolks runs MariaDB 10.11)
+    image: mariadb:${MARIADB_VERSION:-10.11}
+    environment:
+      MARIADB_DATABASE: ${MARIADB_DATABASE:-app}
+      # You should definitely change the passwords in production
+      MARIADB_USER: ${MARIADB_USER:-app}
+      MARIADB_PASSWORD: ${MARIADB_PASSWORD:-!ChangeMe!}
+      MARIADB_ROOT_PASSWORD: ${MARIADB_ROOT_PASSWORD:-!ChangeMe!}
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      timeout: 5s
+      retries: 5
+      start_period: 60s
+    volumes:
+      # New volume name: the old `database_data` holds MySQL 8 files that MariaDB cannot read
+      - mariadb_data:/var/lib/mysql:rw
+      # You may use a bind-mounted host directory instead, so that it is harder to accidentally remove the volume and lose all your data!
+      # - ./docker/db/data:/var/lib/mysql:rw
+###< doctrine/doctrine-bundle ###
+
+volumes:
+###> doctrine/doctrine-bundle ###
+  mariadb_data:
+###< doctrine/doctrine-bundle ###
