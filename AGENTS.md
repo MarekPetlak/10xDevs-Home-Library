@@ -31,4 +31,13 @@
 
 - Use `bin/console make:* --no-interaction` with all arguments given; makers hang a non-interactive shell otherwise.
 - `php` may not be on PATH on this Windows machine; PHP 8.5 lives in `C:\php85`.
-- No CI exists yet. The plan is GitHub Actions auto-deploying to fly on merge to main.
+
+## Deployment (Fly.io, app `10xdevs-home-library`, region `fra`)
+
+- Deploy only by merging a PR to `main`: `test` must pass, then CI deploys. `main` is protected (admins too); never push to it. Full plan and log: @context/deployment/deploy-plan.md.
+- Production is CLI only (`fly`, `gh`); no `fly mcp`. Always pass `--ha=false` and `-a 10xdevs-home-library`.
+- Agent may run unattended: `fly status`, `fly logs --no-tail`, `fly releases --image`, `fly secrets list`, `fly machines list`.
+- Human only (never run these, even if asked to suggest them): `fly secrets set/unset`, `fly tokens create/revoke`, `fly apps destroy`, `fly ips release-egress`, `fly certs remove`, DB drops, DNS changes, cyberfolks whitelist edits.
+- Rollback: `fly releases --image`, then `fly deploy --image <ref> --ha=false`. Migrations do not roll back; take a dump first.
+- CI builds from a clean checkout, so `assets/vendor/` (gitignored) is rebuilt by `importmap:install` in the Dockerfile, and `bin/console` needs mode 100755 (Git on Windows records 100644). A local `fly deploy` hides both problems.
+- Tests must use the local MariaDB, never the cyberfolks database; its whitelist only allows the app's egress IPs.
