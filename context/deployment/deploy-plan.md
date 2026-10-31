@@ -6,7 +6,7 @@ platform: Fly.io
 status: DEPLOYED to https://10xdevs-home-library.fly.dev on 2026-10-21 (Phases 2-5 done). Open: custom domain (6), CI (7), first user, backups (9)
 inputs: context/foundation/infrastructure.md, context/foundation/tech-stack.md
 app_name: 10xdevs-home-library
-primary_region: fra   # re-evaluate waw vs fra in Phase 1 (see D6)
+primary_region: fra   # decided 2026-10-31, see D6 (waw does not exist on Fly)
 database: cyberfolks MySQL (external, remote access)
 web_server: nginx + php-fpm (single container)
 domain: custom domain accepted (name to be filled in D4)
@@ -28,7 +28,7 @@ Tip for running interactive commands (login, token creation) inside the agent se
 | D3 | Machine `shared-cpu-1x` 512 MB, always on | about $3.69/month (NA price; confirm for your region) |
 | D4 | **Custom domain accepted** | DNS + certificate steps added (Phase 1D, Phase 6). Domain name still needed from user. |
 | D5 | No staging app for MVP | Revisit if migrations become risky. |
-| D6 | Region: **open** | Compare `waw` (Warsaw, closest to a Polish host) and `fra`; DB latency matters for the 2 s goal. Decide in Phase 1E using a real measurement. |
+| D6 | Region: **`fra`** (decided 2026-10-31) | `waw` is not available on Fly. Measured from a `fra` machine: about 30 ms per query to the cyberfolks DB (Phase 1E). Changing region later means new egress IPs and a new whitelist. |
 
 Estimated cost: machine about $3.69 + static egress IPv4 $3.60 = about **$7.3/month** + domain (already owned or bought) + cyberfolks plan you already pay for. No compute free tier; trial is only about 2 h or 7 days *(verified)*.
 
@@ -65,7 +65,7 @@ Rules: least-privilege tokens, secrets only in `fly secrets` / GitHub Secrets / 
 - [x] Payment card ready for Fly (required). (implied: app created and deployed on 2026-10-21; Fly refuses app creation without a card. Not checked in the billing dashboard.)
 - [x] cyberfolks panel login ready (DB `uwzkfxjtru_homelibrary`, dedicated user created and egress IPs whitelisted in the panel on 2026-10-21). Panel type (DirectAdmin vs WebAs) is not recorded; see 1D.
 - [~] Domain name chosen and DNS panel access ready (see 1C/1D). Not needed now: Phase 6 skipped, app runs on `10xdevs-home-library.fly.dev`. Reopen only if a custom domain is revived.
-- [ ] Password manager ready for: Fly login, DB password, `APP_SECRET`, tokens.
+- [x] Password manager ready for: Fly login, DB password, `APP_SECRET`, tokens. (confirmed by user 2026-10-31: Fly login, DB password and `APP_SECRET` stored; the deploy token does not exist yet, store it when created in Phase 3.)
 
 ---
 
@@ -75,11 +75,11 @@ Rules: least-privilege tokens, secrets only in `fly secrets` / GitHub Secrets / 
 
 - [x] Install in PowerShell: `pwsh -Command "iwr https://fly.io/install.ps1 -useb | iex"` (if `pwsh` is missing, use `powershell -Command "iwr https://fly.io/install.ps1 -useb | iex"`) *(verified)*.
 - [x] Open a **new** terminal (PATH refresh) and check: `fly version` (the binary is available as both `fly` and `flyctl`). (fly.exe v0.4.120 already installed)
-- [ ] Update when needed: `fly version update` *(unverified, check `fly version --help`)*.
+- [x] Update when needed: `fly version update` (already on latest flyctl v0.5.1, verified 2026-10-31).
 - [x] Log in: `fly auth signup` (new account) or `fly auth login` (existing). A browser window opens; the session is stored in `%USERPROFILE%\.fly\config.yml`.
 - [x] Check identity: `fly auth whoami` (logged in as m.petlak@protonmail.com).
-- [ ] Optional: tab completion `fly completion powershell` *(unverified)*.
-- [ ] Health check of the local setup: `fly doctor` *(unverified, shows connectivity/agent problems)*.
+- [~] Optional: tab completion `fly completion powershell` (command works, verified 2026-10-31; not yet loaded in `$PROFILE`, so completion is not active).
+- [x] Health check of the local setup: `fly doctor` (all checks passed 2026-10-31 after `fly agent restart`; first run failed on the flyctl agent socket).
 
 **Support steps:**
 - `fly` not recognized: reopen the terminal; otherwise add `%USERPROFILE%\.fly\bin` to the user PATH and reopen.
@@ -89,15 +89,15 @@ Rules: least-privilege tokens, secrets only in `fly secrets` / GitHub Secrets / 
 
 ### 1B. Fly.io account configuration
 
-- [ ] **HUMAN** Add the payment card in the dashboard (Billing). Fly has no compute free tier *(verified)*.
-- [ ] **HUMAN** Enable 2FA on the account (Account > Security).
+- [x] **HUMAN** Add the payment card in the dashboard (Billing). Fly has no compute free tier *(verified)*. (confirmed by user 2026-10-31)
+- [x] **HUMAN** Enable 2FA on the account (Account > Security). (confirmed by user 2026-10-31)
 - [x] Note your **organization slug** (`fly orgs list`): app owner is `personal` (seen in `fly apps list`); use `--org <slug>` in `fly launch` if you have more than one (`--org` flag *(verified)*).
-- [ ] Check available regions: `fly platform regions` and see whether `waw` and `fra` are listed (see D6).
-- [ ] Decide token strategy (important for agent safety):
+- [x] Check available regions: `fly platform regions` and see whether `waw` and `fra` are listed (see D6). (checked 2026-10-31: `fra` is listed, `waw` is not available on Fly, so D6 reduces to `fra` vs other EU regions.)
+- [x] Decide token strategy (important for agent safety; decided 2026-10-31: keep the strategy below, token creation is still pending in Phase 3):
   - Your interactive `fly auth login` session has **full account access**. Use it yourself.
   - For CI and for the agent use a **deploy token scoped to one app**: `fly tokens create deploy -a 10xdevs-home-library -x 720h` *(verified: scope is one app; `-x` sets expiry; default would be 20 years, so always set a shorter one)*. Create it **after** the app exists (Phase 3).
   - Provide it to a shell as an environment variable (`$env:FLY_API_TOKEN = "..."`), never in a committed file.
-- [ ] Reserve the app name early: `fly apps create 10xdevs-home-library` happens in Phase 3; check beforehand that the name is free.
+- [x] (app `10xdevs-home-library` already created, confirmed by user 2026-10-31) Reserve the app name early: `fly apps create 10xdevs-home-library` happens in Phase 3; check beforehand that the name is free.
 
 **Support steps:**
 - No card = `fly launch` refuses to create the app. Add the card first.
@@ -140,8 +140,8 @@ Facts from cyberfolks help *(verified 2026-10-20)*: remote access to MySQL is **
 
 ### 1E. Region and latency check (D6)
 
-- [ ] From your laptop or a temporary Fly machine measure RTT to the cyberfolks DB host (`ping`, or timing a `SELECT 1`). A Polish host is likely closer to `waw` than `fra` *(assumption: confirm the server location with support)*.
-- [ ] Pick the region; set `primary_region` accordingly. Every uncached page does several DB queries, so keep RTT under about 20-30 ms if possible.
+- [x] From your laptop or a temporary Fly machine measure RTT to the cyberfolks DB host (`ping`, or timing a `SELECT 1`). Measured 2026-10-31: laptop ping 23-29 ms, TCP 3308 27-41 ms; Fly machine in `fra`: TCP about 30 ms, PDO connect 89 ms, `SELECT 1` 29.5-29.7 ms. `waw` does not exist on Fly. *(Original assumption: a Polish host is closer to `waw`; DB server location still unconfirmed with support.)*
+- [x] Pick the region; set `primary_region` accordingly. Decision: keep `fra` (about 30 ms per query, no better EU option, avoids re-allocating egress IPs). Every uncached page does several DB queries, so keep RTT under about 20-30 ms if possible.
 - [ ] Remember: static egress IPs are **scoped per app and per region** *(verified)*; changing region later means allocating and whitelisting new IPs.
 
 **Verify (Phase 1 overall):** `fly auth whoami` shows your email; `fly orgs list` shows the org; `fly platform regions` includes the chosen region; card added; cyberfolks DB + user exist and the connection details (including port and TLS answer) are in the password manager; domain/DNS access confirmed.
@@ -182,12 +182,12 @@ Goal: prove PHP 8.4 + Symfony 8.1 runs in prod mode behind nginx in one containe
 
 ## Phase 3 - Fly app creation and `fly.toml` (AGENT writes, HUMAN creates)
 
-- [x] **HUMAN/AGENT** (app `10xdevs-home-library` exists, owner personal, region fra; `fly.toml` in repo) `fly launch --no-deploy --name 10xdevs-home-library --region <waw|fra> --no-db --dockerfile Dockerfile` (flags *(verified)*); add `--copy-config` if a `fly.toml` already exists; answer **No** to any offer to create a database, Redis, or overwrite the Dockerfile; use `--no-github-workflow` to avoid a generated workflow (we write our own) *(verified flag)*.
+- [x] **HUMAN/AGENT** (app `10xdevs-home-library` exists, owner personal, region fra; `fly.toml` in repo) `fly launch --no-deploy --name 10xdevs-home-library --region fra --no-db --dockerfile Dockerfile` (flags *(verified)*); add `--copy-config` if a `fly.toml` already exists; answer **No** to any offer to create a database, Redis, or overwrite the Dockerfile; use `--no-github-workflow` to avoid a generated workflow (we write our own) *(verified flag)*.
 - [x] Edit `fly.toml` (written to repo root; DEFAULT_URI temporarily the fly.dev host):
 
 ```toml
 app = "10xdevs-home-library"
-primary_region = "fra"   # or "waw" per D6
+primary_region = "fra"   # decided in D6
 
 [build]
   dockerfile = "Dockerfile"
