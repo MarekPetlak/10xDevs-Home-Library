@@ -16,6 +16,16 @@ final class HomeControllerTest extends WebTestCase
         self::assertResponseStatusCodeSame(200);
     }
 
+    public function testAnonymousHomeShowsLoginLinkAndNoPersonalData(): void
+    {
+        $client = static::createClient();
+        $client->request('GET', '/');
+
+        self::assertSelectorExists('a[href="/login"]');
+        self::assertSelectorNotExists('a[href*="/logout"]');
+        self::assertSelectorTextNotContains('body', '@');
+    }
+
     public function testLayoutIsPolishAndLoadsBootstrap(): void
     {
         $client = static::createClient();

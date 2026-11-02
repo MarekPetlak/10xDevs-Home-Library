@@ -359,29 +359,29 @@ Two migrations reach production through `release_command`: `user`, then `session
 
 #### Automated
 
-- [x] 2.1 Tests pass: `php bin/phpunit`
-- [x] 2.2 Assets install and compile (`importmap:install`, `asset-map:compile --env=prod`)
-- [x] 2.3 Bootstrap appears in `debug:asset-map`
+- [x] 2.1 Tests pass: `php bin/phpunit` — 64035a0
+- [x] 2.2 Assets install and compile (`importmap:install`, `asset-map:compile --env=prod`) — 64035a0
+- [x] 2.3 Bootstrap appears in `debug:asset-map` — 64035a0
 
 #### Manual
 
-- [x] 2.4 `/` renders styled in Polish at desktop and narrow widths with no console errors
-- [x] 2.5 `/healthz` still returns `ok`
+- [x] 2.4 `/` renders styled in Polish at desktop and narrow widths with no console errors — 64035a0
+- [x] 2.5 `/healthz` still returns `ok` — 64035a0
 
 ### Phase 3: Login, logout, throttling and database sessions
 
 #### Automated
 
-- [ ] 3.1 Tests pass: `php bin/phpunit`
-- [ ] 3.2 Both migrations apply to an empty DB
-- [ ] 3.3 Schema validate and migrations diff are clean with the sessions table ignored
-- [ ] 3.4 Container lints: `php bin/console lint:container`
+- [x] 3.1 Tests pass: `php bin/phpunit`
+- [x] 3.2 Both migrations apply to an empty DB
+- [x] 3.3 Schema validate and migrations diff are clean with the sessions table ignored
+- [x] 3.4 Container lints: `php bin/console lint:container`
 
 #### Manual
 
-- [ ] 3.5 Local sign-in shows the greeting and logout, and a `sessions` row exists
-- [ ] 3.6 Restarting the dev server keeps the browser signed in
-- [ ] 3.7 Six wrong passwords trigger throttling and never reveal whether the e-mail exists
+- [x] 3.5 Local sign-in shows the greeting and logout, and a `sessions` row exists
+- [x] 3.6 Restarting the dev server keeps the browser signed in
+- [x] 3.7 Six wrong passwords trigger throttling and never reveal whether the e-mail exists
 
 ### Phase 4: Production verification and documentation
 

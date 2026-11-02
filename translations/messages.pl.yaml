@@ -2,8 +2,18 @@ app:
     name: Moja domowa biblioteka
 home:
     title: Strona główna
+    greeting: 'Cześć, %email%!'
     welcome:
         heading: Witaj w domowej bibliotece
         lead: Przeglądaj książki i zarządzaj domową biblioteką w jednym miejscu.
 nav:
     toggle: Przełącz nawigację
+security:
+    login:
+        title: Logowanie
+        heading: Zaloguj się
+        email: Adres e-mail
+        password: Hasło
+        submit: Zaloguj
+        error: Nieprawidłowy adres e-mail lub hasło.
+    logout: Wyloguj
