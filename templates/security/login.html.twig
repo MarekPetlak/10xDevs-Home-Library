@@ -1,0 +1,28 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ 'security.login.title'|trans }} - {{ parent() }}{% endblock %}
+
+{% block body_content %}
+    <div class="row justify-content-center">
+        <div class="col-md-6 col-lg-4">
+            <h1 class="h3 mb-3">{{ 'security.login.heading'|trans }}</h1>
+
+            {% if error %}
+                <div class="alert alert-danger" role="alert">{% if error.messageKey starts with 'Too many' %}{{ error.messageKey|trans(error.messageData, 'security') }}{% else %}{{ 'security.login.error'|trans }}{% endif %}</div>
+            {% endif %}
+
+            <form method="post" action="{{ path('app_login') }}">
+                <div class="mb-3">
+                    <label for="login-email" class="form-label">{{ 'security.login.email'|trans }}</label>
+                    <input type="email" id="login-email" name="_username" value="{{ last_username }}" class="form-control" autocomplete="email" required autofocus>
+                </div>
+                <div class="mb-3">
+                    <label for="login-password" class="form-label">{{ 'security.login.password'|trans }}</label>
+                    <input type="password" id="login-password" name="_password" class="form-control" autocomplete="current-password" required>
+                </div>
+                <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+                <button type="submit" class="btn btn-primary">{{ 'security.login.submit'|trans }}</button>
+            </form>
+        </div>
+    </div>
+{% endblock %}

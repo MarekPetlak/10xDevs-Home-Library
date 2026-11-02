@@ -19,5 +19,13 @@ services:
     App\:
         resource: '../src/'
 
+    # Sessions live in MariaDB and reuse the app's single native PDO connection
+    # (cyberfolks limits outside connections per user).
+    session.handler.pdo:
+        class: Symfony\Component\HttpFoundation\Session\Storage\Handler\PdoSessionHandler
+        arguments:
+            - '@=service("doctrine.dbal.default_connection").getNativeConnection()'
+            - { db_table: sessions }
+
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones

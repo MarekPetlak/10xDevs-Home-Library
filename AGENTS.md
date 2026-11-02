@@ -8,13 +8,14 @@
 - Anonymous users may only browse and search books (FR-003). Everything else requires login. There is no self-registration; the owner creates accounts.
 - The duplicate check (FR-005) compares title + author (case and surrounding whitespace ignored) and ISBN. It only warns; the adding user decides.
 - Recommendations follow "Business Logic" in @context/foundation/prd.md: at most three, never user-taste similarity (Non-Goal).
-- `config/packages/security.yaml` still has the `users_in_memory` placeholder provider. Replace it with an entity provider before adding any login feature.
+- Auth is form login (e-mail + password, CSRF, throttled at 5 attempts) on the `app_user_provider` entity provider (`App\Entity\User`); logout is CSRF-protected. No remember-me.
+- Sessions live in the `sessions` table (`PdoSessionHandler` on the shared DBAL connection, dev and prod; tests use `mock_file`). The table is created by a migration and hidden from Doctrine by `dbal.schema_filter`; never model it as an entity.
 - Use `declare(strict_types=1);` and typed properties in all PHP files under `src/` and `tests/`.
 - Never edit `context/archive/` or `context/foundation/archive/`.
 
 ## Project Structure
 
-- `src/Controller`, `src/Entity`, `src/Repository`: empty so far (namespace `App\`).
+- `src/Controller`, `src/Entity`, `src/Repository`, `src/Service`, `src/Command` (namespace `App\`): so far `User`, `UserManager`, the account commands and the home, login and health controllers.
 - `templates/` (Twig), `assets/` + `importmap.php` (AssetMapper; no Node or bundler, add JS packages with `bin/console importmap:require`).
 - `migrations/`: schema changes go through migrations only.
 - `context/`: planning artifacts for the 10x workflow.
@@ -24,7 +25,8 @@
 - `docker compose up -d database mailer`: MariaDB 10.11 on host port 3307 (matches `DATABASE_URL` in `.env`) and Mailpit.
 - `symfony serve -d`: dev server.
 - `bin/console make:migration`, then `bin/console doctrine:migrations:migrate`: never `doctrine:schema:update`.
-- `bin/phpunit`: tests (`phpunit.dist.xml` fails on deprecations, notices and warnings).
+- `bin/phpunit`: tests; need `docker compose up -d database` and use the root `DATABASE_URL` from `.env.test` (creates `app_test`); never the production/cyberfolks DB (`phpunit.dist.xml` fails on deprecations, notices and warnings).
+- `bin/console app:user:create <email>` and `bin/console app:user:change-password <email>`: the owner's account tools. The password is asked through a hidden prompt (twice, minimum 8 characters); there is no password argument. On Fly use a real terminal: `fly ssh console -a 10xdevs-home-library --pty -C "php bin/console app:user:create <email>"`.
 - `composer audit`: the only dependency audit; none runs automatically.
 
 ## Conventions
