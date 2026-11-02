@@ -1,0 +1,9 @@
+app:
+    name: Moja domowa biblioteka
+home:
+    title: Strona główna
+    welcome:
+        heading: Witaj w domowej bibliotece
+        lead: Przeglądaj książki i zarządzaj domową biblioteką w jednym miejscu.
+nav:
+    toggle: Przełącz nawigację

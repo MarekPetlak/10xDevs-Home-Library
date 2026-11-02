@@ -345,28 +345,28 @@ Two migrations reach production through `release_command`: `user`, then `session
 
 #### Automated
 
-- [x] 1.1 Migration applies to an empty test DB and mapping is in sync (`doctrine:schema:validate`)
-- [x] 1.2 Tests pass: `php bin/phpunit`
-- [x] 1.3 Container lints and the `users_in_memory` provider is gone from `security.yaml`
+- [x] 1.1 Migration applies to an empty test DB and mapping is in sync (`doctrine:schema:validate`) — b35dea0
+- [x] 1.2 Tests pass: `php bin/phpunit` — b35dea0
+- [x] 1.3 Container lints and the `users_in_memory` provider is gone from `security.yaml` — b35dea0
 
 #### Manual
 
-- [x] 1.4 `app:user:create` asks for a hidden password, rejects short ones and stores a hash
-- [x] 1.5 `app:user:change-password` works for an existing e-mail and fails clearly for an unknown one
-- [ ] 1.6 CI `test` job passes on the PR with the create-database and migrate steps
+- [x] 1.4 `app:user:create` asks for a hidden password, rejects short ones and stores a hash — b35dea0
+- [x] 1.5 `app:user:change-password` works for an existing e-mail and fails clearly for an unknown one — b35dea0
+- [x] 1.6 CI `test` job passes on the PR with the create-database and migrate steps — b35dea0
 
 ### Phase 2: Layout, Polish locale and public home page
 
 #### Automated
 
-- [ ] 2.1 Tests pass: `php bin/phpunit`
-- [ ] 2.2 Assets install and compile (`importmap:install`, `asset-map:compile --env=prod`)
-- [ ] 2.3 Bootstrap appears in `debug:asset-map`
+- [x] 2.1 Tests pass: `php bin/phpunit`
+- [x] 2.2 Assets install and compile (`importmap:install`, `asset-map:compile --env=prod`)
+- [x] 2.3 Bootstrap appears in `debug:asset-map`
 
 #### Manual
 
-- [ ] 2.4 `/` renders styled in Polish at desktop and narrow widths with no console errors
-- [ ] 2.5 `/healthz` still returns `ok`
+- [x] 2.4 `/` renders styled in Polish at desktop and narrow widths with no console errors
+- [x] 2.5 `/healthz` still returns `ok`
 
 ### Phase 3: Login, logout, throttling and database sessions
 

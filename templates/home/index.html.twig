@@ -1,0 +1,10 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ 'home.title'|trans }} - {{ parent() }}{% endblock %}
+
+{% block body_content %}
+    <div class="py-5 text-center">
+        <h1 class="display-5">{{ 'home.welcome.heading'|trans }}</h1>
+        <p class="lead">{{ 'home.welcome.lead'|trans }}</p>
+    </div>
+{% endblock %}
