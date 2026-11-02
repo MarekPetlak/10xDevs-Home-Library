@@ -372,24 +372,24 @@ Two migrations reach production through `release_command`: `user`, then `session
 
 #### Automated
 
-- [x] 3.1 Tests pass: `php bin/phpunit`
-- [x] 3.2 Both migrations apply to an empty DB
-- [x] 3.3 Schema validate and migrations diff are clean with the sessions table ignored
-- [x] 3.4 Container lints: `php bin/console lint:container`
+- [x] 3.1 Tests pass: `php bin/phpunit` — c4e785c
+- [x] 3.2 Both migrations apply to an empty DB — c4e785c
+- [x] 3.3 Schema validate and migrations diff are clean with the sessions table ignored — c4e785c
+- [x] 3.4 Container lints: `php bin/console lint:container` — c4e785c
 
 #### Manual
 
-- [x] 3.5 Local sign-in shows the greeting and logout, and a `sessions` row exists
-- [x] 3.6 Restarting the dev server keeps the browser signed in
-- [x] 3.7 Six wrong passwords trigger throttling and never reveal whether the e-mail exists
+- [x] 3.5 Local sign-in shows the greeting and logout, and a `sessions` row exists — c4e785c
+- [x] 3.6 Restarting the dev server keeps the browser signed in — c4e785c
+- [x] 3.7 Six wrong passwords trigger throttling and never reveal whether the e-mail exists — c4e785c
 
 ### Phase 4: Production verification and documentation
 
 #### Automated
 
-- [ ] 4.1 Full test suite passes on the final tree
-- [ ] 4.2 `docker build` succeeds from the clean tree
-- [ ] 4.3 `AGENTS.md` no longer contains `users_in_memory`
+- [x] 4.1 Full test suite passes on the final tree
+- [x] 4.2 `docker build` succeeds from the clean tree
+- [x] 4.3 `AGENTS.md` no longer contains `users_in_memory`
 
 #### Manual
 
