@@ -24,7 +24,7 @@
 - `docker compose up -d database mailer`: MariaDB 10.11 on host port 3307 (matches `DATABASE_URL` in `.env`) and Mailpit.
 - `symfony serve -d`: dev server.
 - `bin/console make:migration`, then `bin/console doctrine:migrations:migrate`: never `doctrine:schema:update`.
-- `bin/phpunit`: tests (`phpunit.dist.xml` fails on deprecations, notices and warnings).
+- `bin/phpunit`: tests; need `docker compose up -d database` and use the root `DATABASE_URL` from `.env.test` (creates `app_test`); never the production/cyberfolks DB (`phpunit.dist.xml` fails on deprecations, notices and warnings).
 - `composer audit`: the only dependency audit; none runs automatically.
 
 ## Conventions
