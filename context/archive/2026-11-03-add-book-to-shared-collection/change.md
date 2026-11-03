@@ -1,10 +1,10 @@
 ---
 change_id: add-book-to-shared-collection
 title: Add book to shared collection (roadmap S-02)
-status: implemented
+status: archived
 created: 2026-11-03
 updated: 2026-11-03
-archived_at: null
+archived_at: 2026-11-03T20:04:23Z
 ---
 
 ## Notes

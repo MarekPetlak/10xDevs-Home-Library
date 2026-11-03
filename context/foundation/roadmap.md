@@ -42,7 +42,7 @@ Użytkownik nie pamięta, jakie książki ma w domowej bibliotece i które przec
 | ID    | Change ID                      | Outcome (user can …)                                                    | Prerequisites | PRD refs      | Status   |
 | ----- | ------------------------------ | ----------------------------------------------------------------------- | ------------- | ------------- | -------- |
 | S-01  | sign-in-household-accounts     | user can sign in with e-mail and password and see the logged-in home page | —             | FR-001, US-01 | done |
-| S-02  | add-book-to-shared-collection  | user can add a book to the shared collection                            | S-01          | FR-004, US-01 | in-progress |
+| S-02  | add-book-to-shared-collection  | user can add a book to the shared collection                            | S-01          | FR-004, US-01 | done |
 | S-03  | rate-read-book                 | user can mark a book as read and rate it 1–5                            | S-02          | FR-008, US-01 | proposed |
 | S-04  | home-recommendations           | user can see up to three recommended books on the home page             | S-03          | FR-010, US-01 | proposed |
 | S-05  | browse-and-search-books        | anyone can browse and search books by title, author and category        | S-02          | FR-003        | proposed |
@@ -94,7 +94,7 @@ Brak. Warstwy oznaczone w Baseline jako `partial` (dane, auth, interfejs) są wp
   - Czym jest „rok” w polach książki — rok dodania czy rok wydania — Owner: user. Block: no. Resolved: rok wydania, wymagany.
   - Do czego służą tagi i notatka książki i czy to must-have w MVP — Owner: user. Block: no. Resolved: tagi jako encje (do pięciu); notatka książki wypada, notatki czytelników patrz pytanie 11.
 - **Risk:** Wprowadza encję książki i kategorię, od której zależy reguła rekomendacji, dlatego kategorie muszą być rozstrzygnięte przed planowaniem; to najdłuższa gałąź prowadząca do north star.
-- **Status:** in-progress
+- **Status:** done
 
 ### S-03: Oznaczanie jako przeczytana i ocena
 
@@ -221,3 +221,4 @@ Brak. Warstwy oznaczone w Baseline jako `partial` (dane, auth, interfejs) są wp
 (Empty on first generation. `/10x-archive` appends an entry here — and flips that item's `Status` to `done` — when a change whose `Change ID` matches the item is archived.)
 
 - **S-01: user can sign in with e-mail and password and see the logged-in home page (konta zakłada właściciel ręcznie; niezalogowany nie ma dostępu do funkcji osobistych).** — Archived 2026-11-03 → `context/archive/2026-11-02-sign-in-household-accounts/`. Lesson: —.
+- **S-02: user can add a book to the shared collection (tytuł i autor wymagane i walidowane, ISBN, rok, notatka, kategoria, do około pięciu tagów).** — Archived 2026-11-03 → `context/archive/2026-11-03-add-book-to-shared-collection/`. Lesson: —.
