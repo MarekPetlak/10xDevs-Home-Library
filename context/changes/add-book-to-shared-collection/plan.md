@@ -336,12 +336,12 @@ One migration reaches production through `release_command`; it only creates tabl
 
 #### Automated
 
-- [x] 3.1 Full test suite passes on the final tree
-- [x] 3.2 `docker build` succeeds from the clean tree
-- [x] 3.3 `AGENTS.md` mentions `App\Enum\Category`
+- [x] 3.1 Full test suite passes on the final tree — ba1cee1
+- [x] 3.2 `docker build` succeeds from the clean tree — ba1cee1
+- [x] 3.3 `AGENTS.md` mentions `App\Enum\Category` — ba1cee1
 
 #### Manual
 
-- [ ] 3.4 PR green, merged by the human, deploy finished, `fly releases --image` shows a new complete release
-- [ ] 3.5 `doctrine:migrations:status` on Fly shows the book migration executed
-- [ ] 3.6 A book is added on production, a same author in different case reuses one author row, signed-out access redirects to login and `/healthz` is 200
+- [x] 3.4 PR green, merged by the human, deploy finished, `fly releases --image` shows a new complete release — ba1cee1
+- [x] 3.5 `doctrine:migrations:status` on Fly shows the book migration executed — ba1cee1
+- [x] 3.6 A book is added on production, a same author in different case reuses one author row, signed-out access redirects to login and `/healthz` is 200 — ba1cee1
