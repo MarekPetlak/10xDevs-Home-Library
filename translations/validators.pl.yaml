@@ -1,0 +1,10 @@
+book:
+    authors:
+        required: Podaj co najmniej jednego autora.
+        single_word: 'Autor „{{ author }}” musi mieć imię i nazwisko.'
+        too_long: 'Imię autora „{{ author }}” może mieć do 100 znaków, a nazwisko do 150.'
+    tags:
+        too_many: 'Możesz podać najwyżej {{ limit }} tagów.'
+        too_long: 'Tag „{{ tag }}” jest za długi (najwyżej {{ limit }} znaków).'
+    year:
+        invalid: 'Podaj rok z zakresu od {{ min }} do {{ max }}.'

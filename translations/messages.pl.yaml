@@ -8,6 +8,7 @@ home:
         lead: Przeglądaj książki i zarządzaj domową biblioteką w jednym miejscu.
 nav:
     toggle: Przełącz nawigację
+    book_new: Dodaj książkę
 security:
     login:
         title: Logowanie
@@ -17,3 +18,33 @@ security:
         submit: Zaloguj
         error: Nieprawidłowy adres e-mail lub hasło.
     logout: Wyloguj
+book:
+    new:
+        title: Dodaj książkę
+        heading: Dodaj książkę do wspólnej kolekcji
+    form:
+        title: Tytuł
+        authors: Autorzy
+        authors_help: imię i nazwisko, oddziel autorów przecinkami
+        isbn: ISBN
+        publication_year: Rok wydania
+        category: Kategoria
+        category_placeholder: Wybierz kategorię
+        tags: Tagi
+        tags_help: do pięciu, oddzielone przecinkami
+        description: Opis
+        submit: Zapisz książkę
+    flash:
+        added: Książka została dodana do kolekcji.
+    category:
+        novel: Powieść
+        crime: Kryminał
+        fantasy: Fantastyka
+        non-fiction: Literatura faktu
+        biography: Biografia
+        history: Historia
+        science: Nauka
+        self-help: Poradnik
+        children: Dla dzieci
+        poetry: Poezja
+        other: Inne

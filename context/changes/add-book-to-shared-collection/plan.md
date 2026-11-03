@@ -170,7 +170,15 @@ Add the login-protected `/books/new` page, its form and the service that turns v
 
 **Contract**: `messages.pl.yaml` gets `book.new.title`, `book.new.heading`, field labels, help texts, the submit label, `book.flash.added`, the nav label and `book.category.<value>` for every enum case. `validators.pl.yaml` holds the custom constraint messages (authors required, too many tags, tag too long, invalid year); built-in constraints (not blank, ISBN, length) already ship Polish translations.
 
-#### 6. Tests
+#### 6. Session handler lock mode (found during manual verification)
+
+**File**: `config/services.yaml`
+
+**Intent**: Let Doctrine transactions work in dev and prod. The `PdoSessionHandler` shares the native PDO connection with Doctrine, and its default transactional lock opens a PDO transaction on it, so any `wrapInTransaction` in a request failed with "There is already an active transaction". The tests could not catch this because they use `mock_file` sessions.
+
+**Contract**: The `session.handler.pdo` options get `lock_mode: LOCK_NONE`. Tradeoff: two simultaneous requests from one browser can overwrite each other's session writes, which is acceptable for 2-4 users.
+
+#### 7. Tests
 
 **File**: `tests/Service/NameListTest.php`, `tests/Service/BookManagerTest.php`, `tests/Controller/BookControllerTest.php`
 
@@ -216,7 +224,7 @@ Bring the repository docs in line with what was built and decided, then ship thr
 
 **Intent**: Keep the agent guide current for the next slices.
 
-**Contract**: Update the `src/` structure line to mention `Book`, `Author`, `Tag`, `Category`, `BookManager` and the add-book controller; add a short rule that categories live in `App\Enum\Category` (fixed list, change by code and deploy) and that authors and tags are reusable entities matched ignoring case.
+**Contract**: Update the `src/` structure line to mention `Book`, `Author`, `Tag`, `Category`, `BookManager` and the add-book controller; note that the session handler runs with `LOCK_NONE` because it shares the Doctrine connection; add a short rule that categories live in `App\Enum\Category` (fixed list, change by code and deploy) and that authors and tags are reusable entities matched ignoring case.
 
 #### 2. PRD and roadmap decisions
 
@@ -297,32 +305,32 @@ One migration reaches production through `release_command`; it only creates tabl
 
 #### Automated
 
-- [x] 1.1 Migration applies to an empty test DB and mapping is in sync (`doctrine:schema:validate`)
-- [x] 1.2 Migration diff is clean (`doctrine:migrations:diff` reports no changes)
-- [x] 1.3 Tests pass: `php bin/phpunit`
-- [x] 1.4 Container lints: `php bin/console lint:container`
+- [x] 1.1 Migration applies to an empty test DB and mapping is in sync (`doctrine:schema:validate`) — 26d9612
+- [x] 1.2 Migration diff is clean (`doctrine:migrations:diff` reports no changes) — 26d9612
+- [x] 1.3 Tests pass: `php bin/phpunit` — 26d9612
+- [x] 1.4 Container lints: `php bin/console lint:container` — 26d9612
 
 #### Manual
 
-- [x] 1.5 Local dev DB migrate creates the five tables and `down` removes them
-- [ ] 1.6 Draft PR opened into `main` and the CI `test` job passes with the new migration
+- [x] 1.5 Local dev DB migrate creates the five tables and `down` removes them — 26d9612
+- [x] 1.6 Draft PR opened into `main` and the CI `test` job passes with the new migration
 
 ### Phase 2: Add-book form and flow
 
 #### Automated
 
-- [ ] 2.1 Tests pass: `php bin/phpunit`
-- [ ] 2.2 Container lints: `php bin/console lint:container`
-- [ ] 2.3 Route `book_new` is registered (`debug:router book_new`)
-- [ ] 2.4 Schema stays clean (`doctrine:schema:validate --env=test`)
+- [x] 2.1 Tests pass: `php bin/phpunit`
+- [x] 2.2 Container lints: `php bin/console lint:container`
+- [x] 2.3 Route `book_new` is registered (`debug:router book_new`)
+- [x] 2.4 Schema stays clean (`doctrine:schema:validate --env=test`)
 
 #### Manual
 
-- [ ] 2.5 Signed-in user adds a book with two authors, three tags and a description; success message shown and rows exist in the dev DB
-- [ ] 2.6 Empty submit, missing year and bad ISBN show Polish errors, save nothing and keep entered values
-- [ ] 2.7 An author spelled in a different case reuses the existing author row
-- [ ] 2.8 Signed out `/books/new` redirects to login and the navbar link shows only when signed in
-- [ ] 2.9 The form is usable and Bootstrap-styled at narrow width
+- [x] 2.5 Signed-in user adds a book with two authors, three tags and a description; success message shown and rows exist in the dev DB
+- [x] 2.6 Empty submit, missing year and bad ISBN show Polish errors, save nothing and keep entered values
+- [x] 2.7 An author spelled in a different case reuses the existing author row
+- [x] 2.8 Signed out `/books/new` redirects to login and the navbar link shows only when signed in
+- [x] 2.9 The form is usable and Bootstrap-styled at narrow width
 
 ### Phase 3: Docs sync and production check
 
