@@ -387,13 +387,13 @@ Two migrations reach production through `release_command`: `user`, then `session
 
 #### Automated
 
-- [x] 4.1 Full test suite passes on the final tree
-- [x] 4.2 `docker build` succeeds from the clean tree
-- [x] 4.3 `AGENTS.md` no longer contains `users_in_memory`
+- [x] 4.1 Full test suite passes on the final tree — ba797cb
+- [x] 4.2 `docker build` succeeds from the clean tree — ba797cb
+- [x] 4.3 `AGENTS.md` no longer contains `users_in_memory` — ba797cb
 
 #### Manual
 
-- [ ] 4.4 PR green, merged by the human, deploy finished, `fly releases` shows a new complete release
-- [ ] 4.5 First production account created via `fly ssh console`
-- [ ] 4.6 Production sign-in works, `/healthz` is 200 and http redirects to https
-- [ ] 4.7 The browser stays signed in after a redeploy or restart
+- [x] 4.4 PR green, merged by the human, deploy finished, `fly releases` shows a new complete release — ba797cb
+- [x] 4.5 First production account created via `fly ssh console` — ba797cb
+- [x] 4.6 Production sign-in works, `/healthz` is 200 and http redirects to https — ba797cb
+- [x] 4.7 The browser stays signed in after a redeploy or restart — ba797cb
