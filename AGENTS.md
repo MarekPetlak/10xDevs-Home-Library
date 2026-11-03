@@ -9,13 +9,14 @@
 - The duplicate check (FR-005) compares title + author (case and surrounding whitespace ignored) and ISBN. It only warns; the adding user decides.
 - Recommendations follow "Business Logic" in @context/foundation/prd.md: at most three, never user-taste similarity (Non-Goal).
 - Auth is form login (e-mail + password, CSRF, throttled at 5 attempts) on the `app_user_provider` entity provider (`App\Entity\User`); logout is CSRF-protected. No remember-me.
-- Sessions live in the `sessions` table (`PdoSessionHandler` on the shared DBAL connection, dev and prod; tests use `mock_file`). The table is created by a migration and hidden from Doctrine by `dbal.schema_filter`; never model it as an entity.
+- Sessions live in the `sessions` table (`PdoSessionHandler` on the shared DBAL connection, dev and prod; tests use `mock_file`). The table is created by a migration and hidden from Doctrine by `dbal.schema_filter`; never model it as an entity. The handler runs with `lock_mode: LOCK_NONE` (`config/services.yaml`) because it shares the Doctrine connection: the default transactional lock opens a PDO transaction and breaks Doctrine's `wrapInTransaction`.
+- Book categories live in `App\Enum\Category`: a fixed list with English-named values, Polish labels are translations `book.category.<value>`; change the list by code and deploy. Authors (first name + last name, both required) and tags are reusable entities matched ignoring case through an explicit `utf8mb4_unicode_ci` column collation (also accent-insensitive).
 - Use `declare(strict_types=1);` and typed properties in all PHP files under `src/` and `tests/`.
 - Never edit `context/archive/` or `context/foundation/archive/`.
 
 ## Project Structure
 
-- `src/Controller`, `src/Entity`, `src/Repository`, `src/Service`, `src/Command` (namespace `App\`): so far `User`, `UserManager`, the account commands and the home, login and health controllers.
+- `src/Controller`, `src/Entity`, `src/Repository`, `src/Service`, `src/Command`, `src/Enum`, `src/Dto`, `src/Form` (namespace `App\`): so far `User`, `UserManager`, the account commands, `Book`, `Author`, `Tag`, `Category` (enum in `src/Enum`), `BookManager`, `NameList`, the `NewBook` DTO with the `BookType` form, the add-book controller (`/books/new`) and the home, login and health controllers.
 - `templates/` (Twig), `assets/` + `importmap.php` (AssetMapper; no Node or bundler, add JS packages with `bin/console importmap:require`).
 - `migrations/`: schema changes go through migrations only.
 - `context/`: planning artifacts for the 10x workflow.
@@ -25,7 +26,7 @@
 - `docker compose up -d database mailer`: MariaDB 10.11 on host port 3307 (matches `DATABASE_URL` in `.env`) and Mailpit.
 - `symfony serve -d`: dev server.
 - `bin/console make:migration`, then `bin/console doctrine:migrations:migrate`: never `doctrine:schema:update`.
-- `bin/phpunit`: tests; need `docker compose up -d database` and use the root `DATABASE_URL` from `.env.test` (creates `app_test`); never the production/cyberfolks DB (`phpunit.dist.xml` fails on deprecations, notices and warnings).
+- `bin/phpunit`: tests; need `docker compose up -d database` and use the root `DATABASE_URL` from `.env.test` (creates `app_test`); each test runs in a rolled-back transaction via `dama/doctrine-test-bundle`; never the production/cyberfolks DB (`phpunit.dist.xml` fails on deprecations, notices and warnings).
 - `bin/console app:user:create <email>` and `bin/console app:user:change-password <email>`: the owner's account tools. The password is asked through a hidden prompt (twice, minimum 8 characters); there is no password argument. On Fly use a real terminal: `fly ssh console -a 10xdevs-home-library --pty -C "php bin/console app:user:create <email>"`.
 - `composer audit`: the only dependency audit; none runs automatically.
 

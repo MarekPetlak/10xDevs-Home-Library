@@ -313,32 +313,32 @@ One migration reaches production through `release_command`; it only creates tabl
 #### Manual
 
 - [x] 1.5 Local dev DB migrate creates the five tables and `down` removes them — 26d9612
-- [x] 1.6 Draft PR opened into `main` and the CI `test` job passes with the new migration
+- [x] 1.6 Draft PR opened into `main` and the CI `test` job passes with the new migration — 26dcf8c
 
 ### Phase 2: Add-book form and flow
 
 #### Automated
 
-- [x] 2.1 Tests pass: `php bin/phpunit`
-- [x] 2.2 Container lints: `php bin/console lint:container`
-- [x] 2.3 Route `book_new` is registered (`debug:router book_new`)
-- [x] 2.4 Schema stays clean (`doctrine:schema:validate --env=test`)
+- [x] 2.1 Tests pass: `php bin/phpunit` — 26dcf8c
+- [x] 2.2 Container lints: `php bin/console lint:container` — 26dcf8c
+- [x] 2.3 Route `book_new` is registered (`debug:router book_new`) — 26dcf8c
+- [x] 2.4 Schema stays clean (`doctrine:schema:validate --env=test`) — 26dcf8c
 
 #### Manual
 
-- [x] 2.5 Signed-in user adds a book with two authors, three tags and a description; success message shown and rows exist in the dev DB
-- [x] 2.6 Empty submit, missing year and bad ISBN show Polish errors, save nothing and keep entered values
-- [x] 2.7 An author spelled in a different case reuses the existing author row
-- [x] 2.8 Signed out `/books/new` redirects to login and the navbar link shows only when signed in
-- [x] 2.9 The form is usable and Bootstrap-styled at narrow width
+- [x] 2.5 Signed-in user adds a book with two authors, three tags and a description; success message shown and rows exist in the dev DB — 26dcf8c
+- [x] 2.6 Empty submit, missing year and bad ISBN show Polish errors, save nothing and keep entered values — 26dcf8c
+- [x] 2.7 An author spelled in a different case reuses the existing author row — 26dcf8c
+- [x] 2.8 Signed out `/books/new` redirects to login and the navbar link shows only when signed in — 26dcf8c
+- [x] 2.9 The form is usable and Bootstrap-styled at narrow width — 26dcf8c
 
 ### Phase 3: Docs sync and production check
 
 #### Automated
 
-- [ ] 3.1 Full test suite passes on the final tree
-- [ ] 3.2 `docker build` succeeds from the clean tree
-- [ ] 3.3 `AGENTS.md` mentions `App\Enum\Category`
+- [x] 3.1 Full test suite passes on the final tree
+- [x] 3.2 `docker build` succeeds from the clean tree
+- [x] 3.3 `AGENTS.md` mentions `App\Enum\Category`
 
 #### Manual
 
