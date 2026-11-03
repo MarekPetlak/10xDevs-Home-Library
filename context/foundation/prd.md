@@ -1,6 +1,6 @@
 ---
 project: "My home library"
-version: 1
+version: 2
 status: draft
 created: 2026-10-16
 context_type: greenfield
@@ -16,6 +16,8 @@ timeline_budget:
 ---
 
 # My home library — PRD
+
+> Wersja 2 (2026-11-03): FR-004 uściślony po rozstrzygnięciu Open Questions 1, 2, 3 i 6 (bez notatki książki, opcjonalny opis, autorzy i tagi jako encje, rok wydania, stała lista kategorii, ISBN wymagany).
 
 ## Vision & Problem Statement
 
@@ -70,7 +72,7 @@ Rejestracja (samodzielne zakładanie konta) wypadła z MVP: konta zakłada wła�
 ### Książki
 
 - FR-003: Każdy użytkownik, także niezalogowany, może przeglądać i wyszukiwać książki (tytuł, autor, kategoria). Priority: must-have
-- FR-004: Zalogowany użytkownik może dodać książkę do wspólnego zbioru, wpisując tytuł, autora lub autorów, numer ISBN i rok, krótką notatkę, wybierając kategorię oraz dodając do około pięciu tagów. Tytuł i autor są polami wymaganymi i podlegają walidacji. Priority: must-have
+- FR-004: Zalogowany użytkownik może dodać książkę do wspólnego zbioru, wpisując tytuł, autora lub autorów (autorzy są encjami: imię i nazwisko), numer ISBN i rok wydania, opcjonalny opis (widoczny dla wszystkich, oddzielny od notatek czytelników), wybierając kategorię ze stałej listy oraz dodając do pięciu tagów (tagi są encjami). Tytuł, autor, ISBN i rok wydania są polami wymaganymi; tytuł, autor i ISBN podlegają walidacji. Priority: must-have
   > Socrates: Counter-argument considered: "każdy może dodać wpis o błędnym tytule lub autorze." Resolution: kept; pola tytuł i autor wymagane i walidowane, a przy porównywaniu duplikatów ignorowane są wielkość liter i zbędne spacje.
 - FR-005: System wyświetla informację przed dodaniem książki, jeśli jest ona duplikatem. Porównanie opiera się na tytule i autorze (z pominięciem wielkości liter i zbędnych spacji) oraz na kodzie ISBN wpisanym przez użytkownika przy dodawaniu. Decyzja o dodaniu należy do użytkownika dodającego książkę. Priority: must-have
   > Socrates: Counter-argument considered: "różne wydania tej samej książki to prawdziwe duplikaty lub nie." Resolution: kept; użytkownik wpisuje przy dodawaniu kod ISBN, na podstawie którego również wykonywane jest porównanie.
@@ -131,11 +133,11 @@ Nierozstrzygnięte kwestie dostępu (zakładanie kont przez właściciela, los k
 
 ## Open Questions
 
-1. **Czym jest „rok” w polach książki** — rok dodania do zbioru czy rok wydania? — Owner: użytkownik.
-2. **Czy kategoria pochodzi ze stałej listy, czy jest wolnym tekstem, i jakie są kategorie?** Wybór wpływa na zliczanie „najczęściej czytanej” kategorii. — Owner: użytkownik. Block: yes (reguła rekomendacji zależy od spójnych kategorii).
-3. **Do czego służą tagi i notatka książki?** Reguła rekomendacji ich nie używa; są w FR-004 jako część wpisu. Czy to must-have w MVP? — Owner: użytkownik.
+1. **Czym jest „rok” w polach książki** — rok dodania do zbioru czy rok wydania? — Owner: użytkownik. Resolved: rok wydania, pole wymagane.
+2. **Czy kategoria pochodzi ze stałej listy, czy jest wolnym tekstem, i jakie są kategorie?** Wybór wpływa na zliczanie „najczęściej czytanej” kategorii. — Owner: użytkownik. Block: yes (reguła rekomendacji zależy od spójnych kategorii). Resolved: stała lista kategorii w kodzie (`App\Enum\Category`), zmiana przez kod i wdrożenie.
+3. **Do czego służą tagi i notatka książki?** Reguła rekomendacji ich nie używa; są w FR-004 jako część wpisu. Czy to must-have w MVP? — Owner: użytkownik. Resolved: tagi są encjami, do pięciu na książkę; notatka książki wypada z FR-004 (zastępują ją notatki czytelników, o których zdecyduje się później, patrz roadmapa, pytanie 11); dodano opcjonalny opis.
 4. **Jak właściciel zakłada konta i kto nim jest** (poza aplikacją czy ekran administracyjny). — Owner: użytkownik.
 5. **Co dzieje się z książkami, gdy konto ich autora zostanie usunięte.** — Owner: użytkownik.
-6. **Czy ISBN jest polem wymaganym i jak łączą się dopasowania po ISBN oraz po tytule i autorze** przy ostrzeżeniu o duplikacie. — Owner: użytkownik.
+6. **Czy ISBN jest polem wymaganym i jak łączą się dopasowania po ISBN oraz po tytule i autorze** przy ostrzeżeniu o duplikacie. — Owner: użytkownik. Resolved: ISBN jest polem wymaganym i walidowanym; zasady łączenia dopasowań w ostrzeżeniu o duplikacie wchodzą z S-06.
 7. **Jaki jest przewidywany ruch (qps)?** Pole `target_scale.qps` nie zostało podane w notatkach. — Owner: użytkownik.
 8. **Jaki jest przewidywany wolumen danych (data_volume)?** Pole `target_scale.data_volume` nie zostało podane w notatkach. — Owner: użytkownik.

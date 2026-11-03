@@ -4,7 +4,7 @@ version: 1
 status: draft
 created: 2026-11-02
 updated: 2026-11-03
-prd_version: 1
+prd_version: 2
 main_goal: speed
 top_blocker: decisions
 milestone_id: first-recommendation-flow
@@ -14,7 +14,7 @@ milestone_status: open
 
 # Roadmap: My home library
 
-> Derived from `context/foundation/prd.md` (v1) + auto-researched codebase baseline.
+> Derived from `context/foundation/prd.md` (v2) + auto-researched codebase baseline.
 > Edit-in-place; the next milestone continues this file. Archive only when an independent roadmap replaces it.
 > Slices below are listed in dependency order. The "At a glance" table is the index.
 
@@ -23,7 +23,7 @@ milestone_status: open
 **M-1: Pierwszy przepływ od logowania do rekomendacji** — Status: open
 
 - **Intent:** Zalogowany domownik przechodzi cały przepływ MVP z PRD: loguje się, dodaje książki do wspólnego zbioru (z ostrzeżeniem o duplikacie), oznacza je jako przeczytane, ocenia i widzi na stronie głównej do trzech rekomendacji. Rezultat jest wdrożony na produkcji.
-- **Source materials:** `context/foundation/prd.md` (v1)
+- **Source materials:** `context/foundation/prd.md` (v2)
 - **Done when:** every F-NN and S-NN below is `done`.
 - **Scope anchors:** FR-001, FR-003, FR-004, FR-005, FR-006, FR-007, FR-008, FR-010 (wszystkie must-have) oraz US-01.
 
@@ -42,7 +42,7 @@ Użytkownik nie pamięta, jakie książki ma w domowej bibliotece i które przec
 | ID    | Change ID                      | Outcome (user can …)                                                    | Prerequisites | PRD refs      | Status   |
 | ----- | ------------------------------ | ----------------------------------------------------------------------- | ------------- | ------------- | -------- |
 | S-01  | sign-in-household-accounts     | user can sign in with e-mail and password and see the logged-in home page | —             | FR-001, US-01 | done |
-| S-02  | add-book-to-shared-collection  | user can add a book to the shared collection                            | S-01          | FR-004, US-01 | blocked  |
+| S-02  | add-book-to-shared-collection  | user can add a book to the shared collection                            | S-01          | FR-004, US-01 | in-progress |
 | S-03  | rate-read-book                 | user can mark a book as read and rate it 1–5                            | S-02          | FR-008, US-01 | proposed |
 | S-04  | home-recommendations           | user can see up to three recommended books on the home page             | S-03          | FR-010, US-01 | proposed |
 | S-05  | browse-and-search-books        | anyone can browse and search books by title, author and category        | S-02          | FR-003        | proposed |
@@ -90,11 +90,11 @@ Brak. Warstwy oznaczone w Baseline jako `partial` (dane, auth, interfejs) są wp
 - **Parallel with:** —
 - **Blockers:** —
 - **Unknowns:**
-  - Czy kategoria pochodzi ze stałej listy, czy jest wolnym tekstem, i jakie są kategorie — Owner: user. Block: yes.
-  - Czym jest „rok” w polach książki — rok dodania czy rok wydania — Owner: user. Block: no.
-  - Do czego służą tagi i notatka książki i czy to must-have w MVP — Owner: user. Block: no.
+  - Czy kategoria pochodzi ze stałej listy, czy jest wolnym tekstem, i jakie są kategorie — Owner: user. Block: yes. Resolved: stała lista w `App\Enum\Category`.
+  - Czym jest „rok” w polach książki — rok dodania czy rok wydania — Owner: user. Block: no. Resolved: rok wydania, wymagany.
+  - Do czego służą tagi i notatka książki i czy to must-have w MVP — Owner: user. Block: no. Resolved: tagi jako encje (do pięciu); notatka książki wypada, notatki czytelników patrz pytanie 11.
 - **Risk:** Wprowadza encję książki i kategorię, od której zależy reguła rekomendacji, dlatego kategorie muszą być rozstrzygnięte przed planowaniem; to najdłuższa gałąź prowadząca do north star.
-- **Status:** blocked
+- **Status:** in-progress
 
 ### S-03: Oznaczanie jako przeczytana i ocena
 
@@ -104,7 +104,8 @@ Brak. Warstwy oznaczone w Baseline jako `partial` (dane, auth, interfejs) są wp
 - **Prerequisites:** S-02
 - **Parallel with:** S-05, S-06, S-07
 - **Blockers:** —
-- **Unknowns:** —
+- **Unknowns:**
+  - Notatki czytelników (wiele na książkę, publiczne lub prywatne wg autora notatki) razem z oceną — patrz Open Roadmap Question 11 — Owner: user. Block: no.
 - **Risk:** Data oznaczenia jako przeczytana jest wejściem reguły „ostatni rok”, więc musi być zapisywana od początku, a nie dopisywana później; błąd w izolacji ocen naruszyłby guardraile prywatności.
 - **Status:** proposed
 
@@ -176,7 +177,7 @@ Brak. Warstwy oznaczone w Baseline jako `partial` (dane, auth, interfejs) są wp
 | Roadmap ID | Change ID                     | Suggested issue title                                      | Ready for `/10x-plan` | Notes |
 | ---------- | ----------------------------- | ---------------------------------------------------------- | --------------------- | ----- |
 | S-01       | sign-in-household-accounts    | Logowanie kont domowników (e-mail + hasło)                 | yes                   | Run `/10x-plan sign-in-household-accounts` |
-| S-02       | add-book-to-shared-collection | Dodawanie książki do wspólnego zbioru                      | no                    | Najpierw rozstrzygnij kategorie (lista czy wolny tekst) |
+| S-02       | add-book-to-shared-collection | Dodawanie książki do wspólnego zbioru                      | yes                   | S-02 jest zaimplementowane w zmianie add-book-to-shared-collection |
 | S-03       | rate-read-book                | Oznaczanie książki jako przeczytanej i ocena 1–5           | no                    | Czeka na S-02 |
 | S-04       | home-recommendations          | Rekomendacje na stronie głównej (north star)               | no                    | Czeka na S-03 |
 | S-05       | browse-and-search-books       | Przeglądanie i wyszukiwanie książek                        | no                    | Czeka na S-02 |
@@ -186,16 +187,17 @@ Brak. Warstwy oznaczone w Baseline jako `partial` (dane, auth, interfejs) są wp
 
 ## Open Roadmap Questions
 
-1. **Czym jest „rok” w polach książki** — rok dodania do zbioru czy rok wydania? — Owner: user. Block: S-02.
-2. **Czy kategoria pochodzi ze stałej listy, czy jest wolnym tekstem, i jakie są kategorie?** Wybór wpływa na zliczanie „najczęściej czytanej” kategorii. — Owner: user. Block: S-02, S-04, S-05.
-3. **Do czego służą tagi i notatka książki?** Reguła rekomendacji ich nie używa; czy to must-have w MVP? — Owner: user. Block: S-02.
+1. **Czym jest „rok” w polach książki** — rok dodania do zbioru czy rok wydania? — Owner: user. Block: S-02. Resolved: rok wydania, pole wymagane.
+2. **Czy kategoria pochodzi ze stałej listy, czy jest wolnym tekstem, i jakie są kategorie?** Wybór wpływa na zliczanie „najczęściej czytanej” kategorii. — Owner: user. Block: S-02, S-04, S-05. Resolved: stała lista w kodzie (`App\Enum\Category`).
+3. **Do czego służą tagi i notatka książki?** Reguła rekomendacji ich nie używa; czy to must-have w MVP? — Owner: user. Block: S-02. Resolved: tagi są encjami, do pięciu na książkę; notatka książki wypada (zastępują ją notatki czytelników, pytanie 11).
 4. **Jak właściciel zakłada konta i kto nim jest** (poza aplikacją czy ekran administracyjny). — Owner: user. Block: S-01.
 5. **Co dzieje się z książkami, gdy konto ich autora zostanie usunięte.** — Owner: user. Block: S-08.
-6. **Czy ISBN jest polem wymaganym i jak łączą się dopasowania po ISBN oraz po tytule i autorze** przy ostrzeżeniu o duplikacie. — Owner: user. Block: S-06.
+6. **Czy ISBN jest polem wymaganym i jak łączą się dopasowania po ISBN oraz po tytule i autorze** przy ostrzeżeniu o duplikacie. — Owner: user. Block: S-06. Resolved: ISBN jest wymagany i walidowany; zasady łączenia dopasowań dla duplikatu rozstrzyga S-06.
 7. **Jaki jest przewidywany ruch (qps)?** — Owner: user. Block: S-04.
 8. **Jaki jest przewidywany wolumen danych (data_volume)?** — Owner: user. Block: S-04.
 9. **Czy podłączyć zewnętrzne narzędzie do śledzenia błędów w tym kamieniu milowym?** Użytkownik zgłosił taki zamiar, ale PRD go nie zawiera; jeśli ma wejść do zakresu, dopisz wymaganie do PRD. — Owner: user. Block: roadmap-wide.
 10. **Kopie zapasowe produkcyjnej bazy** (otwarta faza w planie wdrożenia) przed pierwszymi danymi domowników; guardrail PRD mówi, że dane nie giną. — Owner: user. Block: roadmap-wide.
+11. **Notatki czytelników** (decyzja właściciela): notatki wchodzą razem z oceną w S-03 (FR-008/FR-009): wiele notatek na książkę, dodawanych przez czytelników, każda oznaczona jako publiczna lub prywatna przez jej autora. Przeczy to regule PRD „notatki są osobiste / ukryte przed niezalogowanymi” (FR-009, Access Control, Guardrails), dopóki PRD nie zostanie zaktualizowane przy planowaniu S-03. — Owner: user. Block: S-03.
 
 ## Parked
 

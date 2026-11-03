@@ -25,7 +25,9 @@ services:
         class: Symfony\Component\HttpFoundation\Session\Storage\Handler\PdoSessionHandler
         arguments:
             - '@=service("doctrine.dbal.default_connection").getNativeConnection()'
-            - { db_table: sessions }
+            # LOCK_NONE: the default transactional lock opens a PDO transaction on the shared
+            # connection, which makes Doctrine's own beginTransaction() fail ("already an active transaction").
+            - { db_table: sessions, lock_mode: !php/const Symfony\Component\HttpFoundation\Session\Storage\Handler\PdoSessionHandler::LOCK_NONE }
 
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
