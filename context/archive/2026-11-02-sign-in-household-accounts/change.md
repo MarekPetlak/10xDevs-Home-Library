@@ -1,10 +1,10 @@
 ---
 change_id: sign-in-household-accounts
 title: Sign-in for household accounts (roadmap S-01)
-status: implemented
+status: archived
 created: 2026-11-02
-updated: 2026-11-02
-archived_at: null
+updated: 2026-11-03
+archived_at: 2026-11-03T17:51:53Z
 ---
 
 ## Notes
