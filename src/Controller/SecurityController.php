@@ -7,6 +7,7 @@ namespace App\Controller;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Core\Exception\TooManyLoginAttemptsAuthenticationException;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 
 final class SecurityController extends AbstractController
@@ -18,9 +19,13 @@ final class SecurityController extends AbstractController
             return $this->redirectToRoute('home');
         }
 
+        $error = $authenticationUtils->getLastAuthenticationError();
+
         return $this->render('security/login.html.twig', [
             'last_username' => $authenticationUtils->getLastUsername(),
-            'error' => $authenticationUtils->getLastAuthenticationError(),
+            'error' => $error,
+            // Decided from the exception class, not from the framework's message text.
+            'throttled' => $error instanceof TooManyLoginAttemptsAuthenticationException,
         ]);
     }
 

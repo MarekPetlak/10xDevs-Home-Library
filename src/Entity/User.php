@@ -84,4 +84,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
         return $this;
     }
+
+    /**
+     * Keeps the real password hash out of the session row: Symfony compares the short hash
+     * with the refreshed user, so a password change still invalidates old sessions.
+     *
+     * @return array<string, mixed>
+     */
+    public function __serialize(): array
+    {
+        $data = (array) $this;
+        $data["\0".self::class."\0password"] = hash('crc32c', $this->password);
+
+        return $data;
+    }
 }
