@@ -1,0 +1,191 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Tests\Controller;
+
+use App\Entity\Author;
+use App\Entity\Book;
+use App\Entity\ReadBook;
+use App\Entity\Tag;
+use App\Entity\User;
+use App\Enum\Category;
+use App\Service\UserManager;
+use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Bridge\Doctrine\DataCollector\DoctrineDataCollector;
+use Symfony\Bundle\FrameworkBundle\KernelBrowser;
+use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+
+final class BookListControllerTest extends WebTestCase
+{
+    private KernelBrowser $client;
+    private User $user;
+    private int $isbnCounter = 0;
+    private ?Author $author = null;
+
+    protected function setUp(): void
+    {
+        $this->client = static::createClient();
+        $this->user = static::getContainer()->get(UserManager::class)->create('anna@example.com', 'secret-pass');
+        $this->client->loginUser($this->user);
+    }
+
+    public function testAnonymousIsRedirectedToLoginOnBothPages(): void
+    {
+        $book = $this->createBook('Solaris', $this->user);
+        $this->client->restart();
+
+        $this->client->request('GET', '/books');
+        self::assertResponseRedirects('/login');
+
+        $this->client->request('GET', '/books/'.$book->getId());
+        self::assertResponseRedirects('/login');
+    }
+
+    public function testListShowsEveryBookIncludingOnesAddedByOthers(): void
+    {
+        $other = static::getContainer()->get(UserManager::class)->create('ola@example.com', 'secret-pass');
+        $this->createBook('Solaris', $this->user);
+        $this->createBook('Dziady', $other, Category::Poetry);
+
+        $this->client->request('GET', '/books');
+
+        self::assertResponseStatusCodeSame(200);
+        self::assertSelectorTextContains('table', 'Solaris');
+        self::assertSelectorTextContains('table', 'Dziady');
+        self::assertSelectorTextContains('table', 'Stanisław Lem');
+        self::assertSelectorTextContains('table', 'Poezja');
+        self::assertSelectorTextContains('nav', 'Książki');
+    }
+
+    public function testEmptyListShowsMessageWithLinkToNewBook(): void
+    {
+        $this->client->request('GET', '/books');
+
+        self::assertResponseStatusCodeSame(200);
+        self::assertSelectorExists('a[href="/books/new"]');
+        self::assertSelectorNotExists('table');
+    }
+
+    public function testListMarksOnlyTheCurrentUsersReadBooksAndNeverShowsOthersRatings(): void
+    {
+        $other = static::getContainer()->get(UserManager::class)->create('ola@example.com', 'secret-pass');
+        $mine = $this->createBook('Moja przeczytana', $this->user);
+        $theirs = $this->createBook('Przeczytana przez Olę', $other);
+        $this->createReadBook($this->user, $mine, 4);
+        $this->createReadBook($other, $theirs, 5);
+
+        $crawler = $this->client->request('GET', '/books');
+
+        $mineRow = $crawler->filter('tr:contains("Moja przeczytana")')->text();
+        $theirsRow = $crawler->filter('tr:contains("Przeczytana przez Olę")')->text();
+        self::assertStringContainsString('Przeczytana', $mineRow);
+        self::assertStringContainsString('4/5', $mineRow);
+        self::assertStringNotContainsString('5/5', $theirsRow);
+        self::assertStringNotContainsString('Przeczytana (', $theirsRow);
+        self::assertStringNotContainsString('5/5', $this->client->getResponse()->getContent());
+    }
+
+    public function testListQueryCountDoesNotGrowWithBookCount(): void
+    {
+        $this->createBook('Pierwsza', $this->user);
+        $this->createReadBook($this->user, $this->createBook('Druga', $this->user), 3);
+        $this->client->enableProfiler();
+        $this->client->request('GET', '/books');
+        $few = $this->queryCount();
+
+        for ($i = 0; $i < 8; ++$i) {
+            $book = $this->createBook('Kolejna '.$i, $this->user);
+            $this->createReadBook($this->user, $book, 2);
+        }
+        $this->client->enableProfiler();
+        $this->client->request('GET', '/books');
+        $many = $this->queryCount();
+
+        self::assertGreaterThan(0, $few);
+        self::assertSame($few, $many);
+    }
+
+    public function testDetailShowsAllBookFields(): void
+    {
+        $book = $this->createBook('Solaris', $this->user, Category::Novel);
+        $book->setDescription('Planeta-ocean.')->addTag((new Tag())->setName('sci-fi'));
+        $this->entityManager()->persist($book->getTags()->first());
+        $this->entityManager()->flush();
+
+        $this->client->request('GET', '/books/'.$book->getId());
+
+        self::assertResponseStatusCodeSame(200);
+        self::assertSelectorTextContains('h1', 'Solaris');
+        $text = $this->client->getCrawler()->filter('main')->text();
+        foreach (['Stanisław Lem', $book->getIsbn(), '1961', 'Powieść', 'sci-fi', 'Planeta-ocean.'] as $expected) {
+            self::assertStringContainsString($expected, $text);
+        }
+    }
+
+    public function testMissingBookReturns404(): void
+    {
+        $this->client->request('GET', '/books/999999');
+
+        self::assertResponseStatusCodeSame(404);
+    }
+
+    public function testNewRouteIsNotCapturedByTheDetailRoute(): void
+    {
+        $this->client->request('GET', '/books/new');
+
+        self::assertResponseStatusCodeSame(200);
+        self::assertSelectorExists('form[name="book"]');
+    }
+
+    private function createBook(string $title, User $addedBy, Category $category = Category::Novel): Book
+    {
+        // One shared author, so this helper issues no SELECT that would skew the query count.
+        $author = $this->author ??= (new Author())->setFirstName('Stanisław')->setLastName('Lem');
+        $book = (new Book())
+            ->setTitle($title)
+            ->setIsbn(sprintf('97883080%05d', ++$this->isbnCounter))
+            ->setPublicationYear(1961)
+            ->setCategory($category)
+            ->setAddedBy($addedBy)
+            ->addAuthor($author);
+        $this->entityManager()->persist($author);
+        $this->entityManager()->persist($book);
+        $this->entityManager()->flush();
+
+        return $book;
+    }
+
+    private function createReadBook(User $user, Book $book, int $rating): void
+    {
+        $this->entityManager()->persist(
+            (new ReadBook())->setUser($user)->setBook($book)->setRating($rating)->setReadOn(new \DateTimeImmutable('2026-10-01')),
+        );
+        $this->entityManager()->flush();
+    }
+
+    private function queryCount(): int
+    {
+        $profile = $this->client->getProfile();
+        self::assertNotFalse($profile);
+        $collector = $profile->getCollector('db');
+        self::assertInstanceOf(DoctrineDataCollector::class, $collector);
+
+        // Only SELECTs: the setup inserts made through the same connection are logged too.
+        $selects = 0;
+        foreach ($collector->getQueries() as $queries) {
+            foreach ($queries as $query) {
+                if (str_starts_with(ltrim($query['sql']), 'SELECT')) {
+                    ++$selects;
+                }
+            }
+        }
+
+        return $selects;
+    }
+
+    private function entityManager(): EntityManagerInterface
+    {
+        return static::getContainer()->get(EntityManagerInterface::class);
+    }
+}

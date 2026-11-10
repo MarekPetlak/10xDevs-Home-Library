@@ -1,0 +1,78 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ book.title }} - {{ parent() }}{% endblock %}
+
+{% block body_content %}
+    <p><a href="{{ path('book_index') }}">&larr; {{ 'book.show.back'|trans }}</a></p>
+
+    <h1 class="h3">{{ book.title }}</h1>
+    <p class="text-muted">{{ book.authors|map(a => a.fullName)|join(', ') }}</p>
+
+    <dl class="row">
+        <dt class="col-sm-3">{{ 'book.form.isbn'|trans }}</dt>
+        <dd class="col-sm-9">{{ book.isbn }}</dd>
+
+        <dt class="col-sm-3">{{ 'book.form.publication_year'|trans }}</dt>
+        <dd class="col-sm-9">{{ book.publicationYear }}</dd>
+
+        <dt class="col-sm-3">{{ 'book.form.category'|trans }}</dt>
+        <dd class="col-sm-9">{{ book.category.translationKey|trans }}</dd>
+
+        {% if book.tags is not empty %}
+            <dt class="col-sm-3">{{ 'book.form.tags'|trans }}</dt>
+            <dd class="col-sm-9">
+                {% for tag in book.tags %}<span class="badge text-bg-secondary me-1">{{ tag.name }}</span>{% endfor %}
+            </dd>
+        {% endif %}
+
+        {% if book.description %}
+            <dt class="col-sm-3">{{ 'book.form.description'|trans }}</dt>
+            <dd class="col-sm-9">{{ book.description|nl2br }}</dd>
+        {% endif %}
+    </dl>
+
+    {% block read_state %}
+        <section class="mb-4">
+            {% if readBook %}
+                <h2 class="h5">
+                    <span class="badge text-bg-success">{{ 'book.index.read'|trans }}</span>
+                </h2>
+                <dl class="row">
+                    <dt class="col-sm-3">{{ 'reading.show.rating'|trans }}</dt>
+                    <dd class="col-sm-9">{{ 'book.index.rating'|trans({'%rating%': readBook.rating}) }}</dd>
+
+                    <dt class="col-sm-3">{{ 'reading.show.read_on'|trans }}</dt>
+                    <dd class="col-sm-9">{{ readBook.readOn|date('d.m.Y') }}</dd>
+
+                    {% if readBook.comment %}
+                        <dt class="col-sm-3">{{ 'reading.show.comment'|trans }}</dt>
+                        <dd class="col-sm-9">{{ readBook.comment|nl2br }}</dd>
+                    {% endif %}
+                </dl>
+                <form method="post" action="{{ path('book_read_remove', {id: book.id}) }}" onsubmit="return confirm({{ 'reading.remove.confirm'|trans|json_encode(constant('JSON_UNESCAPED_UNICODE')) }});">
+                    <input type="hidden" name="_token" value="{{ csrf_token('read_remove') }}">
+                    <button type="submit" class="btn btn-outline-danger">{{ 'reading.remove.submit'|trans }}</button>
+                </form>
+            {% elseif readForm %}
+                <h2 class="h5">{{ 'reading.form.heading'|trans }}</h2>
+                {{ form(readForm) }}
+            {% endif %}
+        </section>
+    {% endblock %}
+    {% block comments %}
+        <section id="comments">
+            <h2 class="h5">{{ 'comments.heading'|trans }}</h2>
+            {% for entry in comments %}
+                <article class="border rounded p-3 mb-2">
+                    <p class="mb-1 text-muted small">
+                        {{ entry.user.email|mask_email }}
+                        <span class="badge text-bg-secondary ms-1">{{ 'book.index.rating'|trans({'%rating%': entry.rating}) }}</span>
+                    </p>
+                    <p class="mb-0">{{ entry.comment|nl2br }}</p>
+                </article>
+            {% else %}
+                <p class="text-muted">{{ 'comments.empty'|trans }}</p>
+            {% endfor %}
+        </section>
+    {% endblock %}
+{% endblock %}

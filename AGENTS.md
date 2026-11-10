@@ -4,7 +4,8 @@
 
 ## Hard rules
 
-- Ratings, read status and notes are private per user. Only a book's author may edit or delete it (FR-006, FR-007). Deleting hides the book from every list but keeps other users' ratings and notes (soft delete, no cascade).
+- Ratings and read status are private per user. Only a book's author may edit or delete it (FR-006, FR-007). Deleting hides the book from every list but keeps other users' ratings and comments (soft delete, no cascade).
+- Read records (`ReadBook`) are immutable: create or hard delete only, never edit. Each carries a rating 1-5, the read date (`read_on`, "today" = Europe/Warsaw day) and an optional comment. Exception until the privacy slice S-09 (`reader-comments-privacy`) lands: a comment is visible to all signed-in users, shown with its author's rating (a rating is shown only next to a comment) and the author's e-mail obfuscated by `EmailMasker` (Twig filter `mask_email`). Other users' ratings without a comment and read status stay private.
 - Anonymous users may only browse and search books (FR-003). Everything else requires login. There is no self-registration; the owner creates accounts.
 - The duplicate check (FR-005) compares title + author (case and surrounding whitespace ignored) and ISBN. It only warns; the adding user decides.
 - Recommendations follow "Business Logic" in @context/foundation/prd.md: at most three, never user-taste similarity (Non-Goal).
@@ -16,7 +17,7 @@
 
 ## Project Structure
 
-- `src/Controller`, `src/Entity`, `src/Repository`, `src/Service`, `src/Command`, `src/Enum`, `src/Dto`, `src/Form` (namespace `App\`): so far `User`, `UserManager`, the account commands, `Book`, `Author`, `Tag`, `Category` (enum in `src/Enum`), `BookManager`, `NameList`, the `NewBook` DTO with the `BookType` form, the add-book controller (`/books/new`) and the home, login and health controllers.
+- `src/Controller`, `src/Entity`, `src/Repository`, `src/Service`, `src/Command`, `src/Enum`, `src/Dto`, `src/Form` (namespace `App\`): so far `User`, `UserManager`, the account commands, `Book`, `Author`, `Tag`, `Category` (enum in `src/Enum`), `BookManager`, `NameList`, the `NewBook` DTO with the `BookType` form, the add-book controller (`/books/new`), `ReadBook` (with `ReadBookRepository`), `ReadingManager`, `EmailMasker` (+ `EmailMaskExtension` in `src/Twig`), the `MarkRead` DTO with the `MarkReadType` form, the book list and detail routes (`GET /books` `book_index`, `GET /books/{id}` `book_show`), the read routes (`POST /books/{id}/read` `book_read`, `POST /books/{id}/read/remove` `book_read_remove`, CSRF token id `read_remove`) and the home, login and health controllers.
 - `templates/` (Twig), `assets/` + `importmap.php` (AssetMapper; no Node or bundler, add JS packages with `bin/console importmap:require`).
 - `migrations/`: schema changes go through migrations only.
 - `context/`: planning artifacts for the 10x workflow.

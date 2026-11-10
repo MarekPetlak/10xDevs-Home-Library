@@ -8,6 +8,7 @@ home:
         lead: Przeglądaj książki i zarządzaj domową biblioteką w jednym miejscu.
 nav:
     toggle: Przełącz nawigację
+    book_index: Książki
     book_new: Dodaj książkę
 security:
     login:
@@ -19,6 +20,16 @@ security:
         error: Nieprawidłowy adres e-mail lub hasło.
     logout: Wyloguj
 book:
+    index:
+        title: Książki
+        heading: Książki we wspólnej kolekcji
+        empty: W kolekcji nie ma jeszcze żadnych książek.
+        empty_link: Dodaj pierwszą książkę
+        read_state: Twój status
+        read: Przeczytana
+        rating: '%rating%/5'
+    show:
+        back: Wróć do listy książek
     new:
         title: Dodaj książkę
         heading: Dodaj książkę do wspólnej kolekcji
@@ -48,3 +59,24 @@ book:
         children: Dla dzieci
         poetry: Poezja
         other: Inne
+comments:
+    heading: Komentarze czytelników
+    empty: Brak komentarzy do tej książki.
+reading:
+    form:
+        heading: Oznacz jako przeczytaną
+        rating: Ocena (1-5)
+        read_on: Data przeczytania
+        comment: Komentarz
+        submit: Zapisz jako przeczytaną
+    show:
+        rating: Twoja ocena
+        read_on: Data przeczytania
+        comment: Twój komentarz
+    remove:
+        submit: Usuń moje oznaczenie jako przeczytanej
+        confirm: Usunięcie oznaczenia skasuje Twoją ocenę, datę przeczytania i komentarz. Kontynuować?
+    flash:
+        marked: Książka została oznaczona jako przeczytana.
+        already_read: Ta książka jest już oznaczona jako przeczytana.
+        removed: Oznaczenie jako przeczytanej zostało usunięte.
