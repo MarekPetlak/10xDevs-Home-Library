@@ -6,7 +6,10 @@ namespace App\Tests\Service;
 
 use App\Entity\User;
 use App\Exception\UserManagementException;
+use App\Repository\UserRepository;
 use App\Service\UserManager;
+use Doctrine\DBAL\Driver\Exception as DriverException;
+use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
@@ -58,10 +61,47 @@ final class UserManagerTest extends KernelTestCase
         $this->userManager->create('ANNA@example.com', 'other-secret');
     }
 
+    public function testCreateTurnsALostDuplicateRaceIntoAUserManagementException(): void
+    {
+        // Two concurrent runs both pass the existence check; the unique index rejects the second flush.
+        $entityManager = $this->createMock(EntityManagerInterface::class);
+        $entityManager->expects(self::once())->method('flush')->willThrowException(
+            new UniqueConstraintViolationException($this->createStub(DriverException::class), null),
+        );
+        $repository = $this->createStub(UserRepository::class);
+        $repository->method('findOneByEmail')->willReturn(null);
+
+        $this->expectException(UserManagementException::class);
+        $this->expectExceptionMessage('already exists');
+
+        (new UserManager($entityManager, $repository, $this->hasher))->create('anna@example.com', 'secret-pass');
+    }
+
     public function testCreateRejectsShortPassword(): void
     {
         $this->expectException(UserManagementException::class);
         $this->userManager->create('anna@example.com', 'short');
+    }
+
+    public function testCreateRejectsPasswordLongerThanBcryptLimit(): void
+    {
+        $this->expectException(UserManagementException::class);
+        $this->expectExceptionMessage('at most 72');
+        $this->userManager->create('anna@example.com', str_repeat('a', 73));
+    }
+
+    public function testCreateAcceptsPasswordOfExactlyTheMaximumLength(): void
+    {
+        $user = $this->userManager->create('anna@example.com', str_repeat('a', 72));
+
+        self::assertNotNull($user->getId());
+    }
+
+    public function testMaximumLengthIsCountedInBytes(): void
+    {
+        // 37 two-byte characters are 74 bytes, although only 37 characters long.
+        $this->expectException(UserManagementException::class);
+        $this->userManager->create('anna@example.com', str_repeat('ł', 37));
     }
 
     public function testCreateRejectsInvalidEmail(): void

@@ -7,12 +7,14 @@ namespace App\Service;
 use App\Entity\User;
 use App\Exception\UserManagementException;
 use App\Repository\UserRepository;
+use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 final class UserManager
 {
     public const MIN_PASSWORD_LENGTH = 8;
+    public const MAX_PASSWORD_BYTES = 72;
 
     public function __construct(
         private readonly EntityManagerInterface $entityManager,
@@ -33,8 +35,13 @@ final class UserManager
         $user = (new User())->setEmail($email);
         $user->setPassword($this->passwordHasher->hashPassword($user, $plainPassword));
 
-        $this->entityManager->persist($user);
-        $this->entityManager->flush();
+        try {
+            $this->entityManager->persist($user);
+            $this->entityManager->flush();
+        } catch (UniqueConstraintViolationException $e) {
+            // A concurrent run inserted the same e-mail after our check. Doctrine closed the EntityManager.
+            throw new UserManagementException(sprintf('A user with e-mail "%s" already exists.', $email), previous: $e);
+        }
 
         return $user;
     }
@@ -70,6 +77,11 @@ final class UserManager
     {
         if (mb_strlen($plainPassword) < self::MIN_PASSWORD_LENGTH) {
             throw new UserManagementException(sprintf('The password must be at least %d characters long.', self::MIN_PASSWORD_LENGTH));
+        }
+
+        // bcrypt silently ignores everything after 72 bytes, so refuse such passwords instead.
+        if (\strlen($plainPassword) > self::MAX_PASSWORD_BYTES) {
+            throw new UserManagementException(sprintf('The password must be at most %d bytes long.', self::MAX_PASSWORD_BYTES));
         }
     }
 }

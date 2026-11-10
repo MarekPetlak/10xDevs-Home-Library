@@ -8,7 +8,7 @@
             <h1 class="h3 mb-3">{{ 'security.login.heading'|trans }}</h1>
 
             {% if error %}
-                <div class="alert alert-danger" role="alert">{% if error.messageKey starts with 'Too many' %}{{ error.messageKey|trans(error.messageData, 'security') }}{% else %}{{ 'security.login.error'|trans }}{% endif %}</div>
+                <div class="alert alert-danger" role="alert">{% if throttled %}{{ error.messageKey|trans(error.messageData, 'security') }}{% else %}{{ 'security.login.error'|trans }}{% endif %}</div>
             {% endif %}
 
             <form method="post" action="{{ path('app_login') }}">

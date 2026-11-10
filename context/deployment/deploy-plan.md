@@ -311,7 +311,7 @@ Steps:
 
 **Verify:** a trivial PR merge triggers test then deploy; `fly releases` shows the new release; smoke tests 1-3 pass.
 - [x] Merge triggers test then deploy (2026-10-31: PR #3, run 41202014043, `test` 34 s then `deploy` 1m18s). `fly releases` shows v10 complete (v9 failed, see execution log).
-- [~] Smoke tests: `/healthz` 200 and http -> https 301 confirmed; the https URL check on the login page is still open: `/login` is implemented in PR #8 (change `sign-in-household-accounts`, 2026-11-02) but has not been verified on https://10xdevs-home-library.fly.dev yet. Mark this done after the merge, the first account and a sign-in on production.
+- [x] Smoke tests: `/healthz` 200, http -> https 301 and the https login page confirmed (`/login` from PR #8, change `sign-in-household-accounts`; first account created and sign-in verified on https://10xdevs-home-library.fly.dev, 2026-11-03).
 
 **Support steps:** `No access token available` = secret name or expired token (recreate with `-x`); forked PRs get no secrets (deploy only from `main`); builder flakiness: re-run the job.
 

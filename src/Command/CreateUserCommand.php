@@ -5,20 +5,22 @@ declare(strict_types=1);
 namespace App\Command;
 
 use App\Exception\UserManagementException;
+use App\Service\PasswordPrompt;
 use App\Service\UserManager;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Question\Question;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
 #[AsCommand(name: 'app:user:create', description: 'Create a household account (password is asked interactively)')]
 final class CreateUserCommand extends Command
 {
-    public function __construct(private readonly UserManager $userManager)
-    {
+    public function __construct(
+        private readonly UserManager $userManager,
+        private readonly PasswordPrompt $passwordPrompt,
+    ) {
         parent::__construct();
     }
 
@@ -32,7 +34,7 @@ final class CreateUserCommand extends Command
         $io = new SymfonyStyle($input, $output);
         $email = (string) $input->getArgument('email');
 
-        $password = $this->askPassword($io);
+        $password = $this->passwordPrompt->ask($io, 'Password', 'Repeat password');
         if (null === $password) {
             return Command::FAILURE;
         }
@@ -50,20 +52,4 @@ final class CreateUserCommand extends Command
         return Command::SUCCESS;
     }
 
-    private function askPassword(SymfonyStyle $io): ?string
-    {
-        $question = (new Question('Password'))->setHidden(true)->setHiddenFallback(false);
-        $confirmation = (new Question('Repeat password'))->setHidden(true)->setHiddenFallback(false);
-
-        $password = (string) $io->askQuestion($question);
-        $repeated = (string) $io->askQuestion($confirmation);
-
-        if ($password !== $repeated) {
-            $io->error('The passwords do not match.');
-
-            return null;
-        }
-
-        return $password;
-    }
 }
