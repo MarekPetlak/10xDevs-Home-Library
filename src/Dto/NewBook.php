@@ -14,6 +14,8 @@ use Symfony\Component\Validator\Context\ExecutionContextInterface;
  */
 final class NewBook
 {
+    public const MAX_AUTHORS = 10;
+    public const MAX_LIST_TEXT_LENGTH = 1000;
     public const MAX_TAGS = 5;
     public const MAX_TAG_LENGTH = 30;
     public const MAX_FIRST_NAME_LENGTH = 100;
@@ -25,6 +27,7 @@ final class NewBook
     public ?string $title = null;
 
     /** Comma-separated "first last" entries. */
+    #[Assert\Length(max: self::MAX_LIST_TEXT_LENGTH, maxMessage: 'book.text.too_long')]
     public ?string $authors = null;
 
     #[Assert\NotBlank]
@@ -38,10 +41,14 @@ final class NewBook
     public ?Category $category = null;
 
     /** Comma-separated tag names. */
+    #[Assert\Length(max: self::MAX_LIST_TEXT_LENGTH, maxMessage: 'book.text.too_long')]
     public ?string $tags = null;
 
+    /** Stored trimmed; blank input becomes null so "has a description" is one check. */
     #[Assert\Length(max: 2000)]
-    public ?string $description = null;
+    public ?string $description = null {
+        set => null === $value || '' === trim($value) ? null : trim($value);
+    }
 
     #[Assert\Callback]
     public function validateAuthors(ExecutionContextInterface $context): void
@@ -50,6 +57,15 @@ final class NewBook
 
         if ([] === $authors) {
             $context->buildViolation('book.authors.required')->atPath('authors')->addViolation();
+
+            return;
+        }
+
+        if (count($authors) > self::MAX_AUTHORS) {
+            $context->buildViolation('book.authors.too_many')
+                ->setParameter('{{ limit }}', (string) self::MAX_AUTHORS)
+                ->atPath('authors')
+                ->addViolation();
 
             return;
         }

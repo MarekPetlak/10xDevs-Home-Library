@@ -7,7 +7,12 @@ namespace App\Tests\Controller;
 use App\Entity\Author;
 use App\Entity\Book;
 use App\Entity\Tag;
+use App\Repository\AuthorRepository;
+use App\Repository\TagRepository;
+use App\Service\BookManager;
 use App\Service\UserManager;
+use Doctrine\DBAL\Driver\Exception as DriverException;
+use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
@@ -110,6 +115,39 @@ final class BookControllerTest extends WebTestCase
         yield 'description over 2000 characters' => [['book[description]' => str_repeat('x', 2001)]];
         yield 'first name over 100 characters' => [['book[authors]' => str_repeat('x', 101).' Kowalski']];
         yield 'title over 255 characters' => [['book[title]' => str_repeat('x', 256)]];
+        yield 'eleven authors' => [['book[authors]' => implode(', ', array_map(static fn (int $i): string => 'Imie'.chr(97 + $i).' Nazwisko', range(0, 10)))]];
+        yield 'authors text over 1000 characters' => [['book[authors]' => implode(', ', array_fill(0, 60, 'Adam Mickiewiczowski-Kowalski'))]];
+        yield 'tags text over 1000 characters' => [['book[tags]' => str_repeat('ab, ', 300)]];
+    }
+
+    public function testTenAuthorsAreAccepted(): void
+    {
+        $authors = implode(', ', array_map(static fn (int $i): string => 'Imie'.chr(97 + $i).' Nazwisko', range(0, 9)));
+
+        $this->submit(['book[authors]' => $authors]);
+
+        self::assertResponseRedirects('/books/new');
+    }
+
+    public function testLostCreationRaceShowsATryAgainErrorInsteadOfA500(): void
+    {
+        // Without this the client reboots the kernel between requests and drops the replaced service.
+        $this->client->disableReboot();
+        $failing = $this->createStub(EntityManagerInterface::class);
+        $failing->method('wrapInTransaction')->willThrowException(
+            new UniqueConstraintViolationException($this->createStub(DriverException::class), null),
+        );
+        static::getContainer()->set(BookManager::class, new BookManager(
+            $failing,
+            static::getContainer()->get(AuthorRepository::class),
+            static::getContainer()->get(TagRepository::class),
+        ));
+
+        $this->submit([]);
+
+        self::assertResponseStatusCodeSame(400);
+        self::assertSelectorTextContains('.invalid-feedback, .alert-danger, .form-error-message', 'Spróbuj ponownie');
+        self::assertInputValueSame('book[title]', 'Dziady');
     }
 
     public function testBoundaryValuesAreAccepted(): void

@@ -7,12 +7,14 @@ namespace App\Controller;
 use App\Dto\MarkRead;
 use App\Dto\NewBook;
 use App\Entity\User;
+use App\Exception\BookConflictException;
 use App\Form\BookType;
 use App\Form\MarkReadType;
 use App\Repository\BookRepository;
 use App\Repository\ReadBookRepository;
 use App\Service\BookManager;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -67,7 +69,15 @@ final class BookController extends AbstractController
             $user = $this->getUser();
             \assert($user instanceof User);
 
-            $bookManager->add($form->getData(), $user);
+            try {
+                $bookManager->add($form->getData(), $user);
+            } catch (BookConflictException) {
+                // A concurrent request created the same author or tag first: keep the input, ask to retry.
+                $form->addError(new FormError($translator->trans('book.error.conflict')));
+
+                return $this->render('book/new.html.twig', ['form' => $form], new Response(status: Response::HTTP_BAD_REQUEST));
+            }
+
             $this->addFlash('success', $translator->trans('book.flash.added'));
 
             return $this->redirectToRoute('book_new');
