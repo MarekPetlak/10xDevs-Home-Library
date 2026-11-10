@@ -398,14 +398,14 @@ The migration only creates one new table, so existing data is untouched. It runs
 
 #### Automated
 
-- [x] 1.1 Migration applies on the test database: `php bin/console doctrine:migrations:migrate --no-interaction --env=test`
-- [x] 1.2 Schema matches mapping: `php bin/console doctrine:schema:validate --env=test`
-- [x] 1.3 Tests pass: `php bin/phpunit`
+- [x] 1.1 Migration applies on the test database: `php bin/console doctrine:migrations:migrate --no-interaction --env=test` — dfdca17
+- [x] 1.2 Schema matches mapping: `php bin/console doctrine:schema:validate --env=test` — dfdca17
+- [x] 1.3 Tests pass: `php bin/phpunit` — dfdca17
 
 #### Manual
 
-- [x] 1.4 The migration SQL was read and matches the contract (FK actions, unique index, nullable comment, no extra columns)
-- [x] 1.5 Applying the migration on the local dev database and rolling it back with `down()` both succeed
+- [x] 1.4 The migration SQL was read and matches the contract (FK actions, unique index, nullable comment, no extra columns) — dfdca17
+- [x] 1.5 Applying the migration on the local dev database and rolling it back with `down()` both succeed — dfdca17
 
 ### Phase 2: Book list and detail
 
