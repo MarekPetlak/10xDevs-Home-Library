@@ -59,6 +59,9 @@ book:
         children: Dla dzieci
         poetry: Poezja
         other: Inne
+comments:
+    heading: Komentarze czytelników
+    empty: Brak komentarzy do tej książki.
 reading:
     form:
         heading: Oznacz jako przeczytaną

@@ -226,10 +226,23 @@ final class ReadBookControllerTest extends WebTestCase
         self::assertStringNotContainsString('5/5', $this->client->getResponse()->getContent());
         self::assertSelectorNotExists('.badge.text-bg-success');
 
-        $this->client->request('GET', $this->showUrl());
-        self::assertStringNotContainsString('5/5', $this->client->getResponse()->getContent());
-        self::assertStringNotContainsString('Tajny komentarz Anny', $this->client->getResponse()->getContent());
+        // On the detail page the rating is visible only next to its author's comment.
+        $crawler = $this->client->request('GET', $this->showUrl());
+        self::assertStringContainsString('5/5', $crawler->filter('section#comments')->text());
+        self::assertStringContainsString('Tajny komentarz Anny', $crawler->filter('section#comments')->text());
+        self::assertSame(1, substr_count((string) $this->client->getResponse()->getContent(), '5/5'));
         self::assertSelectorExists('form[name="mark_read"]');
+    }
+
+    public function testOthersRatingWithoutACommentNeverAppearsOnTheDetailPage(): void
+    {
+        $this->submit(['mark_read[rating]' => '5']);
+
+        $other = static::getContainer()->get(UserManager::class)->create('ola@example.com', 'secret-pass');
+        $this->client->loginUser($other);
+
+        $this->client->request('GET', $this->showUrl());
+        self::assertStringNotContainsString('5/5', (string) $this->client->getResponse()->getContent());
     }
 
     public function testRemoveOnlyAffectsTheCurrentUsersOwnRecord(): void

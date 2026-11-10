@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Repository;
 
+use App\Entity\Book;
 use App\Entity\ReadBook;
 use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
@@ -41,5 +42,31 @@ class ReadBookRepository extends ServiceEntityRepository
         }
 
         return $indexed;
+    }
+
+    /**
+     * Read records of one book that carry a comment, newest first, authors loaded in the same query.
+     * The viewer's own record is left out: it is already shown in their read state.
+     * Ratings are exposed only through records that have a comment.
+     *
+     * @return list<ReadBook>
+     */
+    public function findCommentsForBook(Book $book, User $viewer): array
+    {
+        /** @var list<ReadBook> $records */
+        $records = $this->createQueryBuilder('r')
+            ->addSelect('u')
+            ->join('r.user', 'u')
+            ->where('r.book = :book')
+            ->andWhere('r.comment IS NOT NULL')
+            ->andWhere('r.user != :viewer')
+            ->setParameter('book', $book)
+            ->setParameter('viewer', $viewer)
+            ->orderBy('r.createdAt', 'DESC')
+            ->addOrderBy('r.id', 'DESC')
+            ->getQuery()
+            ->getResult();
+
+        return $records;
     }
 }

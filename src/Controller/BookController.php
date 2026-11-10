@@ -49,6 +49,7 @@ final class BookController extends AbstractController
         return $this->render('book/show.html.twig', [
             'book' => $book,
             'readBook' => $readBook,
+            'comments' => $readBookRepository->findCommentsForBook($book, $user),
             'readForm' => null === $readBook
                 ? $this->createForm(MarkReadType::class, $markRead, ['action' => $this->generateUrl('book_read', ['id' => $id])])
                 : null,

@@ -9,6 +9,7 @@ use App\Entity\User;
 use App\Exception\AlreadyReadException;
 use App\Form\MarkReadType;
 use App\Repository\BookRepository;
+use App\Repository\ReadBookRepository;
 use App\Service\ReadingManager;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -21,7 +22,7 @@ final class ReadBookController extends AbstractController
 {
     #[Route('/books/{id}/read', name: 'book_read', requirements: ['id' => '\d+'], methods: ['POST'])]
     #[IsGranted('ROLE_USER')]
-    public function read(int $id, Request $request, BookRepository $bookRepository, ReadingManager $readingManager, TranslatorInterface $translator): Response
+    public function read(int $id, Request $request, BookRepository $bookRepository, ReadBookRepository $readBookRepository, ReadingManager $readingManager, TranslatorInterface $translator): Response
     {
         $book = $bookRepository->findForDetail($id) ?? throw $this->createNotFoundException();
         $user = $this->getUser();
@@ -47,6 +48,7 @@ final class ReadBookController extends AbstractController
         return $this->render('book/show.html.twig', [
             'book' => $book,
             'readBook' => null,
+            'comments' => $readBookRepository->findCommentsForBook($book, $user),
             'readForm' => $form,
         ], new Response(status: Response::HTTP_BAD_REQUEST));
     }

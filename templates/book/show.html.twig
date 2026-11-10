@@ -31,7 +31,6 @@
         {% endif %}
     </dl>
 
-    {# Phase 4 fills the readers' comments. #}
     {% block read_state %}
         <section class="mb-4">
             {% if readBook %}
@@ -60,5 +59,20 @@
             {% endif %}
         </section>
     {% endblock %}
-    {% block comments %}{% endblock %}
+    {% block comments %}
+        <section id="comments">
+            <h2 class="h5">{{ 'comments.heading'|trans }}</h2>
+            {% for entry in comments %}
+                <article class="border rounded p-3 mb-2">
+                    <p class="mb-1 text-muted small">
+                        {{ entry.user.email|mask_email }}
+                        <span class="badge text-bg-secondary ms-1">{{ 'book.index.rating'|trans({'%rating%': entry.rating}) }}</span>
+                    </p>
+                    <p class="mb-0">{{ entry.comment|nl2br }}</p>
+                </article>
+            {% else %}
+                <p class="text-muted">{{ 'comments.empty'|trans }}</p>
+            {% endfor %}
+        </section>
+    {% endblock %}
 {% endblock %}

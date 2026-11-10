@@ -426,34 +426,34 @@ The migration only creates one new table, so existing data is untouched. It runs
 
 #### Automated
 
-- [x] 3.1 Tests pass: `php bin/phpunit`
-- [x] 3.2 Schema stays clean: `php bin/console doctrine:schema:validate --env=test`
-- [x] 3.3 Container lints: `php bin/console lint:container`
-- [x] 3.4 Routes registered: `php bin/console debug:router book_read book_read_remove`
+- [x] 3.1 Tests pass: `php bin/phpunit` — 084cc09
+- [x] 3.2 Schema stays clean: `php bin/console doctrine:schema:validate --env=test` — 084cc09
+- [x] 3.3 Container lints: `php bin/console lint:container` — 084cc09
+- [x] 3.4 Routes registered: `php bin/console debug:router book_read book_read_remove` — 084cc09
 
 #### Manual
 
-- [x] 3.5 Marking a book with rating 4, today's date and a comment shows "Przeczytana", rating 4, the date and the comment on the detail page, and the rating on the list
-- [x] 3.6 Marking a book with no comment works and shows no comment
-- [x] 3.7 A back-dated read date is accepted; tomorrow's date shows a Polish error and saves nothing
-- [x] 3.8 Rating 0 or 6 cannot be submitted from the radio buttons and is rejected if forced
-- [x] 3.9 Removing the mark (after the confirmation) returns the book to unread and the form reappears; marking again with a different rating and comment works
-- [x] 3.10 A second user signed in on another browser does not see the first user's rating anywhere except next to the first user's comment (Phase 4)
+- [x] 3.5 Marking a book with rating 4, today's date and a comment shows "Przeczytana", rating 4, the date and the comment on the detail page, and the rating on the list — 084cc09
+- [x] 3.6 Marking a book with no comment works and shows no comment — 084cc09
+- [x] 3.7 A back-dated read date is accepted; tomorrow's date shows a Polish error and saves nothing — 084cc09
+- [x] 3.8 Rating 0 or 6 cannot be submitted from the radio buttons and is rejected if forced — 084cc09
+- [x] 3.9 Removing the mark (after the confirmation) returns the book to unread and the form reappears; marking again with a different rating and comment works — 084cc09
+- [x] 3.10 A second user signed in on another browser does not see the first user's rating anywhere except next to the first user's comment (Phase 4) — 084cc09
 
 ### Phase 4: Shared reader comments
 
 #### Automated
 
-- [ ] 4.1 Tests pass: `php bin/phpunit`
-- [ ] 4.2 Container lints: `php bin/console lint:container`
-- [ ] 4.3 Twig lints: `php bin/console lint:twig templates`
+- [x] 4.1 Tests pass: `php bin/phpunit`
+- [x] 4.2 Container lints: `php bin/console lint:container`
+- [x] 4.3 Twig lints: `php bin/console lint:twig templates`
 
 #### Manual
 
-- [ ] 4.4 A second user sees the first user's comment as `a***@example.com`-style text, never the full address, together with the first user's rating next to it
-- [ ] 4.5 A comment containing a script tag is displayed as text
-- [ ] 4.6 A read record with no comment adds nothing to the block; with no comments at all the empty-state message shows
-- [ ] 4.7 After the author removes their read mark, their comment disappears from the other user's view
+- [x] 4.4 A second user sees the first user's comment as `a***@example.com`-style text, never the full address, together with the first user's rating next to it
+- [x] 4.5 A comment containing a script tag is displayed as text
+- [x] 4.6 A read record with no comment adds nothing to the block; with no comments at all the empty-state message shows
+- [x] 4.7 After the author removes their read mark, their comment disappears from the other user's view
 
 ### Phase 5: Docs sync and production check
 
