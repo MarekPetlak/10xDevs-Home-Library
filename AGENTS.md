@@ -11,7 +11,7 @@
 - Recommendations follow "Business Logic" in @context/foundation/prd.md: at most three, never user-taste similarity (Non-Goal).
 - Auth is form login (e-mail + password, CSRF, throttled at 5 attempts) on the `app_user_provider` entity provider (`App\Entity\User`); logout is CSRF-protected. No remember-me.
 - Sessions live in the `sessions` table (`PdoSessionHandler` on the shared DBAL connection, dev and prod; tests use `mock_file`). The table is created by a migration and hidden from Doctrine by `dbal.schema_filter`; never model it as an entity. The handler runs with `lock_mode: LOCK_NONE` (`config/services.yaml`) because it shares the Doctrine connection: the default transactional lock opens a PDO transaction and breaks Doctrine's `wrapInTransaction`.
-- Book categories live in `App\Enum\Category`: a fixed list with English-named values, Polish labels are translations `book.category.<value>`; change the list by code and deploy. Authors (first name + last name, both required) and tags are reusable entities matched ignoring case through an explicit `utf8mb4_unicode_ci` column collation (also accent-insensitive).
+- Book categories live in `App\Enum\Category`: a fixed list with English-named values, Polish labels are translations `book.category.<value>`; change the list by code and deploy. Authors (first name + last name, both required) and tags are reusable entities matched ignoring case but not accents ("José" and "Jose" are different) through an explicit `utf8mb4_uca1400_as_ci` column collation (MariaDB 10.10+; production and CI run 10.11).
 - Use `declare(strict_types=1);` and typed properties in all PHP files under `src/` and `tests/`.
 - Never edit `context/archive/` or `context/foundation/archive/`.
 

@@ -6,7 +6,6 @@ namespace App\Entity;
 
 use App\Repository\AuthorRepository;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: AuthorRepository::class)]
 #[ORM\Table(name: 'author')]
@@ -18,12 +17,10 @@ class Author
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(length: 100, options: ['collation' => 'utf8mb4_unicode_ci'])]
-    #[Assert\NotBlank]
+    #[ORM\Column(length: 100, options: ['collation' => 'utf8mb4_uca1400_as_ci'])]
     private string $firstName = '';
 
-    #[ORM\Column(length: 150, options: ['collation' => 'utf8mb4_unicode_ci'])]
-    #[Assert\NotBlank]
+    #[ORM\Column(length: 150, options: ['collation' => 'utf8mb4_uca1400_as_ci'])]
     private string $lastName = '';
 
     public function getId(): ?int

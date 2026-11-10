@@ -10,8 +10,13 @@ use App\Entity\Book;
 use App\Entity\Tag;
 use App\Entity\User;
 use App\Enum\Category;
+use App\Exception\BookConflictException;
+use App\Repository\AuthorRepository;
+use App\Repository\TagRepository;
 use App\Service\BookManager;
 use App\Service\UserManager;
+use Doctrine\DBAL\Driver\Exception as DriverException;
+use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
@@ -67,6 +72,35 @@ final class BookManagerTest extends KernelTestCase
         $this->entityManager->clear();
 
         self::assertCount(1, $this->entityManager->getRepository(Tag::class)->findAll());
+    }
+
+    public function testAuthorsAndTagsDifferingOnlyInAccentsAreKeptApart(): void
+    {
+        $this->bookManager->add($this->input(authors: 'Jose Kowalski', tags: 'zolw'), $this->user);
+        $this->bookManager->add($this->input(title: 'Inna', authors: 'José Kowalski', tags: 'żółw'), $this->user);
+
+        $this->entityManager->clear();
+
+        self::assertCount(2, $this->entityManager->getRepository(Author::class)->findAll());
+        self::assertCount(2, $this->entityManager->getRepository(Tag::class)->findAll());
+    }
+
+    public function testLostRaceOnANewAuthorOrTagBecomesABookConflictException(): void
+    {
+        // Two requests both missed the lookup; the unique index rejects the second insert.
+        $entityManager = $this->createMock(EntityManagerInterface::class);
+        $entityManager->expects(self::once())->method('wrapInTransaction')->willThrowException(
+            new UniqueConstraintViolationException($this->createStub(DriverException::class), null),
+        );
+        $manager = new BookManager(
+            $entityManager,
+            $this->createStub(AuthorRepository::class),
+            $this->createStub(TagRepository::class),
+        );
+
+        $this->expectException(BookConflictException::class);
+
+        $manager->add($this->input(), $this->user);
     }
 
     public function testNoTagsIsAllowed(): void

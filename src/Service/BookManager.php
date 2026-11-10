@@ -9,8 +9,10 @@ use App\Entity\Author;
 use App\Entity\Book;
 use App\Entity\Tag;
 use App\Entity\User;
+use App\Exception\BookConflictException;
 use App\Repository\AuthorRepository;
 use App\Repository\TagRepository;
+use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Doctrine\ORM\EntityManagerInterface;
 
 /**
@@ -25,17 +27,28 @@ final class BookManager
     ) {
     }
 
+    /**
+     * @throws BookConflictException when a concurrent request created the same author or tag first
+     */
     public function add(NewBook $input, User $user): Book
     {
-        return $this->entityManager->wrapInTransaction(function () use ($input, $user): Book {
-            $description = null === $input->description ? '' : trim($input->description);
+        try {
+            return $this->save($input, $user);
+        } catch (UniqueConstraintViolationException $e) {
+            // Doctrine closed the EntityManager, so nothing may use it after this point.
+            throw new BookConflictException(previous: $e);
+        }
+    }
 
+    private function save(NewBook $input, User $user): Book
+    {
+        return $this->entityManager->wrapInTransaction(function () use ($input, $user): Book {
             $book = (new Book())
                 ->setTitle((string) $input->title)
                 ->setIsbn((string) $input->isbn)
                 ->setPublicationYear((int) $input->publicationYear)
                 ->setCategory($input->category)
-                ->setDescription('' === $description ? null : $description)
+                ->setDescription($input->description)
                 ->setAddedBy($user);
 
             foreach (NameList::parse($input->authors ?? '') as $entry) {

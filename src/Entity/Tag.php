@@ -17,7 +17,7 @@ class Tag
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(length: 30, options: ['collation' => 'utf8mb4_unicode_ci'])]
+    #[ORM\Column(length: 30, options: ['collation' => 'utf8mb4_uca1400_as_ci'])]
     private string $name = '';
 
     public function getId(): ?int
