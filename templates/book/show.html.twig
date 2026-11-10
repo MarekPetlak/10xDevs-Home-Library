@@ -31,7 +31,34 @@
         {% endif %}
     </dl>
 
-    {# Phase 3 fills the read state; Phase 4 fills the readers' comments. #}
-    {% block read_state %}{% endblock %}
+    {# Phase 4 fills the readers' comments. #}
+    {% block read_state %}
+        <section class="mb-4">
+            {% if readBook %}
+                <h2 class="h5">
+                    <span class="badge text-bg-success">{{ 'book.index.read'|trans }}</span>
+                </h2>
+                <dl class="row">
+                    <dt class="col-sm-3">{{ 'reading.show.rating'|trans }}</dt>
+                    <dd class="col-sm-9">{{ 'book.index.rating'|trans({'%rating%': readBook.rating}) }}</dd>
+
+                    <dt class="col-sm-3">{{ 'reading.show.read_on'|trans }}</dt>
+                    <dd class="col-sm-9">{{ readBook.readOn|date('d.m.Y') }}</dd>
+
+                    {% if readBook.comment %}
+                        <dt class="col-sm-3">{{ 'reading.show.comment'|trans }}</dt>
+                        <dd class="col-sm-9">{{ readBook.comment|nl2br }}</dd>
+                    {% endif %}
+                </dl>
+                <form method="post" action="{{ path('book_read_remove', {id: book.id}) }}" onsubmit="return confirm({{ 'reading.remove.confirm'|trans|json_encode(constant('JSON_UNESCAPED_UNICODE')) }});">
+                    <input type="hidden" name="_token" value="{{ csrf_token('read_remove') }}">
+                    <button type="submit" class="btn btn-outline-danger">{{ 'reading.remove.submit'|trans }}</button>
+                </form>
+            {% elseif readForm %}
+                <h2 class="h5">{{ 'reading.form.heading'|trans }}</h2>
+                {{ form(readForm) }}
+            {% endif %}
+        </section>
+    {% endblock %}
     {% block comments %}{% endblock %}
 {% endblock %}

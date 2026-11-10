@@ -411,34 +411,34 @@ The migration only creates one new table, so existing data is untouched. It runs
 
 #### Automated
 
-- [x] 2.1 Tests pass: `php bin/phpunit`
-- [x] 2.2 Routes registered: `php bin/console debug:router book_index book_show`
-- [x] 2.3 Twig and translations lint: `php bin/console lint:twig templates` and `php bin/console lint:yaml translations`
+- [x] 2.1 Tests pass: `php bin/phpunit` — 5e2026c
+- [x] 2.2 Routes registered: `php bin/console debug:router book_index book_show` — 5e2026c
+- [x] 2.3 Twig and translations lint: `php bin/console lint:twig templates` and `php bin/console lint:yaml translations` — 5e2026c
 
 #### Manual
 
-- [x] 2.4 `/books` lists the books added in S-02 with authors and category; the navbar link appears only when signed in
-- [x] 2.5 `/books/{id}` shows all book fields; `/books/new` still opens the add form
-- [x] 2.6 Signed out, both routes redirect to the login page
-- [x] 2.7 Pages are readable at narrow width
+- [x] 2.4 `/books` lists the books added in S-02 with authors and category; the navbar link appears only when signed in — 5e2026c
+- [x] 2.5 `/books/{id}` shows all book fields; `/books/new` still opens the add form — 5e2026c
+- [x] 2.6 Signed out, both routes redirect to the login page — 5e2026c
+- [x] 2.7 Pages are readable at narrow width — 5e2026c
 
 ### Phase 3: Mark as read with rating, date and comment
 
 #### Automated
 
-- [ ] 3.1 Tests pass: `php bin/phpunit`
-- [ ] 3.2 Schema stays clean: `php bin/console doctrine:schema:validate --env=test`
-- [ ] 3.3 Container lints: `php bin/console lint:container`
-- [ ] 3.4 Routes registered: `php bin/console debug:router book_read book_read_remove`
+- [x] 3.1 Tests pass: `php bin/phpunit`
+- [x] 3.2 Schema stays clean: `php bin/console doctrine:schema:validate --env=test`
+- [x] 3.3 Container lints: `php bin/console lint:container`
+- [x] 3.4 Routes registered: `php bin/console debug:router book_read book_read_remove`
 
 #### Manual
 
-- [ ] 3.5 Marking a book with rating 4, today's date and a comment shows "Przeczytana", rating 4, the date and the comment on the detail page, and the rating on the list
-- [ ] 3.6 Marking a book with no comment works and shows no comment
-- [ ] 3.7 A back-dated read date is accepted; tomorrow's date shows a Polish error and saves nothing
-- [ ] 3.8 Rating 0 or 6 cannot be submitted from the radio buttons and is rejected if forced
-- [ ] 3.9 Removing the mark (after the confirmation) returns the book to unread and the form reappears; marking again with a different rating and comment works
-- [ ] 3.10 A second user signed in on another browser does not see the first user's rating anywhere except next to the first user's comment (Phase 4)
+- [x] 3.5 Marking a book with rating 4, today's date and a comment shows "Przeczytana", rating 4, the date and the comment on the detail page, and the rating on the list
+- [x] 3.6 Marking a book with no comment works and shows no comment
+- [x] 3.7 A back-dated read date is accepted; tomorrow's date shows a Polish error and saves nothing
+- [x] 3.8 Rating 0 or 6 cannot be submitted from the radio buttons and is rejected if forced
+- [x] 3.9 Removing the mark (after the confirmation) returns the book to unread and the form reappears; marking again with a different rating and comment works
+- [x] 3.10 A second user signed in on another browser does not see the first user's rating anywhere except next to the first user's comment (Phase 4)
 
 ### Phase 4: Shared reader comments
 

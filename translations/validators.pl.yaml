@@ -8,3 +8,12 @@ book:
         too_long: 'Tag „{{ tag }}” jest za długi (najwyżej {{ limit }} znaków).'
     year:
         invalid: 'Podaj rok z zakresu od {{ min }} do {{ max }}.'
+reading:
+    rating:
+        required: Wybierz ocenę od 1 do 5.
+        invalid: Ocena musi być liczbą od 1 do 5.
+    date:
+        required: Podaj datę przeczytania.
+        future: Data przeczytania nie może być z przyszłości.
+    comment:
+        too_long: Komentarz może mieć najwyżej 2000 znaków.

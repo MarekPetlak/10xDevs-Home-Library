@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
+use App\Dto\MarkRead;
 use App\Dto\NewBook;
 use App\Entity\User;
 use App\Form\BookType;
+use App\Form\MarkReadType;
 use App\Repository\BookRepository;
 use App\Repository\ReadBookRepository;
 use App\Service\BookManager;
@@ -34,11 +36,23 @@ final class BookController extends AbstractController
 
     #[Route('/books/{id}', name: 'book_show', requirements: ['id' => '\d+'], methods: ['GET'])]
     #[IsGranted('ROLE_USER')]
-    public function show(int $id, BookRepository $bookRepository): Response
+    public function show(int $id, BookRepository $bookRepository, ReadBookRepository $readBookRepository): Response
     {
         $book = $bookRepository->findForDetail($id) ?? throw $this->createNotFoundException();
+        $user = $this->getUser();
+        \assert($user instanceof User);
 
-        return $this->render('book/show.html.twig', ['book' => $book]);
+        $readBook = $readBookRepository->findOneBy(['user' => $user, 'book' => $book]);
+        $markRead = new MarkRead();
+        $markRead->readOn = MarkRead::today();
+
+        return $this->render('book/show.html.twig', [
+            'book' => $book,
+            'readBook' => $readBook,
+            'readForm' => null === $readBook
+                ? $this->createForm(MarkReadType::class, $markRead, ['action' => $this->generateUrl('book_read', ['id' => $id])])
+                : null,
+        ]);
     }
 
     #[Route('/books/new', name: 'book_new', methods: ['GET', 'POST'])]

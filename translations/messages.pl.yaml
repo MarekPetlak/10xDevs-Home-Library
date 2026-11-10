@@ -59,3 +59,21 @@ book:
         children: Dla dzieci
         poetry: Poezja
         other: Inne
+reading:
+    form:
+        heading: Oznacz jako przeczytaną
+        rating: Ocena (1-5)
+        read_on: Data przeczytania
+        comment: Komentarz
+        submit: Zapisz jako przeczytaną
+    show:
+        rating: Twoja ocena
+        read_on: Data przeczytania
+        comment: Twój komentarz
+    remove:
+        submit: Usuń moje oznaczenie jako przeczytanej
+        confirm: Usunięcie oznaczenia skasuje Twoją ocenę, datę przeczytania i komentarz. Kontynuować?
+    flash:
+        marked: Książka została oznaczona jako przeczytana.
+        already_read: Ta książka jest już oznaczona jako przeczytana.
+        removed: Oznaczenie jako przeczytanej zostało usunięte.
