@@ -8,6 +8,7 @@ home:
         lead: Przeglądaj książki i zarządzaj domową biblioteką w jednym miejscu.
 nav:
     toggle: Przełącz nawigację
+    book_index: Książki
     book_new: Dodaj książkę
 security:
     login:
@@ -19,6 +20,16 @@ security:
         error: Nieprawidłowy adres e-mail lub hasło.
     logout: Wyloguj
 book:
+    index:
+        title: Książki
+        heading: Książki we wspólnej kolekcji
+        empty: W kolekcji nie ma jeszcze żadnych książek.
+        empty_link: Dodaj pierwszą książkę
+        read_state: Twój status
+        read: Przeczytana
+        rating: '%rating%/5'
+    show:
+        back: Wróć do listy książek
     new:
         title: Dodaj książkę
         heading: Dodaj książkę do wspólnej kolekcji

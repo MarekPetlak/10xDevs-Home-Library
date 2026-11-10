@@ -1,0 +1,37 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ book.title }} - {{ parent() }}{% endblock %}
+
+{% block body_content %}
+    <p><a href="{{ path('book_index') }}">&larr; {{ 'book.show.back'|trans }}</a></p>
+
+    <h1 class="h3">{{ book.title }}</h1>
+    <p class="text-muted">{{ book.authors|map(a => a.fullName)|join(', ') }}</p>
+
+    <dl class="row">
+        <dt class="col-sm-3">{{ 'book.form.isbn'|trans }}</dt>
+        <dd class="col-sm-9">{{ book.isbn }}</dd>
+
+        <dt class="col-sm-3">{{ 'book.form.publication_year'|trans }}</dt>
+        <dd class="col-sm-9">{{ book.publicationYear }}</dd>
+
+        <dt class="col-sm-3">{{ 'book.form.category'|trans }}</dt>
+        <dd class="col-sm-9">{{ book.category.translationKey|trans }}</dd>
+
+        {% if book.tags is not empty %}
+            <dt class="col-sm-3">{{ 'book.form.tags'|trans }}</dt>
+            <dd class="col-sm-9">
+                {% for tag in book.tags %}<span class="badge text-bg-secondary me-1">{{ tag.name }}</span>{% endfor %}
+            </dd>
+        {% endif %}
+
+        {% if book.description %}
+            <dt class="col-sm-3">{{ 'book.form.description'|trans }}</dt>
+            <dd class="col-sm-9">{{ book.description|nl2br }}</dd>
+        {% endif %}
+    </dl>
+
+    {# Phase 3 fills the read state; Phase 4 fills the readers' comments. #}
+    {% block read_state %}{% endblock %}
+    {% block comments %}{% endblock %}
+{% endblock %}

@@ -411,16 +411,16 @@ The migration only creates one new table, so existing data is untouched. It runs
 
 #### Automated
 
-- [ ] 2.1 Tests pass: `php bin/phpunit`
-- [ ] 2.2 Routes registered: `php bin/console debug:router book_index book_show`
-- [ ] 2.3 Twig and translations lint: `php bin/console lint:twig templates` and `php bin/console lint:yaml translations`
+- [x] 2.1 Tests pass: `php bin/phpunit`
+- [x] 2.2 Routes registered: `php bin/console debug:router book_index book_show`
+- [x] 2.3 Twig and translations lint: `php bin/console lint:twig templates` and `php bin/console lint:yaml translations`
 
 #### Manual
 
-- [ ] 2.4 `/books` lists the books added in S-02 with authors and category; the navbar link appears only when signed in
-- [ ] 2.5 `/books/{id}` shows all book fields; `/books/new` still opens the add form
-- [ ] 2.6 Signed out, both routes redirect to the login page
-- [ ] 2.7 Pages are readable at narrow width
+- [x] 2.4 `/books` lists the books added in S-02 with authors and category; the navbar link appears only when signed in
+- [x] 2.5 `/books/{id}` shows all book fields; `/books/new` still opens the add form
+- [x] 2.6 Signed out, both routes redirect to the login page
+- [x] 2.7 Pages are readable at narrow width
 
 ### Phase 3: Mark as read with rating, date and comment
 
