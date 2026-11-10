@@ -1,10 +1,10 @@
 ---
 change_id: sign-in-household-accounts-review
 title: Sign-in household accounts review
-status: impl_reviewed
+status: archived
 created: 2026-11-10
 updated: 2026-11-10
-archived_at: null
+archived_at: 2026-11-10T15:58:05Z
 ---
 
 ## Notes
