@@ -43,7 +43,7 @@ Użytkownik nie pamięta, jakie książki ma w domowej bibliotece i które przec
 | ----- | ------------------------------ | ----------------------------------------------------------------------- | ------------- | ------------- | -------- |
 | S-01  | sign-in-household-accounts     | user can sign in with e-mail and password and see the logged-in home page | —             | FR-001, US-01 | done |
 | S-02  | add-book-to-shared-collection  | user can add a book to the shared collection                            | S-01          | FR-004, US-01 | done |
-| S-03  | rate-read-book                 | user can mark a book as read and rate it 1–5                            | S-02          | FR-008, US-01 | in-progress |
+| S-03  | rate-read-book                 | user can mark a book as read and rate it 1–5                            | S-02          | FR-008, US-01 | done |
 | S-04  | home-recommendations           | user can see up to three recommended books on the home page             | S-03          | FR-010, US-01 | proposed |
 | S-05  | browse-and-search-books        | anyone can browse and search books by title, author and category        | S-02          | FR-003        | proposed |
 | S-06  | duplicate-book-warning         | user is warned about a duplicate before adding a book                   | S-02          | FR-005, US-01 | proposed |
@@ -108,7 +108,7 @@ Brak. Warstwy oznaczone w Baseline jako `partial` (dane, auth, interfejs) są wp
 - **Unknowns:**
   - Komentarze czytelników (wiele na książkę, publiczne lub prywatne wg autora komentarza) razem z oceną — patrz Open Roadmap Question 11 — Owner: user. Block: no. Resolved: komentarz jest opcjonalnym polem formularza oznaczania jako przeczytanej (jeden na rekord przeczytania, bez edycji; usuwany razem z rekordem), widoczny dla wszystkich zalogowanych (e-mail autora zaciemniony); prywatność komentarzy przenosi S-09.
 - **Risk:** Data oznaczenia jako przeczytana jest wejściem reguły „ostatni rok”, więc musi być zapisywana od początku, a nie dopisywana później; błąd w izolacji ocen (poza oceną pokazywaną obok komentarza jej autora) naruszyłby guardraile prywatności.
-- **Status:** in-progress
+- **Status:** done
 
 ### S-04: Rekomendacje na stronie głównej
 
@@ -237,3 +237,4 @@ Brak. Warstwy oznaczone w Baseline jako `partial` (dane, auth, interfejs) są wp
 
 - **S-01: user can sign in with e-mail and password and see the logged-in home page (konta zakłada właściciel ręcznie; niezalogowany nie ma dostępu do funkcji osobistych).** — Archived 2026-11-03 → `context/archive/2026-11-02-sign-in-household-accounts/`. Lesson: —.
 - **S-02: user can add a book to the shared collection (tytuł i autor wymagane i walidowane, ISBN, rok, notatka, kategoria, do około pięciu tagów).** — Archived 2026-11-03 → `context/archive/2026-11-03-add-book-to-shared-collection/`. Lesson: —.
+- **S-03: user can mark a book as read and rate it 1–5 within their own account (oceny i status są osobiste; ocena jest widoczna dla innych zalogowanych tylko obok komentarza swojego autora; data oznaczenia jest zapisywana; rekord przeczytania nie podlega edycji).** — Archived 2026-11-10 → `context/archive/2026-11-10-rate-read-book/`. Lesson: —.
