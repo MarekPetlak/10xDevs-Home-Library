@@ -65,7 +65,7 @@
             {% for entry in comments %}
                 <article class="border rounded p-3 mb-2">
                     <p class="mb-1 text-muted small">
-                        {{ entry.user.email|mask_email }}
+                        {{ entry.email|mask_email }}
                         <span class="badge text-bg-secondary ms-1">{{ 'book.index.rating'|trans({'%rating%': entry.rating}) }}</span>
                     </p>
                     <p class="mb-0">{{ entry.comment|nl2br }}</p>

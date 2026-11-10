@@ -78,6 +78,8 @@ reading:
     remove:
         submit: Usuń moje oznaczenie jako przeczytanej
         confirm: Usunięcie oznaczenia skasuje Twoją ocenę, datę przeczytania i komentarz. Kontynuować?
+    error:
+        invalid_token: Nie udało się usunąć oznaczenia, bo strona jest nieaktualna. Odśwież stronę i spróbuj ponownie.
     flash:
         marked: Książka została oznaczona jako przeczytana.
         already_read: Ta książka jest już oznaczona jako przeczytana.

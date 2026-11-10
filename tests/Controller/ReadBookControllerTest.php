@@ -194,6 +194,9 @@ final class ReadBookControllerTest extends WebTestCase
 
         $this->client->request('POST', $this->readUrl().'/remove', ['_token' => 'tampered']);
         self::assertResponseStatusCodeSame(400);
+        // The refusal is a Polish message, not a hardcoded English one.
+        self::assertStringContainsString('Odśwież stronę', (string) $this->client->getResponse()->getContent());
+        self::assertStringNotContainsString('Invalid CSRF token', (string) $this->client->getResponse()->getContent());
 
         self::assertCount(1, $this->entityManager()->getRepository(ReadBook::class)->findAll());
     }

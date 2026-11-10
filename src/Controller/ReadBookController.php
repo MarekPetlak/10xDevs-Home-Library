@@ -57,12 +57,13 @@ final class ReadBookController extends AbstractController
     #[IsGranted('ROLE_USER')]
     public function remove(int $id, Request $request, BookRepository $bookRepository, ReadingManager $readingManager, TranslatorInterface $translator): Response
     {
-        $book = $bookRepository->findForDetail($id) ?? throw $this->createNotFoundException();
+        // Only the existence of the book matters here, so no authors or tags are joined.
+        $book = $bookRepository->find($id) ?? throw $this->createNotFoundException();
         $user = $this->getUser();
         \assert($user instanceof User);
 
         if (!$this->isCsrfTokenValid('read_remove', (string) $request->request->get('_token'))) {
-            return new Response('Invalid CSRF token.', Response::HTTP_BAD_REQUEST);
+            return new Response($translator->trans('reading.error.invalid_token'), Response::HTTP_BAD_REQUEST);
         }
 
         $readingManager->remove($user, $book);
