@@ -1,10 +1,10 @@
 ---
 change_id: rate-read-book-review
 title: Rate-read-book review
-status: impl_reviewed
+status: archived
 created: 2026-11-10
 updated: 2026-11-10
-archived_at: null
+archived_at: 2026-11-10T16:46:38Z
 ---
 
 ## Notes
