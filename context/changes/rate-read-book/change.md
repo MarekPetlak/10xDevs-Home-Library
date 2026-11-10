@@ -1,7 +1,7 @@
 ---
 change_id: rate-read-book
 title: Mark book as read and rate it (roadmap S-03)
-status: implementing
+status: implemented
 created: 2026-11-10
 updated: 2026-11-10
 archived_at: null

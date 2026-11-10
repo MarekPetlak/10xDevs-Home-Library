@@ -459,14 +459,14 @@ The migration only creates one new table, so existing data is untouched. It runs
 
 #### Automated
 
-- [x] 5.1 Full test suite passes on the final tree: `php bin/phpunit`
-- [x] 5.2 `docker build` succeeds from the clean tree
-- [x] 5.3 `AGENTS.md` mentions `ReadBook`: `grep -n ReadBook AGENTS.md`
-- [x] 5.4 Roadmap lists the new slice: `grep -n reader-comments-privacy context/foundation/roadmap.md`
+- [x] 5.1 Full test suite passes on the final tree: `php bin/phpunit` — 1bf418e
+- [x] 5.2 `docker build` succeeds from the clean tree — 1bf418e
+- [x] 5.3 `AGENTS.md` mentions `ReadBook`: `grep -n ReadBook AGENTS.md` — 1bf418e
+- [x] 5.4 Roadmap lists the new slice: `grep -n reader-comments-privacy context/foundation/roadmap.md` — 1bf418e
 
 #### Manual
 
-- [x] 5.5 PR green, merged by the human, deploy finished, `fly releases --image` shows a new complete release
-- [x] 5.6 `doctrine:migrations:status` on Fly shows the new migration executed
-- [x] 5.7 On production a book is marked read with a rating and a comment, the comment shows to another user with a masked e-mail, signed-out access redirects to login and `/healthz` is 200
-- [x] 5.8 The PRD and roadmap wording was read and contains no leftover contradiction about comments
+- [x] 5.5 PR green, merged by the human, deploy finished, `fly releases --image` shows a new complete release — 1bf418e
+- [x] 5.6 `doctrine:migrations:status` on Fly shows the new migration executed — 1bf418e
+- [x] 5.7 On production a book is marked read with a rating and a comment, the comment shows to another user with a masked e-mail, signed-out access redirects to login and `/healthz` is 200 — 1bf418e
+- [x] 5.8 The PRD and roadmap wording was read and contains no leftover contradiction about comments — 1bf418e
