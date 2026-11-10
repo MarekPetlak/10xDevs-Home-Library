@@ -1,6 +1,6 @@
 ---
 project: "My home library"
-version: 2
+version: 3
 status: draft
 created: 2026-10-16
 context_type: greenfield
@@ -18,6 +18,8 @@ timeline_budget:
 # My home library — PRD
 
 > Wersja 2 (2026-11-03): FR-004 uściślony po rozstrzygnięciu Open Questions 1, 2, 3 i 6 (bez notatki książki, opcjonalny opis, autorzy i tagi jako encje, rok wydania, stała lista kategorii, ISBN wymagany).
+
+> Wersja 3 (2026-11-10): FR-009 (komentarz do przeczytanej książki) awansowany do must-have w formie z S-03; komentarz widzą wszyscy zalogowani z zaciemnionym e-mailem autora do czasu zmiany z prywatnością komentarzy (reguła osobistych komentarzy czasowo złagodzona tylko dla komentarzy).
 
 ## Vision & Problem Statement
 
@@ -41,7 +43,7 @@ Ewidencja zbioru (co mam, co przeczytałem) jest fundamentem, a rekomendacja kol
 - Uzasadnienie rekomendacji przy każdej pozycji.
 
 ### Guardrails
-- Oceny i komentarze są osobiste. Użytkownik nie może edytować ani usuwać cudzych ocen i komentarzy.
+- Oceny i status przeczytania są osobiste; komentarze są czasowo widoczne dla wszystkich zalogowanych (do czasu zmiany z prywatnością komentarzy), razem z oceną ich autora. Użytkownik nie może edytować ani usuwać cudzych ocen i komentarzy.
 - Zapisane książki, oceny i komentarze nie giną po ponownym zalogowaniu ani po edycji.
 - Konta są bezpieczne. Hasła nie są przechowywane jawnie, a dane osobiste (oceny, komentarze, status przeczytania, rekomendacje) bez logowania są niedostępne.
 
@@ -84,8 +86,9 @@ Rejestracja (samodzielne zakładanie konta) wypadła z MVP: konta zakłada wła�
 ### Czytanie i oceny
 
 - FR-008: Zalogowany użytkownik może w ramach swojego konta oznaczyć książkę jako przeczytaną i wystawić ocenę (skala 1–5). Priority: must-have
-  > Socrates: Counter-argument considered: "komentarz to osobny koszt, a rekomendacja z niego nie korzysta." Resolution: komentarz wydzielony do FR-009 jako nice-to-have; FR-008 obejmuje tylko status przeczytania i ocenę.
-- FR-009: Zalogowany użytkownik może w ramach swojego konta dodać do przeczytanej książki komentarz. Priority: nice-to-have
+  > Socrates: Counter-argument considered: "komentarz to osobny koszt, a rekomendacja z niego nie korzysta." Resolution: komentarz wydzielony do FR-009; FR-008 obejmuje tylko status przeczytania i ocenę.
+- FR-009: Zalogowany użytkownik może przy oznaczaniu książki jako przeczytanej dodać jeden opcjonalny komentarz. Komentarz jest widoczny dla wszystkich zalogowanych użytkowników razem z oceną jego autora i zaciemnionym adresem e-mail autora, do czasu późniejszej zmiany, która doda prywatność poszczególnych komentarzy. Priority: must-have
+  > Socrates: Counter-argument considered: "komentarz widoczny dla wszystkich przeczy regule osobistych komentarzy." Resolution: awansowane z nice-to-have do must-have w formie z S-03; reguła osobistych komentarzy jest czasowo złagodzona tylko dla komentarzy (ocena jest widoczna wyłącznie obok komentarza swojego autora, pozostałe oceny i status przeczytania nadal osobiste).
 
 ### Rekomendacje
 
@@ -95,7 +98,7 @@ Rejestracja (samodzielne zakładanie konta) wypadła z MVP: konta zakłada wła�
 ## Non-Functional Requirements
 
 - Strona główna z rekomendacjami jest widoczna dla zalogowanego użytkownika w czasie krótszym niż 2 sekundy od wejścia na nią.
-- Oceny, komentarze i status przeczytania nie są widoczne dla osób niezalogowanych.
+- Oceny, komentarze i status przeczytania nie są widoczne dla osób niezalogowanych. Między zalogowanymi użytkownikami oceny i status przeczytania są osobiste; wyjątkiem (czasowym, do zmiany z prywatnością komentarzy) jest komentarz razem z oceną jego autora.
 - Zapisane książki, oceny i komentarze są dostępne po ponownym zalogowaniu i po restarcie aplikacji.
 - Aplikacja jest używalna w dwóch ostatnich głównych wersjach czterech popularnych przeglądarek desktopowych.
 
@@ -119,7 +122,7 @@ Aplikacja rekomenduje użytkownikowi do trzech nieprzeczytanych przez niego ksi�
 
 **Edycja i usuwanie książki:** Tylko użytkownik, który dodał daną książkę (autor wpisu).
 
-**Oceny, status przeczytania i komentarze:** Osobiste dla każdego użytkownika.
+**Oceny, status przeczytania i komentarze:** Oceny i status przeczytania są osobiste dla każdego użytkownika. Reguła osobistych komentarzy jest czasowo złagodzona tylko dla komentarzy: komentarz widzą wszyscy zalogowani, z zaciemnionym e-mailem autora i razem z oceną autora (ocena jest widoczna tylko obok jego komentarza), do czasu zmiany dodającej prywatność poszczególnych komentarzy. Rekord przeczytania (ocena, data, komentarz) nie podlega edycji, można go tylko usunąć.
 
 Nierozstrzygnięte kwestie dostępu (zakładanie kont przez właściciela, los książek po usunięciu konta autora) są w `## Open Questions`.
 
@@ -135,7 +138,7 @@ Nierozstrzygnięte kwestie dostępu (zakładanie kont przez właściciela, los k
 
 1. **Czym jest „rok” w polach książki** — rok dodania do zbioru czy rok wydania? — Owner: użytkownik. Resolved: rok wydania, pole wymagane.
 2. **Czy kategoria pochodzi ze stałej listy, czy jest wolnym tekstem, i jakie są kategorie?** Wybór wpływa na zliczanie „najczęściej czytanej” kategorii. — Owner: użytkownik. Block: yes (reguła rekomendacji zależy od spójnych kategorii). Resolved: stała lista kategorii w kodzie (`App\Enum\Category`), zmiana przez kod i wdrożenie.
-3. **Do czego służą tagi i notatka książki?** Reguła rekomendacji ich nie używa; są w FR-004 jako część wpisu. Czy to must-have w MVP? — Owner: użytkownik. Resolved: tagi są encjami, do pięciu na książkę; notatka książki wypada z FR-004 (zastępują ją komentarze czytelników, o których zdecyduje się później, patrz roadmapa, pytanie 11); dodano opcjonalny opis.
+3. **Do czego służą tagi i notatka książki?** Reguła rekomendacji ich nie używa; są w FR-004 jako część wpisu. Czy to must-have w MVP? — Owner: użytkownik. Resolved: tagi są encjami, do pięciu na książkę; notatka książki wypada z FR-004 (zastępuje ją komentarz czytelnika przy oznaczeniu jako przeczytanej, FR-009, a jego prywatność rozstrzygnie późniejsza zmiana, patrz roadmapa, pytanie 11 i S-09); dodano opcjonalny opis.
 4. **Jak właściciel zakłada konta i kto nim jest** (poza aplikacją czy ekran administracyjny). — Owner: użytkownik.
 5. **Co dzieje się z książkami, gdy konto ich autora zostanie usunięte.** — Owner: użytkownik.
 6. **Czy ISBN jest polem wymaganym i jak łączą się dopasowania po ISBN oraz po tytule i autorze** przy ostrzeżeniu o duplikacie. — Owner: użytkownik. Resolved: ISBN jest polem wymaganym i walidowanym; zasady łączenia dopasowań w ostrzeżeniu o duplikacie wchodzą z S-06.

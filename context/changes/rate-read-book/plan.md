@@ -444,29 +444,29 @@ The migration only creates one new table, so existing data is untouched. It runs
 
 #### Automated
 
-- [x] 4.1 Tests pass: `php bin/phpunit`
-- [x] 4.2 Container lints: `php bin/console lint:container`
-- [x] 4.3 Twig lints: `php bin/console lint:twig templates`
+- [x] 4.1 Tests pass: `php bin/phpunit` — b7e5cd9
+- [x] 4.2 Container lints: `php bin/console lint:container` — b7e5cd9
+- [x] 4.3 Twig lints: `php bin/console lint:twig templates` — b7e5cd9
 
 #### Manual
 
-- [x] 4.4 A second user sees the first user's comment as `a***@example.com`-style text, never the full address, together with the first user's rating next to it
-- [x] 4.5 A comment containing a script tag is displayed as text
-- [x] 4.6 A read record with no comment adds nothing to the block; with no comments at all the empty-state message shows
-- [x] 4.7 After the author removes their read mark, their comment disappears from the other user's view
+- [x] 4.4 A second user sees the first user's comment as `a***@example.com`-style text, never the full address, together with the first user's rating next to it — b7e5cd9
+- [x] 4.5 A comment containing a script tag is displayed as text — b7e5cd9
+- [x] 4.6 A read record with no comment adds nothing to the block; with no comments at all the empty-state message shows — b7e5cd9
+- [x] 4.7 After the author removes their read mark, their comment disappears from the other user's view — b7e5cd9
 
 ### Phase 5: Docs sync and production check
 
 #### Automated
 
-- [ ] 5.1 Full test suite passes on the final tree: `php bin/phpunit`
-- [ ] 5.2 `docker build` succeeds from the clean tree
-- [ ] 5.3 `AGENTS.md` mentions `ReadBook`: `grep -n ReadBook AGENTS.md`
-- [ ] 5.4 Roadmap lists the new slice: `grep -n reader-comments-privacy context/foundation/roadmap.md`
+- [x] 5.1 Full test suite passes on the final tree: `php bin/phpunit`
+- [x] 5.2 `docker build` succeeds from the clean tree
+- [x] 5.3 `AGENTS.md` mentions `ReadBook`: `grep -n ReadBook AGENTS.md`
+- [x] 5.4 Roadmap lists the new slice: `grep -n reader-comments-privacy context/foundation/roadmap.md`
 
 #### Manual
 
-- [ ] 5.5 PR green, merged by the human, deploy finished, `fly releases --image` shows a new complete release
-- [ ] 5.6 `doctrine:migrations:status` on Fly shows the new migration executed
-- [ ] 5.7 On production a book is marked read with a rating and a comment, the comment shows to another user with a masked e-mail, signed-out access redirects to login and `/healthz` is 200
-- [ ] 5.8 The PRD and roadmap wording was read and contains no leftover contradiction about comments
+- [x] 5.5 PR green, merged by the human, deploy finished, `fly releases --image` shows a new complete release
+- [x] 5.6 `doctrine:migrations:status` on Fly shows the new migration executed
+- [x] 5.7 On production a book is marked read with a rating and a comment, the comment shows to another user with a masked e-mail, signed-out access redirects to login and `/healthz` is 200
+- [x] 5.8 The PRD and roadmap wording was read and contains no leftover contradiction about comments

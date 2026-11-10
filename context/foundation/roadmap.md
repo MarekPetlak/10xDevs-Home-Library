@@ -4,7 +4,7 @@ version: 1
 status: draft
 created: 2026-11-02
 updated: 2026-11-10
-prd_version: 2
+prd_version: 3
 main_goal: speed
 top_blocker: decisions
 milestone_id: first-recommendation-flow
@@ -14,7 +14,7 @@ milestone_status: open
 
 # Roadmap: My home library
 
-> Derived from `context/foundation/prd.md` (v2) + auto-researched codebase baseline.
+> Derived from `context/foundation/prd.md` (v3) + auto-researched codebase baseline.
 > Edit-in-place; the next milestone continues this file. Archive only when an independent roadmap replaces it.
 > Slices below are listed in dependency order. The "At a glance" table is the index.
 
@@ -23,7 +23,7 @@ milestone_status: open
 **M-1: Pierwszy przepływ od logowania do rekomendacji** — Status: open
 
 - **Intent:** Zalogowany domownik przechodzi cały przepływ MVP z PRD: loguje się, dodaje książki do wspólnego zbioru (z ostrzeżeniem o duplikacie), oznacza je jako przeczytane, ocenia i widzi na stronie głównej do trzech rekomendacji. Rezultat jest wdrożony na produkcji.
-- **Source materials:** `context/foundation/prd.md` (v2)
+- **Source materials:** `context/foundation/prd.md` (v3)
 - **Done when:** every F-NN and S-NN below is `done`.
 - **Scope anchors:** FR-001, FR-003, FR-004, FR-005, FR-006, FR-007, FR-008, FR-010 (wszystkie must-have) oraz US-01.
 
@@ -99,7 +99,7 @@ Brak. Warstwy oznaczone w Baseline jako `partial` (dane, auth, interfejs) są wp
 
 ### S-03: Oznaczanie jako przeczytana i ocena
 
-- **Outcome:** user can mark a book as read and rate it 1–5 within their own account (oceny i status są osobiste, widoczne tylko po zalogowaniu; data oznaczenia jest zapisywana).
+- **Outcome:** user can mark a book as read and rate it 1–5 within their own account (oceny i status są osobiste; ocena jest widoczna dla innych zalogowanych tylko obok komentarza swojego autora; data oznaczenia jest zapisywana; rekord przeczytania nie podlega edycji).
 - **Change ID:** rate-read-book
 - **PRD refs:** FR-008, US-01
 - **Prerequisites:** S-02
@@ -107,7 +107,7 @@ Brak. Warstwy oznaczone w Baseline jako `partial` (dane, auth, interfejs) są wp
 - **Blockers:** —
 - **Unknowns:**
   - Komentarze czytelników (wiele na książkę, publiczne lub prywatne wg autora komentarza) razem z oceną — patrz Open Roadmap Question 11 — Owner: user. Block: no. Resolved: komentarz jest opcjonalnym polem formularza oznaczania jako przeczytanej (jeden na rekord przeczytania, bez edycji; usuwany razem z rekordem), widoczny dla wszystkich zalogowanych (e-mail autora zaciemniony); prywatność komentarzy przenosi S-09.
-- **Risk:** Data oznaczenia jako przeczytana jest wejściem reguły „ostatni rok”, więc musi być zapisywana od początku, a nie dopisywana później; błąd w izolacji ocen naruszyłby guardraile prywatności.
+- **Risk:** Data oznaczenia jako przeczytana jest wejściem reguły „ostatni rok”, więc musi być zapisywana od początku, a nie dopisywana później; błąd w izolacji ocen (poza oceną pokazywaną obok komentarza jej autora) naruszyłby guardraile prywatności.
 - **Status:** in-progress
 
 ### S-04: Rekomendacje na stronie głównej
@@ -213,7 +213,7 @@ Brak. Warstwy oznaczone w Baseline jako `partial` (dane, auth, interfejs) są wp
 8. **Jaki jest przewidywany wolumen danych (data_volume)?** — Owner: user. Block: S-04.
 9. **Czy podłączyć zewnętrzne narzędzie do śledzenia błędów w tym kamieniu milowym?** Użytkownik zgłosił taki zamiar, ale PRD go nie zawiera; jeśli ma wejść do zakresu, dopisz wymaganie do PRD. — Owner: user. Block: roadmap-wide.
 10. **Kopie zapasowe produkcyjnej bazy** (otwarta faza w planie wdrożenia) przed pierwszymi danymi domowników; guardrail PRD mówi, że dane nie giną. — Owner: user. Block: roadmap-wide.
-11. **Komentarze czytelników** (decyzja właściciela): komentarze wchodzą razem z oceną w S-03 (FR-008/FR-009): wiele komentarzy na książkę, dodawanych przez czytelników, każdy oznaczony jako publiczny lub prywatny przez jej autora. Przeczy to regule PRD „komentarze są osobiste / ukryte przed niezalogowanymi” (FR-009, Access Control, Guardrails), dopóki PRD nie zostanie zaktualizowane przy planowaniu S-03. — Owner: user. Block: S-03. Resolved (2026-11-10): S-03 dodaje komentarz od razu jako pole formularza oznaczania jako przeczytanej, widoczny dla wszystkich zalogowanych z zaciemnionym e-mailem autora; flaga publiczna/prywatna wchodzi osobno jako S-09 (`reader-comments-privacy`); PRD jest aktualizowany w fazie 5 planu S-03.
+11. **Komentarze czytelników** (decyzja właściciela): komentarze wchodzą razem z oceną w S-03 (FR-008/FR-009): wiele komentarzy na książkę, dodawanych przez czytelników, każdy oznaczony jako publiczny lub prywatny przez jej autora. Przeczy to regule PRD „komentarze są osobiste / ukryte przed niezalogowanymi” (FR-009, Access Control, Guardrails), dopóki PRD nie zostanie zaktualizowane przy planowaniu S-03. — Owner: user. Block: S-03. Resolved (2026-11-10): S-03 dodaje komentarz od razu jako pole formularza oznaczania jako przeczytanej, widoczny dla wszystkich zalogowanych z zaciemnionym e-mailem autora; flaga publiczna/prywatna wchodzi osobno jako S-09 (`reader-comments-privacy`); PRD zaktualizowano do wersji 3 w fazie 5 planu S-03 (FR-009 awansowany do must-have, reguła osobistych komentarzy czasowo złagodzona tylko dla komentarzy).
 
 ## Parked
 
