@@ -15,3 +15,10 @@
 - **Problem**: Both account commands carried the same password-prompt code. Sharing it through a trait would hide the dependency, make it hard to test on its own, and couple the commands through mixed-in code.
 - **Rule**: Treat traits as a last resort. Put shared behaviour in a small injectable service with its own test.
 - **Applies to**: Commands, controllers and services that would otherwise share code through a trait.
+
+## Pin both case and accent behaviour on uniquely indexed text columns
+
+- **Context**: src/Entity/Author.php, src/Entity/Tag.php, migrations/Version20261103191639.php (S-02 review, F3)
+- **Problem**: `utf8mb4_unicode_ci` was chosen only to get case-insensitive uniqueness for author and tag names. It is also accent-insensitive, so "José" and "Jose" collapsed into one author and the unique index rejected the second. Fixing it needed a later migration (`utf8mb4_uca1400_as_ci`).
+- **Rule**: When picking a collation for a uniquely indexed text column, decide case and accent behaviour on purpose, pin the collation explicitly in the entity and the migration, and add a test with case and accent variants.
+- **Applies to**: Doctrine entities with unique constraints on user-entered text.
