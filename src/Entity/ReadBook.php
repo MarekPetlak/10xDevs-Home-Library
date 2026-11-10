@@ -7,6 +7,7 @@ namespace App\Entity;
 use App\Repository\ReadBookRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Clock\Clock;
 
 #[ORM\Entity(repositoryClass: ReadBookRepository::class)]
 #[ORM\Table(name: 'read_book')]
@@ -41,7 +42,7 @@ class ReadBook
 
     public function __construct()
     {
-        $this->createdAt = new \DateTimeImmutable();
+        $this->createdAt = Clock::get()->now();
     }
 
     public function getId(): ?int

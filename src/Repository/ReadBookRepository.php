@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Repository;
 
+use App\Dto\CommentView;
 use App\Entity\Book;
 use App\Entity\ReadBook;
 use App\Entity\User;
@@ -45,17 +46,17 @@ class ReadBookRepository extends ServiceEntityRepository
     }
 
     /**
-     * Read records of one book that carry a comment, newest first, authors loaded in the same query.
-     * The viewer's own record is left out: it is already shown in their read state.
-     * Ratings are exposed only through records that have a comment.
+     * Comments of one book, newest first, in one query that selects only e-mail, rating and text
+     * (no User entity is hydrated). The viewer's own record is left out: it is already shown in
+     * their read state. Ratings are exposed only through records that have a comment.
      *
-     * @return list<ReadBook>
+     * @return list<CommentView>
      */
     public function findCommentsForBook(Book $book, User $viewer): array
     {
-        /** @var list<ReadBook> $records */
-        $records = $this->createQueryBuilder('r')
-            ->addSelect('u')
+        /** @var list<CommentView> $views */
+        $views = $this->createQueryBuilder('r')
+            ->select(sprintf('NEW %s(u.email, r.rating, r.comment)', CommentView::class))
             ->join('r.user', 'u')
             ->where('r.book = :book')
             ->andWhere('r.comment IS NOT NULL')
@@ -67,6 +68,6 @@ class ReadBookRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
 
-        return $records;
+        return $views;
     }
 }
