@@ -44,7 +44,7 @@ Użytkownik nie pamięta, jakie książki ma w domowej bibliotece i które przec
 | S-01  | sign-in-household-accounts     | user can sign in with e-mail and password and see the logged-in home page | —             | FR-001, US-01 | done |
 | S-02  | add-book-to-shared-collection  | user can add a book to the shared collection                            | S-01          | FR-004, US-01 | done |
 | S-03  | rate-read-book                 | user can mark a book as read and rate it 1–5                            | S-02          | FR-008, US-01 | done |
-| S-04  | home-recommendations           | user can see up to three recommended books on the home page             | S-03          | FR-010, US-01 | in-progress |
+| S-04  | home-recommendations           | user can see up to three recommended books on the home page             | S-03          | FR-010, US-01 | done |
 | S-05  | browse-and-search-books        | anyone can browse and search books by title, author and category        | S-02          | FR-003        | proposed |
 | S-06  | duplicate-book-warning         | user is warned about a duplicate before adding a book                   | S-02          | FR-005, US-01 | proposed |
 | S-07  | edit-own-book-entry            | user can edit a book they added, after confirmation                     | S-02          | FR-006        | proposed |
@@ -121,7 +121,7 @@ Brak. Warstwy oznaczone w Baseline jako `partial` (dane, auth, interfejs) są wp
 - **Unknowns:**
   - Przewidywany ruch (qps) i wolumen danych — Owner: user. Block: no. Resolved: 2–3 qps w MVP (później do 10), do 10 000 książek.
 - **Risk:** To north star i najbardziej ryzykowna logika domenowa; strona musi się ładować poniżej 2 sekund (NFR), a reguła zależy od spójnych kategorii z S-02.
-- **Status:** in-progress
+- **Status:** done
 
 ### S-05: Przeglądanie i wyszukiwanie książek
 
@@ -238,3 +238,4 @@ Brak. Warstwy oznaczone w Baseline jako `partial` (dane, auth, interfejs) są wp
 - **S-01: user can sign in with e-mail and password and see the logged-in home page (konta zakłada właściciel ręcznie; niezalogowany nie ma dostępu do funkcji osobistych).** — Archived 2026-11-03 → `context/archive/2026-11-02-sign-in-household-accounts/`. Lesson: —.
 - **S-02: user can add a book to the shared collection (tytuł i autor wymagane i walidowane, ISBN, rok, notatka, kategoria, do około pięciu tagów).** — Archived 2026-11-03 → `context/archive/2026-11-03-add-book-to-shared-collection/`. Lesson: —.
 - **S-03: user can mark a book as read and rate it 1–5 within their own account (oceny i status są osobiste; ocena jest widoczna dla innych zalogowanych tylko obok komentarza swojego autora; data oznaczenia jest zapisywana; rekord przeczytania nie podlega edycji).** — Archived 2026-11-10 → `context/archive/2026-11-10-rate-read-book/`. Lesson: —.
+- **S-04: user can see up to three recommended books on the home page, chosen by the PRD rule (najwyższe średnie oceny, kategorie najczęściej czytane w ostatnim roku, nieprzeczytane; druga kategoria jako uzupełnienie), or a message when none can be generated.** — Archived 2026-11-12 → `context/archive/2026-11-12-home-recommendations/`. Lesson: —.
