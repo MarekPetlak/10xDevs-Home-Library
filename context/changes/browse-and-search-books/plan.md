@@ -350,31 +350,31 @@ One migration, in Phase 2: it pins `book.title` to `utf8mb4_uca1400_as_ci` (a sm
 
 #### Automated
 
-- [x] 2.1 Repository and controller tests pass: `bin/phpunit tests/Repository tests/Controller`
-- [x] 2.2 Whole suite passes: `bin/phpunit`
-- [x] 2.3 Query-count test still passes with paging
-- [x] 2.7 Migration applies cleanly and the schema is in sync: `bin/console doctrine:migrations:migrate --no-interaction` then `bin/console doctrine:schema:validate`
+- [x] 2.1 Repository and controller tests pass: `bin/phpunit tests/Repository tests/Controller` — 89621d0
+- [x] 2.2 Whole suite passes: `bin/phpunit` — 89621d0
+- [x] 2.3 Query-count test still passes with paging — 89621d0
+- [x] 2.7 Migration applies cleanly and the schema is in sync: `bin/console doctrine:migrations:migrate --no-interaction` then `bin/console doctrine:schema:validate` — 89621d0
 
 #### Manual
 
-- [x] 2.4 Title, author and category searches return the expected books
-- [x] 2.5 A search with no matches returns 200 with an empty result
-- [x] 2.6 Hand-edited URLs (`page=-3`, `category=bogus`) do not break the page
+- [x] 2.4 Title, author and category searches return the expected books — 89621d0
+- [x] 2.5 A search with no matches returns 200 with an empty result — 89621d0
+- [x] 2.6 Hand-edited URLs (`page=-3`, `category=bogus`) do not break the page — 89621d0
 
 ### Phase 3: Search form, pager and empty states
 
 #### Automated
 
-- [ ] 3.1 Controller tests pass: `bin/phpunit tests/Controller`
-- [ ] 3.2 Whole suite passes: `bin/phpunit`
+- [x] 3.1 Controller tests pass: `bin/phpunit tests/Controller`
+- [x] 3.2 Whole suite passes: `bin/phpunit`
 
 #### Manual
 
-- [ ] 3.3 Form and pager usable at desktop and one mobile width
-- [ ] 3.4 Keyboard reaches every control with a visible focus
-- [ ] 3.5 Filters survive paging and "clear" resets them
-- [ ] 3.6 Logged-out and logged-in both work, nothing personal logged out
-- [ ] 3.7 AGENTS.md describes the public list and detail routes
+- [x] 3.3 Form and pager usable at desktop and one mobile width
+- [x] 3.4 Keyboard reaches every control with a visible focus
+- [x] 3.5 Filters survive paging and "clear" resets them
+- [x] 3.6 Logged-out and logged-in both work, nothing personal logged out
+- [x] 3.7 AGENTS.md describes the public list and detail routes
 
 ### Phase 4: `/books` as the main page with recommendations
 

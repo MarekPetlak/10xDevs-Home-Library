@@ -29,6 +29,17 @@ book:
         heading: Książki we wspólnej kolekcji
         empty: W kolekcji nie ma jeszcze żadnych książek.
         empty_link: Dodaj pierwszą książkę
+        no_results: Żadna książka nie pasuje do wyszukiwania.
+        no_results_link: Wyczyść wyszukiwanie
+        search:
+            title: Tytuł
+            author: Autor
+            category: Kategoria
+            all_categories: Wszystkie kategorie
+            submit: Szukaj
+            clear: Wyczyść
+        pager:
+            label: Strony wyników
         read_state: Twój status
         read: Przeczytana
         rating: '%rating%/5'

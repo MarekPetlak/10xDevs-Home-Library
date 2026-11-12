@@ -269,6 +269,101 @@ final class BookListControllerTest extends WebTestCase
         self::assertSelectorNotExists('tbody tr');
     }
 
+    public function testSearchFormExistsForAnonymousAndLoggedInUsers(): void
+    {
+        $this->createBook('Solaris', $this->user);
+
+        foreach ([true, false] as $loggedIn) {
+            if (!$loggedIn) {
+                $this->client->restart();
+            }
+            $this->client->request('GET', '/books');
+
+            self::assertSelectorExists('form[method="get"][action="/books"] input[name="title"]');
+            self::assertSelectorExists('form[method="get"] input[name="author"]');
+            self::assertSelectorExists('form[method="get"] select[name="category"]');
+            self::assertSelectorExists('label[for="search-title"]');
+            self::assertSelectorExists('label[for="search-author"]');
+            self::assertSelectorExists('label[for="search-category"]');
+            self::assertCount(12, $this->client->getCrawler()->filter('select[name="category"] option'));
+            self::assertSelectorExists('form a[href="/books"]');
+        }
+    }
+
+    public function testSearchFormIsHiddenWhenTheLibraryIsEmptyAndUnfiltered(): void
+    {
+        $this->client->request('GET', '/books');
+
+        self::assertSelectorNotExists('form[method="get"]');
+        self::assertSelectorExists('main a[href="/books/new"]');
+    }
+
+    public function testSubmittedValuesAreRefilledAndEscaped(): void
+    {
+        $this->createBook('Solaris', $this->user);
+
+        $crawler = $this->client->request('GET', '/books?title='.rawurlencode('"><script>x</script>').'&author=Lem&category=novel');
+
+        self::assertStringNotContainsString('<script>x</script>', $this->client->getResponse()->getContent());
+        self::assertSame('"><script>x</script>', $crawler->filter('input[name="title"]')->attr('value'));
+        self::assertSame('Lem', $crawler->filter('input[name="author"]')->attr('value'));
+        self::assertSame('novel', $crawler->filter('select[name="category"] option[selected]')->attr('value'));
+    }
+
+    public function testPagerKeepsFiltersAndMarksCurrentPage(): void
+    {
+        for ($i = 1; $i <= 21; ++$i) {
+            $this->createBook(sprintf('Książka %02d', $i), $this->user);
+        }
+
+        $crawler = $this->client->request('GET', '/books?title=Ksi&author=Lem&category=novel&page=2');
+
+        $links = $crawler->filter('ul.pagination a.page-link');
+        self::assertCount(2, $links);
+        foreach ($links as $link) {
+            $query = [];
+            parse_str((string) parse_url($link->getAttribute('href'), \PHP_URL_QUERY), $query);
+            self::assertSame('Ksi', $query['title']);
+            self::assertSame('Lem', $query['author']);
+            self::assertSame('novel', $query['category']);
+        }
+        self::assertCount(1, $crawler->filter('ul.pagination a[aria-current="page"]'));
+        self::assertSame('2', trim($crawler->filter('ul.pagination a[aria-current="page"]')->text()));
+    }
+
+    public function testPagerIsAbsentOnASinglePage(): void
+    {
+        $this->createBook('Solaris', $this->user);
+
+        $this->client->request('GET', '/books');
+
+        self::assertSelectorNotExists('ul.pagination');
+    }
+
+    public function testNoMatchShowsNoResultsMessageNotTheAddFirstBookMessage(): void
+    {
+        $this->createBook('Solaris', $this->user);
+
+        $this->client->request('GET', '/books?title=zzz');
+
+        self::assertSelectorTextContains('main', 'Żadna książka nie pasuje do wyszukiwania.');
+        self::assertSelectorTextNotContains('main', 'Dodaj pierwszą książkę');
+        self::assertSelectorNotExists('table');
+        self::assertSelectorExists('form[method="get"]');
+
+        $this->client->request('GET', '/books?page=9');
+        self::assertSelectorTextContains('main', 'Żadna książka nie pasuje do wyszukiwania.');
+        self::assertSelectorTextNotContains('main', 'Dodaj pierwszą książkę');
+    }
+
+    public function testEmptyLibraryShowsAddFirstBookMessage(): void
+    {
+        $this->client->request('GET', '/books');
+
+        self::assertSelectorTextContains('main', 'Dodaj pierwszą książkę');
+        self::assertSelectorTextNotContains('main', 'Żadna książka nie pasuje');
+    }
+
     public function testFilteredListQueryCountDoesNotGrowWithBookCount(): void
     {
         $this->createBook('Pierwsza', $this->user);

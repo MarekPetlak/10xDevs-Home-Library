@@ -8,8 +8,36 @@
         <a class="btn btn-primary" href="{{ path('book_new') }}">{{ 'nav.book_new'|trans }}</a>
     </div>
 
-    {% if books is empty %}
+    {% if total > 0 or search.isFiltered %}
+        <form method="get" action="{{ path('book_index') }}" class="row g-3 align-items-end mb-4">
+            <div class="col-md">
+                <label for="search-title" class="form-label">{{ 'book.index.search.title'|trans }}</label>
+                <input type="text" class="form-control" id="search-title" name="title" value="{{ search.title }}">
+            </div>
+            <div class="col-md">
+                <label for="search-author" class="form-label">{{ 'book.index.search.author'|trans }}</label>
+                <input type="text" class="form-control" id="search-author" name="author" value="{{ search.author }}">
+            </div>
+            <div class="col-md">
+                <label for="search-category" class="form-label">{{ 'book.index.search.category'|trans }}</label>
+                <select class="form-select" id="search-category" name="category">
+                    <option value="">{{ 'book.index.search.all_categories'|trans }}</option>
+                    {% for category in enum_cases('App\\Enum\\Category') %}
+                        <option value="{{ category.value }}"{{ search.category == category ? ' selected' }}>{{ category.translationKey|trans }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-auto">
+                <button type="submit" class="btn btn-primary">{{ 'book.index.search.submit'|trans }}</button>
+                <a class="btn btn-outline-secondary" href="{{ path('book_index') }}">{{ 'book.index.search.clear'|trans }}</a>
+            </div>
+        </form>
+    {% endif %}
+
+    {% if books is empty and total == 0 and not search.isFiltered %}
         <p class="text-muted">{{ 'book.index.empty'|trans }} <a href="{{ path('book_new') }}">{{ 'book.index.empty_link'|trans }}</a></p>
+    {% elseif books is empty %}
+        <p class="text-muted">{{ 'book.index.no_results'|trans }} <a href="{{ path('book_index') }}">{{ 'book.index.no_results_link'|trans }}</a></p>
     {% else %}
         <div class="table-responsive">
             <table class="table table-hover align-middle">
@@ -41,5 +69,17 @@
                 </tbody>
             </table>
         </div>
+    {% endif %}
+
+    {% if pageCount > 1 %}
+        <nav aria-label="{{ 'book.index.pager.label'|trans }}">
+            <ul class="pagination">
+                {% for n in 1..pageCount %}
+                    <li class="page-item{{ n == page ? ' active' }}">
+                        <a class="page-link" href="{{ path('book_index', search.filters|merge({page: n})) }}"{% if n == page %} aria-current="page"{% endif %}>{{ n }}</a>
+                    </li>
+                {% endfor %}
+            </ul>
+        </nav>
     {% endif %}
 {% endblock %}
