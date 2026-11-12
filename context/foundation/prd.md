@@ -94,6 +94,7 @@ Rejestracja (samodzielne zakładanie konta) wypadła z MVP: konta zakłada wła�
 
 - FR-010: Strona główna pokazuje zalogowanemu użytkownikowi do trzech rekomendacji kolejnych książek, budowanych na podstawie ocen wszystkich użytkowników, którzy przeczytali daną książkę, i nastawionych na kategorie książek przeczytanych przez niego w ciągu ostatniego roku. Priority: must-have
   > Socrates: Counter-argument considered: "kilka kroków reguły (kategoria, inna kategoria, limit) to duży koszt pierwszego przepływu." Resolution: kept; użytkownik podał regułę w wersji z kolejnymi kategoriami (patrz Business Logic): książki o najwyższych ocenach, z kategorii najczęściej czytanej w ostatnim roku, jeszcze nieprzeczytane; jeśli nie ma trzech, powtórka dla drugiej najpopularniejszej kategorii.
+  > Socrates: Counter-argument considered: "reguła bez minimalnej liczby ocen pokazuje na karcie średnią i liczbę ocen, więc przy jednej ocenie ujawnia ocenę konkretnego domownika, a oceny są osobiste (Guardrails)." Resolution: kept (przegląd implementacji, 2026-11-12); reguła ze średnią ocen wszystkich użytkowników i bez progu liczby ocen pozostaje świadomą decyzją przy 2–4 domownikach, a ocenę pojedynczej osoby da się odczytać z karty; próg liczby ocen wymagałby zmiany reguły.
 
 ## Non-Functional Requirements
 

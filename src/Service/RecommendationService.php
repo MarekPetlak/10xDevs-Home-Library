@@ -34,8 +34,7 @@ final class RecommendationService
         $since = MarkRead::today()->modify(self::WINDOW);
         $rows = $this->readBookRepository->countByCategorySince($user, $since);
 
-        usort($rows, static fn (array $a, array $b): int => [$b['count'], $b['lastReadOn']->format('Y-m-d'), array_search($a['category'], Category::cases(), true)]
-            <=> [$a['count'], $a['lastReadOn']->format('Y-m-d'), array_search($b['category'], Category::cases(), true)]);
+        usort($rows, self::compareCategoryRows(...));
 
         $recommendations = [];
         foreach (array_slice($rows, 0, 2) as $row) {
@@ -47,5 +46,22 @@ final class RecommendationService
         }
 
         return $recommendations;
+    }
+
+    /**
+     * Most reads first, then the most recently read day, then the order of the Category enum.
+     *
+     * @param array{category: Category, count: int, lastReadOn: \DateTimeImmutable} $a
+     * @param array{category: Category, count: int, lastReadOn: \DateTimeImmutable} $b
+     */
+    private static function compareCategoryRows(array $a, array $b): int
+    {
+        return [$b['count'], $b['lastReadOn']->format('Y-m-d'), self::enumRank($a['category'])]
+            <=> [$a['count'], $a['lastReadOn']->format('Y-m-d'), self::enumRank($b['category'])];
+    }
+
+    private static function enumRank(Category $category): int
+    {
+        return (int) array_search($category, Category::cases(), true);
     }
 }

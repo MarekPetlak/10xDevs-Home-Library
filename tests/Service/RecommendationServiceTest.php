@@ -160,6 +160,21 @@ final class RecommendationServiceTest extends KernelTestCase
         self::assertSame(['Powieść'], $this->titles($result));
     }
 
+    public function testWindowOnLeapDayStartsOnTheFirstOfMarchOfThePreviousYear(): void
+    {
+        // PHP's "-12 months" overflows 29 February to 1 March: the window is one day shorter on that day only.
+        Clock::set(new MockClock('2028-02-29 12:00:00', 'Europe/Warsaw'));
+        $this->readBy($this->anna, Category::Novel, '2027-03-01');
+        $this->readBy($this->anna, Category::Crime, '2027-02-28');
+        $this->readBy($this->anna, Category::Crime, '2027-02-27');
+        $this->candidate('Powieść', Category::Novel, [3]);
+        $this->candidate('Kryminał', Category::Crime, [5]);
+
+        $result = $this->service->forUser($this->anna);
+
+        self::assertSame(['Powieść'], $this->titles($result));
+    }
+
     public function testCategoryTieIsBrokenByTheMostRecentRead(): void
     {
         $this->readBy($this->anna, Category::Novel, '2026-05-01');

@@ -17,6 +17,15 @@ use Symfony\Component\Clock\NativeClock;
 
 final class HomeControllerTest extends WebTestCase
 {
+    /** @var array<string, int> */
+    private array $bookIds = [];
+
+    protected function tearDown(): void
+    {
+        Clock::set(new NativeClock());
+        parent::tearDown();
+    }
+
     public function testHomeIsPublic(): void
     {
         $client = static::createClient();
@@ -119,11 +128,6 @@ final class HomeControllerTest extends WebTestCase
     /**
      * Anna read two novels (rated also by Ola); four more unread novels are rated by Ola and Ewa.
      *
-     * @var array<string, int>
-     */
-    private array $bookIds = [];
-
-    /**
      * @return array{User, User, User}
      */
     private function seedRecommendableData(): array
@@ -170,11 +174,5 @@ final class HomeControllerTest extends WebTestCase
             );
         }
         $em->flush();
-    }
-
-    protected function tearDown(): void
-    {
-        Clock::set(new NativeClock());
-        parent::tearDown();
     }
 }

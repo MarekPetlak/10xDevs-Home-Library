@@ -129,7 +129,7 @@ final class BookRepositoryTest extends KernelTestCase
 
         $result = $this->repository->findRecommendationCandidates($this->anna, Category::Novel, 10);
 
-        self::assertSame($this->ids([$this->view($book)]), $this->ids($result));
+        self::assertSame([(int) $book->getId()], $this->ids($result));
         self::assertSame(2, $result[0]->ratingCount);
     }
 
@@ -201,11 +201,6 @@ final class BookRepositoryTest extends KernelTestCase
                 ->setReadOn(new \DateTimeImmutable('2026-09-15')),
         );
         $this->entityManager->flush();
-    }
-
-    private function view(Book $book): RecommendationView
-    {
-        return new RecommendationView((int) $book->getId(), $book->getTitle(), $book->getCategory(), 0, 0);
     }
 
     /**
