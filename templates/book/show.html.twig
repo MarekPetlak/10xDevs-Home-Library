@@ -31,6 +31,7 @@
         {% endif %}
     </dl>
 
+    {% if app.user %}
     {% block read_state %}
         <section class="mb-4">
             {% if readBook %}
@@ -75,4 +76,5 @@
             {% endfor %}
         </section>
     {% endblock %}
+    {% endif %}
 {% endblock %}

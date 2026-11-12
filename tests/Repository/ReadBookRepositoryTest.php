@@ -120,6 +120,28 @@ final class ReadBookRepositoryTest extends KernelTestCase
         self::assertSame('2026-02-01', $rows[0]['lastReadOn']->format('Y-m-d'));
     }
 
+    public function testReadStateIsLookedUpOnlyForTheGivenBooksAndTheGivenUser(): void
+    {
+        $other = $this->bookIn('Inna', Category::Crime, '9788308000028');
+        $third = $this->bookIn('Trzecia', Category::Crime, '9788308000035');
+        $this->readOn($this->anna, $this->book, '2026-02-01');
+        $this->readOn($this->anna, $third, '2026-02-02');
+        $this->readOn($this->ola, $other, '2026-02-03');
+        $this->entityManager->clear();
+
+        $result = $this->repository->findByUserIndexedByBookId($this->anna, [$this->entityManager->getReference(Book::class, $this->book->getId()), $this->entityManager->getReference(Book::class, $other->getId())]);
+
+        self::assertSame([(int) $this->book->getId()], array_keys($result));
+        self::assertSame(4, $result[(int) $this->book->getId()]->getRating());
+    }
+
+    public function testReadStateLookupWithoutBooksGivesEmptyArray(): void
+    {
+        $this->readOn($this->anna, $this->book, '2026-02-01');
+
+        self::assertSame([], $this->repository->findByUserIndexedByBookId($this->anna, []));
+    }
+
     public function testNoReadsInWindowGivesEmptyList(): void
     {
         $this->readOn($this->anna, $this->book, '2020-01-01');

@@ -1,15 +1,5 @@
 app:
     name: Moja domowa biblioteka
-home:
-    title: Strona główna
-    greeting: 'Cześć, %email%!'
-    welcome:
-        heading: Witaj w domowej bibliotece
-        lead: Przeglądaj książki i zarządzaj domową biblioteką w jednym miejscu.
-    recommendations:
-        heading: Rekomendacje dla Ciebie
-        empty: Przeczytaj i oceń kilka książek, aby dostać rekomendacje.
-        rating: 'Średnia ocena: %average% (liczba ocen: %count%)'
 nav:
     toggle: Przełącz nawigację
     book_index: Książki
@@ -29,6 +19,23 @@ book:
         heading: Książki we wspólnej kolekcji
         empty: W kolekcji nie ma jeszcze żadnych książek.
         empty_link: Dodaj pierwszą książkę
+        recommendations:
+            heading: Rekomendacje dla Ciebie
+            empty: Przeczytaj i oceń kilka książek, aby dostać rekomendacje.
+            rating: 'Średnia ocena: %average% (liczba ocen: %count%)'
+        no_results: Żadna książka nie pasuje do wyszukiwania.
+        no_results_link: Wyczyść wyszukiwanie
+        search:
+            title: Tytuł
+            author: Autor
+            category: Kategoria
+            all_categories: Wszystkie kategorie
+            submit: Szukaj
+            clear: Wyczyść
+        pager:
+            label: Strony wyników
+            previous: Poprzednia
+            next: Następna
         read_state: Twój status
         read: Przeczytana
         rating: '%rating%/5'

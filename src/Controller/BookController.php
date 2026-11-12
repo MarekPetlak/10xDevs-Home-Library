@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
+use App\Dto\BookSearch;
 use App\Dto\MarkRead;
 use App\Dto\NewBook;
 use App\Entity\User;
@@ -13,6 +14,7 @@ use App\Form\MarkReadType;
 use App\Repository\BookRepository;
 use App\Repository\ReadBookRepository;
 use App\Service\BookManager;
+use App\Service\RecommendationService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\Request;
@@ -23,38 +25,51 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class BookController extends AbstractController
 {
+    // Public (FR-003): anonymous visitors get catalogue data only, personal data needs a signed-in user.
     #[Route('/books', name: 'book_index', methods: ['GET'])]
-    #[IsGranted('ROLE_USER')]
-    public function index(BookRepository $bookRepository, ReadBookRepository $readBookRepository): Response
+    public function index(Request $request, BookRepository $bookRepository, ReadBookRepository $readBookRepository, RecommendationService $recommendations): Response
     {
         $user = $this->getUser();
-        \assert($user instanceof User);
+        $search = BookSearch::fromQuery($request->query);
+        $paginator = $bookRepository->search($search);
+        $books = iterator_to_array($paginator, false);
 
         return $this->render('book/index.html.twig', [
-            'books' => $bookRepository->findAllForList(),
-            'readBooks' => $readBookRepository->findByUserIndexedByBookId($user),
+            'books' => $books,
+            'total' => \count($paginator),
+            'page' => $search->page,
+            'pageCount' => max(1, (int) ceil(\count($paginator) / BookRepository::PER_PAGE)),
+            'search' => $search,
+            'readBooks' => $user instanceof User ? $readBookRepository->findByUserIndexedByBookId($user, $books) : [],
+            // Main page: recommendations for signed-in users only, null (no block, no message) for visitors.
+            'recommendations' => $user instanceof User ? $recommendations->forUser($user) : null,
         ]);
     }
 
     #[Route('/books/{id}', name: 'book_show', requirements: ['id' => '\d+'], methods: ['GET'])]
-    #[IsGranted('ROLE_USER')]
     public function show(int $id, BookRepository $bookRepository, ReadBookRepository $readBookRepository): Response
     {
         $book = $bookRepository->findForDetail($id) ?? throw $this->createNotFoundException();
         $user = $this->getUser();
-        \assert($user instanceof User);
 
-        $readBook = $readBookRepository->findOneBy(['user' => $user, 'book' => $book]);
-        $markRead = new MarkRead();
-        $markRead->readOn = MarkRead::today();
+        $readBook = null;
+        $comments = [];
+        $readForm = null;
+        if ($user instanceof User) {
+            $readBook = $readBookRepository->findOneBy(['user' => $user, 'book' => $book]);
+            $comments = $readBookRepository->findCommentsForBook($book, $user);
+            if (null === $readBook) {
+                $markRead = new MarkRead();
+                $markRead->readOn = MarkRead::today();
+                $readForm = $this->createForm(MarkReadType::class, $markRead, ['action' => $this->generateUrl('book_read', ['id' => $id])]);
+            }
+        }
 
         return $this->render('book/show.html.twig', [
             'book' => $book,
             'readBook' => $readBook,
-            'comments' => $readBookRepository->findCommentsForBook($book, $user),
-            'readForm' => null === $readBook
-                ? $this->createForm(MarkReadType::class, $markRead, ['action' => $this->generateUrl('book_read', ['id' => $id])])
-                : null,
+            'comments' => $comments,
+            'readForm' => $readForm,
         ]);
     }
 

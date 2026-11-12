@@ -33,7 +33,7 @@ final class SecurityControllerTest extends WebTestCase
     {
         $this->submitLogin(self::EMAIL, self::PASSWORD);
 
-        self::assertResponseRedirects('/');
+        self::assertResponseRedirects('/books');
         $this->client->followRedirect();
         self::assertSelectorTextContains('nav', self::EMAIL);
         self::assertSelectorExists('a[href*="/logout"]');
@@ -64,7 +64,7 @@ final class SecurityControllerTest extends WebTestCase
         self::assertResponseRedirects('/login');
         $this->client->followRedirect();
         self::assertSelectorExists('.alert-danger');
-        $this->client->request('GET', '/');
+        $this->client->request('GET', '/books');
         self::assertSelectorTextNotContains('nav', self::EMAIL);
     }
 
@@ -74,7 +74,7 @@ final class SecurityControllerTest extends WebTestCase
         $this->client->request('POST', '/login', ['_username' => self::EMAIL, '_password' => self::PASSWORD]);
 
         self::assertResponseRedirects('/login');
-        $this->client->request('GET', '/');
+        $this->client->request('GET', '/books');
         self::assertSelectorTextNotContains('nav', self::EMAIL);
     }
 
@@ -86,7 +86,7 @@ final class SecurityControllerTest extends WebTestCase
         self::assertStringContainsString('_csrf_token=', (string) $crawler->filter('a[href*="/logout"]')->attr('href'));
 
         $this->client->click($crawler->filter('a[href*="/logout"]')->link());
-        self::assertResponseRedirects('/');
+        self::assertResponseRedirects('/books');
         $this->client->followRedirect();
 
         self::assertSelectorTextNotContains('nav', self::EMAIL);
@@ -99,7 +99,7 @@ final class SecurityControllerTest extends WebTestCase
 
         $this->client->request('GET', '/login');
 
-        self::assertResponseRedirects('/');
+        self::assertResponseRedirects('/books');
     }
 
     public function testSixthFailedAttemptIsThrottled(): void
@@ -116,7 +116,7 @@ final class SecurityControllerTest extends WebTestCase
 
         self::assertSelectorExists('.alert-danger');
         self::assertSelectorTextNotContains('.alert-danger', 'Nieprawidłowy adres e-mail lub hasło.');
-        $this->client->request('GET', '/');
+        $this->client->request('GET', '/books');
         self::assertSelectorTextNotContains('nav', self::EMAIL);
     }
 

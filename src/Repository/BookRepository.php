@@ -4,12 +4,14 @@ declare(strict_types=1);
 
 namespace App\Repository;
 
+use App\Dto\BookSearch;
 use App\Dto\RecommendationView;
 use App\Entity\Book;
 use App\Entity\ReadBook;
 use App\Entity\User;
 use App\Enum\Category;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\Tools\Pagination\Paginator;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -17,29 +19,53 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 class BookRepository extends ServiceEntityRepository
 {
+    public const PER_PAGE = 20;
+
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, Book::class);
     }
 
     /**
-     * Every book for the list page, newest first, authors loaded in the same query.
-     * The single place where a future soft-delete filter (S-08) belongs.
+     * One page of the book list, newest first, authors loaded in the same query. Text filters are
+     * "contains", ignoring case but not accents (the title and author columns are *_as_ci); % and _ in
+     * the input match literally. The author filter is an EXISTS subquery, so a matching book still
+     * lists all of its authors. The single place where a future soft-delete filter (S-08) belongs.
      *
-     * @return list<Book>
+     * @return Paginator<Book>
      */
-    public function findAllForList(): array
+    public function search(BookSearch $search): Paginator
     {
-        /** @var list<Book> $books */
-        $books = $this->createQueryBuilder('b')
+        $qb = $this->createQueryBuilder('b')
             ->addSelect('a')
             ->leftJoin('b.authors', 'a')
             ->orderBy('b.createdAt', 'DESC')
             ->addOrderBy('b.id', 'DESC')
-            ->getQuery()
-            ->getResult();
+            ->setFirstResult(($search->page - 1) * self::PER_PAGE)
+            ->setMaxResults(self::PER_PAGE);
 
-        return $books;
+        if (null !== $search->title) {
+            $qb->andWhere("b.title LIKE :title ESCAPE '!'")
+                ->setParameter('title', self::contains($search->title));
+        }
+        if (null !== $search->author) {
+            $qb->andWhere($qb->expr()->exists(
+                'SELECT fb.id FROM '.Book::class.' fb JOIN fb.authors fa WHERE fb.id = b.id'
+                ." AND (fa.firstName LIKE :author ESCAPE '!' OR fa.lastName LIKE :author ESCAPE '!'"
+                ." OR CONCAT(fa.firstName, ' ', fa.lastName) LIKE :author ESCAPE '!')",
+            ))->setParameter('author', self::contains($search->author));
+        }
+        if (null !== $search->category) {
+            $qb->andWhere('b.category = :category')
+                ->setParameter('category', $search->category);
+        }
+
+        return new Paginator($qb->getQuery(), fetchJoinCollection: true);
+    }
+
+    private static function contains(string $text): string
+    {
+        return '%'.strtr($text, ['!' => '!!', '%' => '!%', '_' => '!_']).'%';
     }
 
     /**

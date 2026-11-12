@@ -26,10 +26,22 @@ final class HomeControllerTest extends WebTestCase
         parent::tearDown();
     }
 
-    public function testHomeIsPublic(): void
+    public function testHomeRedirectsToTheBookListForVisitorsAndUsers(): void
     {
         $client = static::createClient();
         $client->request('GET', '/');
+        self::assertResponseRedirects('/books', 302);
+
+        $user = static::getContainer()->get(UserManager::class)->create('anna@example.com', 'secret-pass');
+        $client->loginUser($user);
+        $client->request('GET', '/');
+        self::assertResponseRedirects('/books', 302);
+    }
+
+    public function testMainPageIsPublic(): void
+    {
+        $client = static::createClient();
+        $client->request('GET', '/books');
 
         self::assertResponseStatusCodeSame(200);
     }
@@ -37,7 +49,7 @@ final class HomeControllerTest extends WebTestCase
     public function testAnonymousHomeShowsLoginLinkAndNoPersonalData(): void
     {
         $client = static::createClient();
-        $client->request('GET', '/');
+        $client->request('GET', '/books');
 
         self::assertSelectorExists('a[href="/login"]');
         self::assertSelectorNotExists('a[href*="/logout"]');
@@ -47,7 +59,7 @@ final class HomeControllerTest extends WebTestCase
     public function testLayoutIsPolishAndLoadsBootstrap(): void
     {
         $client = static::createClient();
-        $client->request('GET', '/');
+        $client->request('GET', '/books');
 
         self::assertSelectorExists('html[lang="pl"]');
         self::assertSelectorExists('link[rel="stylesheet"][href*="bootstrap"]');
@@ -57,7 +69,7 @@ final class HomeControllerTest extends WebTestCase
     {
         $client = static::createClient();
         $this->seedRecommendableData();
-        $client->request('GET', '/');
+        $client->request('GET', '/books');
 
         self::assertResponseStatusCodeSame(200);
         self::assertSelectorNotExists('#recommendations');
@@ -72,7 +84,7 @@ final class HomeControllerTest extends WebTestCase
         $user = static::getContainer()->get(UserManager::class)->create('anna@example.com', 'secret-pass');
         $client->loginUser($user);
 
-        $client->request('GET', '/');
+        $client->request('GET', '/books');
 
         self::assertResponseStatusCodeSame(200);
         self::assertSelectorTextContains('#recommendations h2', 'Rekomendacje dla Ciebie');
@@ -86,7 +98,7 @@ final class HomeControllerTest extends WebTestCase
         [$anna] = $this->seedRecommendableData();
         $client->loginUser($anna);
 
-        $crawler = $client->request('GET', '/');
+        $crawler = $client->request('GET', '/books');
 
         self::assertResponseStatusCodeSame(200);
         $cards = $crawler->filter('#recommendations .recommendation-card');
@@ -112,13 +124,29 @@ final class HomeControllerTest extends WebTestCase
         self::assertStringNotContainsString('Przeczytaj i oceń kilka książek', $section);
     }
 
+    public function testRecommendationsSitAboveTheBookListAndStayOnFilteredPages(): void
+    {
+        $client = static::createClient();
+        [$anna] = $this->seedRecommendableData();
+        $client->loginUser($anna);
+
+        $client->request('GET', '/books');
+        $html = (string) $client->getResponse()->getContent();
+        self::assertLessThan(strpos($html, '<table'), strpos($html, 'id="recommendations"'));
+        self::assertLessThan(strpos($html, '<form method="get"'), strpos($html, 'id="recommendations"'));
+
+        $client->request('GET', '/books?title=Hit&page=1');
+        self::assertSelectorExists('#recommendations .recommendation-card');
+        self::assertSelectorTextContains('table', 'Hit');
+    }
+
     public function testRecommendationsDoNotLeakOtherUsersEmails(): void
     {
         $client = static::createClient();
         [$anna] = $this->seedRecommendableData();
         $client->loginUser($anna);
 
-        $client->request('GET', '/');
+        $client->request('GET', '/books');
 
         $html = (string) $client->getResponse()->getContent();
         self::assertStringNotContainsString('ola@example.com', $html);

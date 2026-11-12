@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace App\Tests\Repository;
 
+use App\Dto\BookSearch;
 use App\Dto\RecommendationView;
+use App\Entity\Author;
 use App\Entity\Book;
 use App\Entity\ReadBook;
 use App\Entity\User;
@@ -177,7 +179,122 @@ final class BookRepositoryTest extends KernelTestCase
         self::assertSame(['Pierwsza', 'Druga'], $this->titles($result));
     }
 
-    private function book(string $title, Category $category, ?User $addedBy = null): Book
+    public function testSearchWithoutFiltersReturnsEveryBookNewestFirst(): void
+    {
+        $this->book('Pierwsza', Category::Novel);
+        $this->book('Druga', Category::Crime);
+
+        $result = $this->repository->search(new BookSearch());
+
+        self::assertSame(['Druga', 'Pierwsza'], $this->searchTitles($result));
+        self::assertCount(2, $result);
+    }
+
+    public function testTitleFilterIsContainsAndIgnoresCase(): void
+    {
+        $this->book('Solaris', Category::Novel);
+        $this->book('Dziady', Category::Poetry);
+
+        self::assertSame(['Solaris'], $this->searchTitles($this->repository->search(new BookSearch(title: 'SOL'))));
+        self::assertSame(['Solaris'], $this->searchTitles($this->repository->search(new BookSearch(title: 'ola'))));
+        self::assertSame([], $this->searchTitles($this->repository->search(new BookSearch(title: 'zzz'))));
+    }
+
+    public function testTitleFilterIsAccentSensitiveBecauseOfThePinnedCollation(): void
+    {
+        $this->book('José w podróży', Category::Novel);
+
+        self::assertSame([], $this->searchTitles($this->repository->search(new BookSearch(title: 'jose'))));
+        self::assertSame(['José w podróży'], $this->searchTitles($this->repository->search(new BookSearch(title: 'JOSÉ'))));
+        self::assertSame(['José w podróży'], $this->searchTitles($this->repository->search(new BookSearch(title: 'jos'))));
+    }
+
+    public function testAuthorFilterMatchesFirstNameLastNameAndFullName(): void
+    {
+        $this->book('Solaris', Category::Novel, authors: [$this->author('Stanisław', 'Lem')]);
+        $this->book('Dziady', Category::Poetry, authors: [$this->author('Adam', 'Mickiewicz')]);
+
+        foreach (['stan', 'LEM', 'Stanisław Lem', 'ław Le'] as $text) {
+            self::assertSame(['Solaris'], $this->searchTitles($this->repository->search(new BookSearch(author: $text))), $text);
+        }
+        self::assertSame([], $this->searchTitles($this->repository->search(new BookSearch(author: 'Lem Stanisław'))));
+    }
+
+    public function testAuthorFilterIsAccentSensitive(): void
+    {
+        $this->book('Ensaio', Category::Novel, authors: [$this->author('José', 'Saramago')]);
+
+        self::assertSame([], $this->searchTitles($this->repository->search(new BookSearch(author: 'jose'))));
+        self::assertSame(['Ensaio'], $this->searchTitles($this->repository->search(new BookSearch(author: 'josé'))));
+    }
+
+    public function testPercentAndUnderscoreAndEscapeCharacterMatchLiterally(): void
+    {
+        $this->book('100% pewne', Category::Novel);
+        $this->book('Sto procent', Category::Novel);
+        $this->book('a_b', Category::Novel);
+        $this->book('axb', Category::Novel);
+        $this->book('Hej! Hej', Category::Novel);
+
+        self::assertSame(['100% pewne'], $this->searchTitles($this->repository->search(new BookSearch(title: '%'))));
+        self::assertSame(['a_b'], $this->searchTitles($this->repository->search(new BookSearch(title: 'a_b'))));
+        self::assertSame(['Hej! Hej'], $this->searchTitles($this->repository->search(new BookSearch(title: '!'))));
+    }
+
+    public function testCategoryFilterAloneAndCombinedWithText(): void
+    {
+        $this->book('Solaris', Category::Novel);
+        $this->book('Dziady', Category::Poetry);
+        $this->book('Pan Tadeusz', Category::Poetry);
+
+        self::assertSame(['Pan Tadeusz', 'Dziady'], $this->searchTitles($this->repository->search(new BookSearch(category: Category::Poetry))));
+        self::assertSame(['Pan Tadeusz'], $this->searchTitles($this->repository->search(new BookSearch(title: 'tad', category: Category::Poetry))));
+        self::assertSame([], $this->searchTitles($this->repository->search(new BookSearch(title: 'sol', category: Category::Poetry))));
+    }
+
+    public function testMatchingBookStillListsAllItsAuthors(): void
+    {
+        $this->book('Piknik', Category::Novel, authors: [$this->author('Arkadij', 'Strugacki'), $this->author('Boris', 'Strugacki')]);
+
+        $books = iterator_to_array($this->repository->search(new BookSearch(author: 'arkadij')), false);
+
+        self::assertCount(1, $books);
+        self::assertCount(2, $books[0]->getAuthors());
+    }
+
+    public function testResultsArePagedByTwenty(): void
+    {
+        for ($i = 1; $i <= 21; ++$i) {
+            $this->book(sprintf('Książka %02d', $i), Category::Novel);
+        }
+
+        $first = $this->repository->search(new BookSearch(page: 1));
+        $second = $this->repository->search(new BookSearch(page: 2));
+        $beyond = $this->repository->search(new BookSearch(page: 3));
+
+        self::assertCount(21, $first);
+        self::assertCount(20, iterator_to_array($first, false));
+        self::assertSame(['Książka 01'], $this->searchTitles($second));
+        self::assertSame([], $this->searchTitles($beyond));
+    }
+
+    public function testPagingCountsBooksNotBookAuthorRows(): void
+    {
+        for ($i = 1; $i <= 21; ++$i) {
+            $this->book(sprintf('Wielu autorów %02d', $i), Category::Novel, authors: [$this->author('Jan'.$i, 'Nowak'), $this->author('Ewa'.$i, 'Nowak')]);
+        }
+
+        $first = $this->repository->search(new BookSearch());
+
+        self::assertCount(21, $first);
+        self::assertCount(20, iterator_to_array($first, false));
+        self::assertCount(1, iterator_to_array($this->repository->search(new BookSearch(page: 2)), false));
+    }
+
+    /**
+     * @param list<Author> $authors
+     */
+    private function book(string $title, Category $category, ?User $addedBy = null, array $authors = []): Book
     {
         $book = (new Book())
             ->setTitle($title)
@@ -185,10 +302,31 @@ final class BookRepositoryTest extends KernelTestCase
             ->setPublicationYear(2000)
             ->setCategory($category)
             ->setAddedBy($addedBy ?? $this->ola);
+        foreach ($authors as $author) {
+            $book->addAuthor($author);
+        }
         $this->entityManager->persist($book);
         $this->entityManager->flush();
 
         return $book;
+    }
+
+    private function author(string $firstName, string $lastName): Author
+    {
+        $author = (new Author())->setFirstName($firstName)->setLastName($lastName);
+        $this->entityManager->persist($author);
+
+        return $author;
+    }
+
+    /**
+     * @param \Traversable<int, Book> $books
+     *
+     * @return list<string>
+     */
+    private function searchTitles(\Traversable $books): array
+    {
+        return array_values(array_map(static fn (Book $b): string => $b->getTitle(), iterator_to_array($books, false)));
     }
 
     private function rate(Book $book, User $user, int $rating): void
