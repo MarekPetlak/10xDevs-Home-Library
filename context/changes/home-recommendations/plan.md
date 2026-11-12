@@ -251,15 +251,15 @@ None: read-only feature on existing tables. S-08 (soft delete) must add its filt
 
 #### Automated
 
-- [x] 3.1 Controller tests pass: `php bin/phpunit tests/Controller/HomeControllerTest.php`
-- [x] 3.2 Whole suite stays green: `php bin/phpunit`
-- [x] 3.3 Twig and translations lint: `php bin/console lint:twig templates/home` and `php bin/console lint:yaml translations`
-- [x] 3.4 Container compiles: `php bin/console lint:container`
+- [x] 3.1 Controller tests pass: `php bin/phpunit tests/Controller/HomeControllerTest.php` — ca5c073
+- [x] 3.2 Whole suite stays green: `php bin/phpunit` — ca5c073
+- [x] 3.3 Twig and translations lint: `php bin/console lint:twig templates/home` and `php bin/console lint:yaml translations` — ca5c073
+- [x] 3.4 Container compiles: `php bin/console lint:container` — ca5c073
 
 #### Manual
 
-- [x] 3.5 Logged in with two categories of rated reads: up to three cards with working links, category and average with rating count
+- [x] 3.5 Logged in with two categories of rated reads: up to three cards with working links, category and average with rating count — ca5c073
 - [x] 3.6 Fresh account with no reads sees the empty-state message
 - [x] 3.7 Logged out, home page shows no recommendations and no message
-- [x] 3.8 After marking a recommended book as read, it disappears from `/`
+- [x] 3.8 After marking a recommended book as read, it disappears from `/` — ca5c073
 - [x] 3.9 Home page loads in under 2 s with realistic data
