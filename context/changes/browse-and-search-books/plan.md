@@ -380,14 +380,14 @@ One migration, in Phase 2: it pins `book.title` to `utf8mb4_uca1400_as_ci` (a sm
 
 #### Automated
 
-- [x] 4.1 Controller tests pass: `bin/phpunit tests/Controller`
-- [x] 4.2 Whole suite passes: `bin/phpunit`
-- [x] 4.3 `GET /` redirects to `/books`
+- [x] 4.1 Controller tests pass: `bin/phpunit tests/Controller` — 4db4836
+- [x] 4.2 Whole suite passes: `bin/phpunit` — 4db4836
+- [x] 4.3 `GET /` redirects to `/books` — 4db4836
 
 #### Manual
 
-- [x] 4.4 Logging in lands on `/books` with up to three recommendations above the list
-- [x] 4.5 A logged-in user with no reads sees the empty recommendation message above the list
-- [x] 4.6 A logged-out visitor sees no recommendation block or message
-- [x] 4.7 Searching or paging keeps the recommendation block at the top
-- [x] 4.8 AGENTS.md describes `/` as a redirect to `/books` and the recommendations as part of the list page
+- [x] 4.4 Logging in lands on `/books` with up to three recommendations above the list — 4db4836
+- [x] 4.5 A logged-in user with no reads sees the empty recommendation message above the list — 4db4836
+- [x] 4.6 A logged-out visitor sees no recommendation block or message — 4db4836
+- [x] 4.7 Searching or paging keeps the recommendation block at the top — 4db4836
+- [x] 4.8 AGENTS.md describes `/` as a redirect to `/books` and the recommendations as part of the list page — 4db4836

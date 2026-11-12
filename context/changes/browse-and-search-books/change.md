@@ -1,7 +1,7 @@
 ---
 change_id: browse-and-search-books
 title: Browse and search books
-status: implementing
+status: implemented
 created: 2026-11-12
 updated: 2026-11-12
 archived_at: null
