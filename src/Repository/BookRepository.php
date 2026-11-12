@@ -4,7 +4,11 @@ declare(strict_types=1);
 
 namespace App\Repository;
 
+use App\Dto\RecommendationView;
 use App\Entity\Book;
+use App\Entity\ReadBook;
+use App\Entity\User;
+use App\Enum\Category;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -36,6 +40,38 @@ class BookRepository extends ServiceEntityRepository
             ->getResult();
 
         return $books;
+    }
+
+    /**
+     * Recommendable books of one category, best first: rated by anyone, not read by the user.
+     * Ranked by average rating, then rating count, then title, then id (determinism only).
+     * Books nobody rated never appear. The single place where the soft-delete filter (S-08) belongs
+     * for recommendations.
+     *
+     * @return list<RecommendationView>
+     */
+    public function findRecommendationCandidates(User $user, Category $category, int $limit): array
+    {
+        $qb = $this->createQueryBuilder('b');
+
+        /** @var list<RecommendationView> $views */
+        $views = $qb
+            ->select(sprintf('NEW %s(b.id, b.title, b.category, AVG(r.rating), COUNT(r.id))', RecommendationView::class))
+            ->join(ReadBook::class, 'r', 'WITH', 'r.book = b')
+            ->where('b.category = :category')
+            ->andWhere($qb->expr()->notIn('b.id', 'SELECT IDENTITY(own.book) FROM '.ReadBook::class.' own WHERE own.user = :user'))
+            ->setParameter('category', $category)
+            ->setParameter('user', $user)
+            ->groupBy('b.id, b.title, b.category')
+            ->orderBy('AVG(r.rating)', 'DESC')
+            ->addOrderBy('COUNT(r.id)', 'DESC')
+            ->addOrderBy('b.title', 'ASC')
+            ->addOrderBy('b.id', 'ASC')
+            ->setMaxResults($limit)
+            ->getQuery()
+            ->getResult();
+
+        return $views;
     }
 
     /**

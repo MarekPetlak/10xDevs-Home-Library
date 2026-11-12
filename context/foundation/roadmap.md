@@ -3,7 +3,7 @@ project: "My home library"
 version: 1
 status: draft
 created: 2026-11-02
-updated: 2026-11-10
+updated: 2026-11-12
 prd_version: 3
 main_goal: speed
 top_blocker: decisions
@@ -44,7 +44,7 @@ Użytkownik nie pamięta, jakie książki ma w domowej bibliotece i które przec
 | S-01  | sign-in-household-accounts     | user can sign in with e-mail and password and see the logged-in home page | —             | FR-001, US-01 | done |
 | S-02  | add-book-to-shared-collection  | user can add a book to the shared collection                            | S-01          | FR-004, US-01 | done |
 | S-03  | rate-read-book                 | user can mark a book as read and rate it 1–5                            | S-02          | FR-008, US-01 | done |
-| S-04  | home-recommendations           | user can see up to three recommended books on the home page             | S-03          | FR-010, US-01 | proposed |
+| S-04  | home-recommendations           | user can see up to three recommended books on the home page             | S-03          | FR-010, US-01 | in-progress |
 | S-05  | browse-and-search-books        | anyone can browse and search books by title, author and category        | S-02          | FR-003        | proposed |
 | S-06  | duplicate-book-warning         | user is warned about a duplicate before adding a book                   | S-02          | FR-005, US-01 | proposed |
 | S-07  | edit-own-book-entry            | user can edit a book they added, after confirmation                     | S-02          | FR-006        | proposed |
@@ -119,9 +119,9 @@ Brak. Warstwy oznaczone w Baseline jako `partial` (dane, auth, interfejs) są wp
 - **Parallel with:** S-05, S-06, S-07
 - **Blockers:** —
 - **Unknowns:**
-  - Przewidywany ruch (qps) i wolumen danych — Owner: user. Block: no.
+  - Przewidywany ruch (qps) i wolumen danych — Owner: user. Block: no. Resolved: 2–3 qps w MVP (później do 10), do 10 000 książek.
 - **Risk:** To north star i najbardziej ryzykowna logika domenowa; strona musi się ładować poniżej 2 sekund (NFR), a reguła zależy od spójnych kategorii z S-02.
-- **Status:** proposed
+- **Status:** in-progress
 
 ### S-05: Przeglądanie i wyszukiwanie książek
 
@@ -209,8 +209,8 @@ Brak. Warstwy oznaczone w Baseline jako `partial` (dane, auth, interfejs) są wp
 4. **Jak właściciel zakłada konta i kto nim jest** (poza aplikacją czy ekran administracyjny). — Owner: user. Block: S-01.
 5. **Co dzieje się z książkami, gdy konto ich autora zostanie usunięte.** — Owner: user. Block: S-08.
 6. **Czy ISBN jest polem wymaganym i jak łączą się dopasowania po ISBN oraz po tytule i autorze** przy ostrzeżeniu o duplikacie. — Owner: user. Block: S-06. Resolved: ISBN jest wymagany i walidowany; zasady łączenia dopasowań dla duplikatu rozstrzyga S-06.
-7. **Jaki jest przewidywany ruch (qps)?** — Owner: user. Block: S-04.
-8. **Jaki jest przewidywany wolumen danych (data_volume)?** — Owner: user. Block: S-04.
+7. **Jaki jest przewidywany ruch (qps)?** — Owner: user. Block: S-04. Resolved: 2–3 qps w MVP, później do 10 qps.
+8. **Jaki jest przewidywany wolumen danych (data_volume)?** — Owner: user. Block: S-04. Resolved: nie więcej niż 10 000 książek (liczba ocen nie podana).
 9. **Czy podłączyć zewnętrzne narzędzie do śledzenia błędów w tym kamieniu milowym?** Użytkownik zgłosił taki zamiar, ale PRD go nie zawiera; jeśli ma wejść do zakresu, dopisz wymaganie do PRD. — Owner: user. Block: roadmap-wide.
 10. **Kopie zapasowe produkcyjnej bazy** (otwarta faza w planie wdrożenia) przed pierwszymi danymi domowników; guardrail PRD mówi, że dane nie giną. — Owner: user. Block: roadmap-wide.
 11. **Komentarze czytelników** (decyzja właściciela): komentarze wchodzą razem z oceną w S-03 (FR-008/FR-009): wiele komentarzy na książkę, dodawanych przez czytelników, każdy oznaczony jako publiczny lub prywatny przez jej autora. Przeczy to regule PRD „komentarze są osobiste / ukryte przed niezalogowanymi” (FR-009, Access Control, Guardrails), dopóki PRD nie zostanie zaktualizowane przy planowaniu S-03. — Owner: user. Block: S-03. Resolved (2026-11-10): S-03 dodaje komentarz od razu jako pole formularza oznaczania jako przeczytanej, widoczny dla wszystkich zalogowanych z zaciemnionym e-mailem autora; flaga publiczna/prywatna wchodzi osobno jako S-09 (`reader-comments-privacy`); PRD zaktualizowano do wersji 3 w fazie 5 planu S-03 (FR-009 awansowany do must-have, reguła osobistych komentarzy czasowo złagodzona tylko dla komentarzy).

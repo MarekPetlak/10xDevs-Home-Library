@@ -7,8 +7,8 @@ context_type: greenfield
 product_type: web-app
 target_scale:
   users: small
-  qps: # TODO: qps — see Open Questions
-  data_volume: # TODO: data_volume — see Open Questions
+  qps: "2-3 in MVP, up to 10 later"
+  data_volume: "up to 10000 books"
 timeline_budget:
   mvp_weeks: 5
   hard_deadline: 2027-01-10
@@ -142,5 +142,5 @@ Nierozstrzygnięte kwestie dostępu (zakładanie kont przez właściciela, los k
 4. **Jak właściciel zakłada konta i kto nim jest** (poza aplikacją czy ekran administracyjny). — Owner: użytkownik.
 5. **Co dzieje się z książkami, gdy konto ich autora zostanie usunięte.** — Owner: użytkownik.
 6. **Czy ISBN jest polem wymaganym i jak łączą się dopasowania po ISBN oraz po tytule i autorze** przy ostrzeżeniu o duplikacie. — Owner: użytkownik. Resolved: ISBN jest polem wymaganym i walidowanym; zasady łączenia dopasowań w ostrzeżeniu o duplikacie wchodzą z S-06.
-7. **Jaki jest przewidywany ruch (qps)?** Pole `target_scale.qps` nie zostało podane w notatkach. — Owner: użytkownik.
-8. **Jaki jest przewidywany wolumen danych (data_volume)?** Pole `target_scale.data_volume` nie zostało podane w notatkach. — Owner: użytkownik.
+7. **Jaki jest przewidywany ruch (qps)?** Pole `target_scale.qps` nie zostało podane w notatkach. — Owner: użytkownik. Resolved: 2–3 qps w MVP, później do 10 qps.
+8. **Jaki jest przewidywany wolumen danych (data_volume)?** Pole `target_scale.data_volume` nie zostało podane w notatkach. — Owner: użytkownik. Resolved: nie więcej niż 10 000 książek (liczba ocen nie podana).
