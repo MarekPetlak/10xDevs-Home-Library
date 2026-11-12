@@ -243,23 +243,23 @@ None: read-only feature on existing tables. S-08 (soft delete) must add its filt
 
 #### Automated
 
-- [x] 2.1 Service tests pass with pinned clock: `php bin/phpunit tests/Service/RecommendationServiceTest.php`
-- [x] 2.2 Named rule cases covered (ranking inside category, second-category fill, single category, empty window, 12-month boundary, category tie-break, equal-average order, read and unrated excluded)
-- [x] 2.3 Whole suite stays green: `php bin/phpunit`
+- [x] 2.1 Service tests pass with pinned clock: `php bin/phpunit tests/Service/RecommendationServiceTest.php` — 661a4fa
+- [x] 2.2 Named rule cases covered (ranking inside category, second-category fill, single category, empty window, 12-month boundary, category tie-break, equal-average order, read and unrated excluded) — 661a4fa
+- [x] 2.3 Whole suite stays green: `php bin/phpunit` — 661a4fa
 
 ### Phase 3: Home page
 
 #### Automated
 
-- [ ] 3.1 Controller tests pass: `php bin/phpunit tests/Controller/HomeControllerTest.php`
-- [ ] 3.2 Whole suite stays green: `php bin/phpunit`
-- [ ] 3.3 Twig and translations lint: `php bin/console lint:twig templates/home` and `php bin/console lint:yaml translations`
-- [ ] 3.4 Container compiles: `php bin/console lint:container`
+- [x] 3.1 Controller tests pass: `php bin/phpunit tests/Controller/HomeControllerTest.php`
+- [x] 3.2 Whole suite stays green: `php bin/phpunit`
+- [x] 3.3 Twig and translations lint: `php bin/console lint:twig templates/home` and `php bin/console lint:yaml translations`
+- [x] 3.4 Container compiles: `php bin/console lint:container`
 
 #### Manual
 
-- [ ] 3.5 Logged in with two categories of rated reads: up to three cards with working links, category and average with rating count
-- [ ] 3.6 Fresh account with no reads sees the empty-state message
-- [ ] 3.7 Logged out, home page shows no recommendations and no message
-- [ ] 3.8 After marking a recommended book as read, it disappears from `/`
-- [ ] 3.9 Home page loads in under 2 s with realistic data
+- [x] 3.5 Logged in with two categories of rated reads: up to three cards with working links, category and average with rating count
+- [x] 3.6 Fresh account with no reads sees the empty-state message
+- [x] 3.7 Logged out, home page shows no recommendations and no message
+- [x] 3.8 After marking a recommended book as read, it disappears from `/`
+- [x] 3.9 Home page loads in under 2 s with realistic data
