@@ -233,19 +233,19 @@ None: read-only feature on existing tables. S-08 (soft delete) must add its filt
 
 #### Automated
 
-- [x] 1.1 Candidate query tests pass: `php bin/phpunit tests/Repository/BookRepositoryTest.php`
-- [x] 1.2 Category count tests pass: `php bin/phpunit tests/Repository/ReadBookRepositoryTest.php`
-- [x] 1.3 Whole suite stays green: `php bin/phpunit`
-- [x] 1.4 Mapping valid, no schema change needed: `php bin/console doctrine:schema:validate`
-- [x] 1.5 Container compiles: `php bin/console lint:container`
+- [x] 1.1 Candidate query tests pass: `php bin/phpunit tests/Repository/BookRepositoryTest.php` — 78b0352
+- [x] 1.2 Category count tests pass: `php bin/phpunit tests/Repository/ReadBookRepositoryTest.php` — 78b0352
+- [x] 1.3 Whole suite stays green: `php bin/phpunit` — 78b0352
+- [x] 1.4 Mapping valid, no schema change needed: `php bin/console doctrine:schema:validate` — 78b0352
+- [x] 1.5 Container compiles: `php bin/console lint:container` — 78b0352
 
 ### Phase 2: RecommendationService
 
 #### Automated
 
-- [ ] 2.1 Service tests pass with pinned clock: `php bin/phpunit tests/Service/RecommendationServiceTest.php`
-- [ ] 2.2 Named rule cases covered (ranking inside category, second-category fill, single category, empty window, 12-month boundary, category tie-break, equal-average order, read and unrated excluded)
-- [ ] 2.3 Whole suite stays green: `php bin/phpunit`
+- [x] 2.1 Service tests pass with pinned clock: `php bin/phpunit tests/Service/RecommendationServiceTest.php`
+- [x] 2.2 Named rule cases covered (ranking inside category, second-category fill, single category, empty window, 12-month boundary, category tie-break, equal-average order, read and unrated excluded)
+- [x] 2.3 Whole suite stays green: `php bin/phpunit`
 
 ### Phase 3: Home page
 
