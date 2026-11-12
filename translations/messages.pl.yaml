@@ -6,6 +6,10 @@ home:
     welcome:
         heading: Witaj w domowej bibliotece
         lead: Przeglądaj książki i zarządzaj domową biblioteką w jednym miejscu.
+    recommendations:
+        heading: Rekomendacje dla Ciebie
+        empty: Przeczytaj i oceń kilka książek, aby dostać rekomendacje.
+        rating: 'Średnia ocena: %average% (liczba ocen: %count%)'
 nav:
     toggle: Przełącz nawigację
     book_index: Książki

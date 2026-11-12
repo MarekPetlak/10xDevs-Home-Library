@@ -10,4 +10,27 @@
             <p>{{ 'home.greeting'|trans({'%email%': app.user.userIdentifier}) }}</p>
         {% endif %}
     </div>
+
+    {% if app.user and recommendations is not null %}
+        <section id="recommendations" class="pb-5">
+            <h2 class="h4 mb-3">{{ 'home.recommendations.heading'|trans }}</h2>
+            {% if recommendations is empty %}
+                <p class="text-muted">{{ 'home.recommendations.empty'|trans }}</p>
+            {% else %}
+                <div class="row g-3">
+                    {% for recommendation in recommendations %}
+                        <div class="col-md-4">
+                            <div class="card h-100 recommendation-card">
+                                <div class="card-body">
+                                    <h3 class="h5 card-title"><a href="{{ path('book_show', {id: recommendation.bookId}) }}">{{ recommendation.title }}</a></h3>
+                                    <p class="card-subtitle text-muted mb-2">{{ recommendation.category.translationKey|trans }}</p>
+                                    <p class="card-text">{{ 'home.recommendations.rating'|trans({'%average%': recommendation.averageRating|number_format(1, ',', ''), '%count%': recommendation.ratingCount}) }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </section>
+    {% endif %}
 {% endblock %}

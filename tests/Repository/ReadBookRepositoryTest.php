@@ -72,6 +72,87 @@ final class ReadBookRepositoryTest extends KernelTestCase
         self::assertSame([], $comments);
     }
 
+    public function testReadsSinceAreGroupedByCategoryWithCountAndLatestDay(): void
+    {
+        $crimeA = $this->bookIn('Kryminał A', Category::Crime, '9788308000028');
+        $crimeB = $this->bookIn('Kryminał B', Category::Crime, '9788308000035');
+        $this->readOn($this->anna, $this->book, '2026-03-01');
+        $this->readOn($this->anna, $crimeA, '2026-05-10');
+        $this->readOn($this->anna, $crimeB, '2026-07-20');
+
+        $rows = $this->repository->countByCategorySince($this->anna, new \DateTimeImmutable('2026-01-01'));
+        usort($rows, static fn (array $a, array $b): int => $a['category']->value <=> $b['category']->value);
+
+        self::assertCount(2, $rows);
+        self::assertSame(Category::Crime, $rows[0]['category']);
+        self::assertSame(2, $rows[0]['count']);
+        self::assertSame('2026-07-20', $rows[0]['lastReadOn']->format('Y-m-d'));
+        self::assertSame(Category::Novel, $rows[1]['category']);
+        self::assertSame(1, $rows[1]['count']);
+        self::assertSame('2026-03-01', $rows[1]['lastReadOn']->format('Y-m-d'));
+    }
+
+    public function testWindowBoundaryIsInclusive(): void
+    {
+        $onBoundary = $this->bookIn('Na granicy', Category::Crime, '9788308000028');
+        $before = $this->bookIn('Przed granicą', Category::Fantasy, '9788308000035');
+        $this->readOn($this->anna, $onBoundary, '2025-11-12');
+        $this->readOn($this->anna, $before, '2025-11-11');
+
+        $rows = $this->repository->countByCategorySince($this->anna, new \DateTimeImmutable('2025-11-12'));
+
+        self::assertCount(1, $rows);
+        self::assertSame(Category::Crime, $rows[0]['category']);
+        self::assertSame(1, $rows[0]['count']);
+    }
+
+    public function testOtherUsersReadsAreIgnored(): void
+    {
+        $this->readOn($this->ola, $this->book, '2026-03-01');
+        $this->readOn($this->ola, $this->bookIn('Inna', Category::Crime, '9788308000028'), '2026-04-01');
+        $this->readOn($this->anna, $this->book, '2026-02-01');
+
+        $rows = $this->repository->countByCategorySince($this->anna, new \DateTimeImmutable('2026-01-01'));
+
+        self::assertCount(1, $rows);
+        self::assertSame(Category::Novel, $rows[0]['category']);
+        self::assertSame(1, $rows[0]['count']);
+        self::assertSame('2026-02-01', $rows[0]['lastReadOn']->format('Y-m-d'));
+    }
+
+    public function testNoReadsInWindowGivesEmptyList(): void
+    {
+        $this->readOn($this->anna, $this->book, '2020-01-01');
+
+        self::assertSame([], $this->repository->countByCategorySince($this->anna, new \DateTimeImmutable('2026-01-01')));
+    }
+
+    private function bookIn(string $title, Category $category, string $isbn): Book
+    {
+        $book = (new Book())
+            ->setTitle($title)
+            ->setIsbn($isbn)
+            ->setPublicationYear(2000)
+            ->setCategory($category)
+            ->setAddedBy($this->anna);
+        $this->entityManager->persist($book);
+        $this->entityManager->flush();
+
+        return $book;
+    }
+
+    private function readOn(User $user, Book $book, string $day): void
+    {
+        $this->entityManager->persist(
+            (new ReadBook())
+                ->setUser($user)
+                ->setBook($book)
+                ->setRating(4)
+                ->setReadOn(new \DateTimeImmutable($day)),
+        );
+        $this->entityManager->flush();
+    }
+
     private function read(User $user, int $rating, ?string $comment): void
     {
         $this->entityManager->persist(

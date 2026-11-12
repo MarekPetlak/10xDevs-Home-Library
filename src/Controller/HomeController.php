@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
+use App\Entity\User;
+use App\Service\RecommendationService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -11,8 +13,12 @@ use Symfony\Component\Routing\Attribute\Route;
 final class HomeController extends AbstractController
 {
     #[Route('/', name: 'home', methods: ['GET'])]
-    public function __invoke(): Response
+    public function __invoke(RecommendationService $recommendations): Response
     {
-        return $this->render('home/index.html.twig');
+        $user = $this->getUser();
+
+        return $this->render('home/index.html.twig', [
+            'recommendations' => $user instanceof User ? $recommendations->forUser($user) : null,
+        ]);
     }
 }

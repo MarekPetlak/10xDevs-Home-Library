@@ -8,7 +8,9 @@ use App\Dto\CommentView;
 use App\Entity\Book;
 use App\Entity\ReadBook;
 use App\Entity\User;
+use App\Enum\Category;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -69,5 +71,35 @@ class ReadBookRepository extends ServiceEntityRepository
             ->getResult();
 
         return $views;
+    }
+
+    /**
+     * The user's reads since a date (inclusive), grouped by book category: how many and the latest read day.
+     * Unordered on purpose: the recommendation service owns the tie-break rule.
+     *
+     * @return list<array{category: Category, count: int, lastReadOn: \DateTimeImmutable}>
+     */
+    public function countByCategorySince(User $user, \DateTimeImmutable $since): array
+    {
+        /** @var list<array{category: Category|string, readCount: int|string, lastReadOn: string}> $rows */
+        $rows = $this->createQueryBuilder('r')
+            ->select('b.category AS category', 'COUNT(r.id) AS readCount', 'MAX(r.readOn) AS lastReadOn')
+            ->join('r.book', 'b')
+            ->where('r.user = :user')
+            ->andWhere('r.readOn >= :since')
+            ->setParameter('user', $user)
+            ->setParameter('since', $since, Types::DATE_IMMUTABLE)
+            ->groupBy('b.category')
+            ->getQuery()
+            ->getResult();
+
+        return array_map(
+            static fn (array $row): array => [
+                'category' => $row['category'] instanceof Category ? $row['category'] : Category::from($row['category']),
+                'count' => (int) $row['readCount'],
+                'lastReadOn' => new \DateTimeImmutable($row['lastReadOn']),
+            ],
+            $rows,
+        );
     }
 }

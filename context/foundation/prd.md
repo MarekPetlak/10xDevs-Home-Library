@@ -7,8 +7,8 @@ context_type: greenfield
 product_type: web-app
 target_scale:
   users: small
-  qps: # TODO: qps — see Open Questions
-  data_volume: # TODO: data_volume — see Open Questions
+  qps: "2-3 in MVP, up to 10 later"
+  data_volume: "up to 10000 books"
 timeline_budget:
   mvp_weeks: 5
   hard_deadline: 2027-01-10
@@ -94,6 +94,7 @@ Rejestracja (samodzielne zakładanie konta) wypadła z MVP: konta zakłada wła�
 
 - FR-010: Strona główna pokazuje zalogowanemu użytkownikowi do trzech rekomendacji kolejnych książek, budowanych na podstawie ocen wszystkich użytkowników, którzy przeczytali daną książkę, i nastawionych na kategorie książek przeczytanych przez niego w ciągu ostatniego roku. Priority: must-have
   > Socrates: Counter-argument considered: "kilka kroków reguły (kategoria, inna kategoria, limit) to duży koszt pierwszego przepływu." Resolution: kept; użytkownik podał regułę w wersji z kolejnymi kategoriami (patrz Business Logic): książki o najwyższych ocenach, z kategorii najczęściej czytanej w ostatnim roku, jeszcze nieprzeczytane; jeśli nie ma trzech, powtórka dla drugiej najpopularniejszej kategorii.
+  > Socrates: Counter-argument considered: "reguła bez minimalnej liczby ocen pokazuje na karcie średnią i liczbę ocen, więc przy jednej ocenie ujawnia ocenę konkretnego domownika, a oceny są osobiste (Guardrails)." Resolution: kept (przegląd implementacji, 2026-11-12); reguła ze średnią ocen wszystkich użytkowników i bez progu liczby ocen pozostaje świadomą decyzją przy 2–4 domownikach, a ocenę pojedynczej osoby da się odczytać z karty; próg liczby ocen wymagałby zmiany reguły.
 
 ## Non-Functional Requirements
 
@@ -142,5 +143,5 @@ Nierozstrzygnięte kwestie dostępu (zakładanie kont przez właściciela, los k
 4. **Jak właściciel zakłada konta i kto nim jest** (poza aplikacją czy ekran administracyjny). — Owner: użytkownik.
 5. **Co dzieje się z książkami, gdy konto ich autora zostanie usunięte.** — Owner: użytkownik.
 6. **Czy ISBN jest polem wymaganym i jak łączą się dopasowania po ISBN oraz po tytule i autorze** przy ostrzeżeniu o duplikacie. — Owner: użytkownik. Resolved: ISBN jest polem wymaganym i walidowanym; zasady łączenia dopasowań w ostrzeżeniu o duplikacie wchodzą z S-06.
-7. **Jaki jest przewidywany ruch (qps)?** Pole `target_scale.qps` nie zostało podane w notatkach. — Owner: użytkownik.
-8. **Jaki jest przewidywany wolumen danych (data_volume)?** Pole `target_scale.data_volume` nie zostało podane w notatkach. — Owner: użytkownik.
+7. **Jaki jest przewidywany ruch (qps)?** Pole `target_scale.qps` nie zostało podane w notatkach. — Owner: użytkownik. Resolved: 2–3 qps w MVP, później do 10 qps.
+8. **Jaki jest przewidywany wolumen danych (data_volume)?** Pole `target_scale.data_volume` nie zostało podane w notatkach. — Owner: użytkownik. Resolved: nie więcej niż 10 000 książek (liczba ocen nie podana).
