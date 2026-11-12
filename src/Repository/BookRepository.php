@@ -19,12 +19,12 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 class BookRepository extends ServiceEntityRepository
 {
+    public const PER_PAGE = 20;
+
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, Book::class);
     }
-
-    public const PER_PAGE = 20;
 
     /**
      * One page of the book list, newest first, authors loaded in the same query. Text filters are

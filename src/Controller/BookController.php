@@ -32,14 +32,15 @@ final class BookController extends AbstractController
         $user = $this->getUser();
         $search = BookSearch::fromQuery($request->query);
         $paginator = $bookRepository->search($search);
+        $books = iterator_to_array($paginator, false);
 
         return $this->render('book/index.html.twig', [
-            'books' => iterator_to_array($paginator, false),
+            'books' => $books,
             'total' => \count($paginator),
             'page' => $search->page,
             'pageCount' => max(1, (int) ceil(\count($paginator) / BookRepository::PER_PAGE)),
             'search' => $search,
-            'readBooks' => $user instanceof User ? $readBookRepository->findByUserIndexedByBookId($user) : [],
+            'readBooks' => $user instanceof User ? $readBookRepository->findByUserIndexedByBookId($user, $books) : [],
             // Main page: recommendations for signed-in users only, null (no block, no message) for visitors.
             'recommendations' => $user instanceof User ? $recommendations->forUser($user) : null,
         ]);

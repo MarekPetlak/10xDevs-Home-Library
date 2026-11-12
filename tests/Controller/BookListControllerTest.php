@@ -319,8 +319,9 @@ final class BookListControllerTest extends WebTestCase
 
         $crawler = $this->client->request('GET', '/books?title=Ksi&author=Lem&category=novel&page=2');
 
+        // Previous, page 1 and the current page 2 are links; "next" is disabled on the last page.
         $links = $crawler->filter('ul.pagination a.page-link');
-        self::assertCount(2, $links);
+        self::assertCount(3, $links);
         foreach ($links as $link) {
             $query = [];
             parse_str((string) parse_url($link->getAttribute('href'), \PHP_URL_QUERY), $query);
@@ -330,6 +331,30 @@ final class BookListControllerTest extends WebTestCase
         }
         self::assertCount(1, $crawler->filter('ul.pagination a[aria-current="page"]'));
         self::assertSame('2', trim($crawler->filter('ul.pagination a[aria-current="page"]')->text()));
+    }
+
+    public function testPagerShowsAWindowAroundTheCurrentPageNotEveryPage(): void
+    {
+        $em = $this->entityManager();
+        $author = $this->author ??= (new Author())->setFirstName('Stanisław')->setLastName('Lem');
+        $em->persist($author);
+        for ($i = 1; $i <= 141; ++$i) { // 8 pages of 20
+            $em->persist((new Book())->setTitle('Tom '.$i)->setIsbn(sprintf('97883090%05d', $i))->setPublicationYear(2000)->setCategory(Category::Novel)->setAddedBy($this->user)->addAuthor($author));
+        }
+        $em->flush();
+
+        $labels = fn (string $query): array => array_map(
+            static fn (string $text): string => trim($text),
+            $this->client->request('GET', '/books?'.$query)->filter('ul.pagination .page-item')->each(static fn ($item): string => $item->text()),
+        );
+
+        self::assertSame(['Poprzednia', '1', '2', '3', '4', '5', '6', '…', '8', 'Następna'], $labels('page=4'));
+        self::assertSame(['Poprzednia', '1', '2', '3', '…', '8', 'Następna'], $labels('page=1'));
+        self::assertSame(['Poprzednia', '1', '…', '6', '7', '8', 'Następna'], $labels('page=8'));
+
+        $this->client->request('GET', '/books?page=99');
+        self::assertResponseStatusCodeSame(200);
+        self::assertSelectorExists('ul.pagination');
     }
 
     public function testPagerIsAbsentOnASinglePage(): void

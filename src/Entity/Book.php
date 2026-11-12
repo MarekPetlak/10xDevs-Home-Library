@@ -14,6 +14,7 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Entity(repositoryClass: BookRepository::class)]
 #[ORM\Table(name: 'book')]
 #[ORM\Index(name: 'IDX_BOOK_ISBN', columns: ['isbn'])]
+#[ORM\Index(name: 'IDX_BOOK_CREATED_AT_ID', columns: ['created_at', 'id'])]
 class Book
 {
     #[ORM\Id]

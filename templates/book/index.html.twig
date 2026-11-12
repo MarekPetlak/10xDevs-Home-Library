@@ -10,9 +10,9 @@
 
     {% if app.user and recommendations is not null %}
         <section id="recommendations" class="pb-4">
-            <h2 class="h4 mb-3">{{ 'home.recommendations.heading'|trans }}</h2>
+            <h2 class="h4 mb-3">{{ 'book.index.recommendations.heading'|trans }}</h2>
             {% if recommendations is empty %}
-                <p class="text-muted">{{ 'home.recommendations.empty'|trans }}</p>
+                <p class="text-muted">{{ 'book.index.recommendations.empty'|trans }}</p>
             {% else %}
                 <div class="row g-3">
                     {% for recommendation in recommendations %}
@@ -21,7 +21,7 @@
                                 <div class="card-body">
                                     <h3 class="h5 card-title"><a href="{{ path('book_show', {id: recommendation.bookId}) }}">{{ recommendation.title }}</a></h3>
                                     <p class="card-subtitle text-muted mb-2">{{ recommendation.category.translationKey|trans }}</p>
-                                    <p class="card-text">{{ 'home.recommendations.rating'|trans({'%average%': recommendation.averageRating|number_format(1, ',', ''), '%count%': recommendation.ratingCount}) }}</p>
+                                    <p class="card-text">{{ 'book.index.recommendations.rating'|trans({'%average%': recommendation.averageRating|number_format(1, ',', ''), '%count%': recommendation.ratingCount}) }}</p>
                                 </div>
                             </div>
                         </div>
@@ -96,12 +96,41 @@
 
     {% if pageCount > 1 %}
         <nav aria-label="{{ 'book.index.pager.label'|trans }}">
-            <ul class="pagination">
-                {% for n in 1..pageCount %}
+            {# Window: first page, last page, the current page ±2, previous/next and gaps; keeps the filters in every link. #}
+            {% set windowEnd = min(pageCount, page + 2) %}
+            {% set windowStart = min(max(1, page - 2), windowEnd) %}
+            <ul class="pagination flex-wrap">
+                <li class="page-item{{ page <= 1 ? ' disabled' }}">
+                    {% if page > 1 %}
+                        <a class="page-link" href="{{ path('book_index', search.filters|merge({page: min(page - 1, pageCount)})) }}" rel="prev">{{ 'book.index.pager.previous'|trans }}</a>
+                    {% else %}
+                        <span class="page-link">{{ 'book.index.pager.previous'|trans }}</span>
+                    {% endif %}
+                </li>
+                {% if windowStart > 1 %}
+                    <li class="page-item"><a class="page-link" href="{{ path('book_index', search.filters|merge({page: 1})) }}">1</a></li>
+                    {% if windowStart > 2 %}
+                        <li class="page-item disabled" aria-hidden="true"><span class="page-link">&hellip;</span></li>
+                    {% endif %}
+                {% endif %}
+                {% for n in windowStart..windowEnd %}
                     <li class="page-item{{ n == page ? ' active' }}">
                         <a class="page-link" href="{{ path('book_index', search.filters|merge({page: n})) }}"{% if n == page %} aria-current="page"{% endif %}>{{ n }}</a>
                     </li>
                 {% endfor %}
+                {% if windowEnd < pageCount %}
+                    {% if windowEnd < pageCount - 1 %}
+                        <li class="page-item disabled" aria-hidden="true"><span class="page-link">&hellip;</span></li>
+                    {% endif %}
+                    <li class="page-item"><a class="page-link" href="{{ path('book_index', search.filters|merge({page: pageCount})) }}">{{ pageCount }}</a></li>
+                {% endif %}
+                <li class="page-item{{ page >= pageCount ? ' disabled' }}">
+                    {% if page < pageCount %}
+                        <a class="page-link" href="{{ path('book_index', search.filters|merge({page: page + 1})) }}" rel="next">{{ 'book.index.pager.next'|trans }}</a>
+                    {% else %}
+                        <span class="page-link">{{ 'book.index.pager.next'|trans }}</span>
+                    {% endif %}
+                </li>
             </ul>
         </nav>
     {% endif %}

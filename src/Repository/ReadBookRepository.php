@@ -24,18 +24,25 @@ class ReadBookRepository extends ServiceEntityRepository
     }
 
     /**
-     * The user's own read records keyed by book id, in one query.
+     * The user's own read records for the given books (the books on the list page) keyed by book id,
+     * in one query. Books are not hydrated: only their ids are read.
+     *
+     * @param list<Book> $books
      *
      * @return array<int, ReadBook>
      */
-    public function findByUserIndexedByBookId(User $user): array
+    public function findByUserIndexedByBookId(User $user, array $books): array
     {
+        if ([] === $books) {
+            return [];
+        }
+
         /** @var list<ReadBook> $records */
         $records = $this->createQueryBuilder('r')
-            ->addSelect('b')
-            ->join('r.book', 'b')
             ->where('r.user = :user')
+            ->andWhere('r.book IN (:books)')
             ->setParameter('user', $user)
+            ->setParameter('books', $books)
             ->getQuery()
             ->getResult();
 

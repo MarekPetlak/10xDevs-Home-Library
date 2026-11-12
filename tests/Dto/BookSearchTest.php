@@ -60,6 +60,23 @@ final class BookSearchTest extends TestCase
         yield 'array' => [['1'], 1];
     }
 
+    public function testUnicodeWhitespaceIsTrimmedAndLongTextIsCapped(): void
+    {
+        $nbsp = " ";
+        $search = BookSearch::fromQuery(new InputBag(['title' => $nbsp.'Solaris'.$nbsp, 'author' => $nbsp.$nbsp, 'category' => '']));
+
+        self::assertSame('Solaris', $search->title);
+        self::assertNull($search->author);
+
+        $long = BookSearch::fromQuery(new InputBag(['title' => str_repeat('ł', 400)]));
+        self::assertSame(BookSearch::MAX_TEXT_LENGTH, mb_strlen((string) $long->title));
+    }
+
+    public function testInvalidUtf8MeansNoFilter(): void
+    {
+        self::assertNull(BookSearch::fromQuery(new InputBag(['title' => "�("]))->title);
+    }
+
     public function testArrayValuesNeverThrow(): void
     {
         $search = BookSearch::fromQuery(new InputBag(['title' => ['x'], 'author' => ['y'], 'category' => ['poetry']]));

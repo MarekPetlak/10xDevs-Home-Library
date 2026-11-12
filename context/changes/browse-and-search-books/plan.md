@@ -34,7 +34,7 @@ Make the book list (`/books`) and the book detail (`/books/{id}`) public (FR-003
 - No new public route or duplicated templates: the existing list and detail are reused.
 - No change to who may add, edit or delete books, and no change to `/books/new` or the read POST routes. The recommendation rule and `RecommendationService` are unchanged; only where the block is shown changes (Phase 4).
 - No removal of the `home` route name: `/` keeps it as a redirect, and the navbar brand keeps using it. Login success, logout and the already-signed-in redirect move to `book_index` directly (Phase 4).
-- No full-text index and no schema change other than pinning the `book.title` collation (Phase 2 §2a).
+- No full-text index and no schema change other than pinning the `book.title` collation (Phase 2 §2a) and, added in the implementation review (F5), an index on `book (created_at, id)` for the list ordering (migration `Version20261112130000`).
 - No design-system or restyle work (that is `/10x-ui`).
 
 ## Implementation Approach
@@ -137,7 +137,7 @@ Accents stay significant: do not add an accent-insensitive collation to the titl
 
 **File**: `src/Controller/BookController.php`
 
-**Intent**: Read the filters from the query string, call the repository and pass results, total pages, current page and the filter values to the template. `readBooks` is looked up only for the books on the page.
+**Intent**: Read the filters from the query string, call the repository and pass results, total pages, current page and the filter values to the template. `readBooks` is looked up only for the books on the page (`ReadBookRepository::findByUserIndexedByBookId($user, $books)`, fixed in the implementation review, F1).
 
 **Contract**: `GET /books?title=&author=&category=&page=`. An out-of-range page shows the "no results" state with a working link back to page 1.
 
@@ -182,7 +182,7 @@ The visible search UI: a filter form, a pager that keeps the filters, and two di
 
 **Intent**: Add a GET form above the table with a title field, an author field, a category `<select>` (an "all categories" option plus the `Category` enum cases, labelled with `book.category.<value>`), a submit button and a "clear" link to `/books`. Add a pager under the table that preserves the active filters. Distinguish "no books yet" from "no books match your search".
 
-**Contract**: The form uses `method="get"` and `action="{{ path('book_index') }}"`, with fields named `title`, `author`, `category`. Every input has a visible `<label>` and the form's values are re-filled from the current filters (escaped by Twig). The pager renders links for pages 1..N via `path('book_index', filters|merge({page: n}))`, marks the current page with `aria-current="page"`, and is hidden when there is one page or none. Reuse Bootstrap's form and pagination classes already used elsewhere; no custom CSS.
+**Contract**: The form uses `method="get"` and `action="{{ path('book_index') }}"`, with fields named `title`, `author`, `category`. Every input has a visible `<label>` and the form's values are re-filled from the current filters (escaped by Twig). The pager renders a window (first page, last page, the current page ±2, previous/next and gaps) via `path('book_index', filters|merge({page: n}))` (changed from "pages 1..N" in the implementation review, F3), marks the current page with `aria-current="page"`, and is hidden when there is one page or none. The form is hidden only when the library is empty and no filter is active (F7). Reuse Bootstrap's form and pagination classes already used elsewhere; no custom CSS.
 
 #### 2. Translations
 
@@ -233,7 +233,7 @@ Turn `/books` into the landing page. `/` redirects to it, and the recommendation
 
 **Intent**: `/` no longer renders a page of its own; it redirects to `/books`. The welcome hero and greeting are dropped. The `home` route name stays for the navbar brand and old bookmarks.
 
-**Contract**: `GET /` (route `home`) responds with a temporary redirect (302) to route `book_index`. The home template is deleted once unused; `home.recommendations.*` translation keys are reused by the list template, and unused `home.title`, `home.welcome.*` and `home.greeting` keys are removed.
+**Contract**: `GET /` (route `home`) responds with a temporary redirect (302) to route `book_index`. The home template is deleted once unused; The recommendation strings move to `book.index.recommendations.*` (renamed in the implementation review, F8) and the unused `home.*` keys are removed.
 
 #### 1a. Login and logout targets
 

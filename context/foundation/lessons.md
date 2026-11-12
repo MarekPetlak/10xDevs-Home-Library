@@ -22,3 +22,10 @@
 - **Problem**: `utf8mb4_unicode_ci` was chosen only to get case-insensitive uniqueness for author and tag names. It is also accent-insensitive, so "José" and "Jose" collapsed into one author and the unique index rejected the second. Fixing it needed a later migration (`utf8mb4_uca1400_as_ci`).
 - **Rule**: When picking a collation for a uniquely indexed text column, decide case and accent behaviour on purpose, pin the collation explicitly in the entity and the migration, and add a test with case and accent variants.
 - **Applies to**: Doctrine entities with unique constraints on user-entered text.
+
+## State engine requirements and table rebuilds in schema migrations
+
+- **Context**: migrations/Version20261112120000.php:22 (browse-and-search-books review, F4)
+- **Problem**: A column-collation `ALTER` needed MariaDB 10.10+ and rebuilds and locks the whole table, but the migration said neither. On an older server it would fail with a cryptic SQL error, and the lock was invisible to whoever deploys it.
+- **Rule**: A migration that changes a collation, column type or index on a populated table states its minimum engine version and its table rebuild or lock behaviour in a comment, and aborts with a clear message (`abortIf`) when the platform cannot run it.
+- **Applies to**: Doctrine migrations that alter existing columns or indexes.

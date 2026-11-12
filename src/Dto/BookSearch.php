@@ -13,6 +13,8 @@ use Symfony\Component\HttpFoundation\InputBag;
  */
 final readonly class BookSearch
 {
+    public const MAX_TEXT_LENGTH = 255;
+
     public function __construct(
         public ?string $title = null,
         public ?string $author = null,
@@ -62,8 +64,12 @@ final readonly class BookSearch
         if (!\is_string($value)) {
             return null;
         }
-        $value = trim($value);
+        // Trim Unicode whitespace too (e.g. a non-breaking space) and bound the work a search can cause.
+        $value = preg_replace('/^[\s\p{Z}\p{C}]+|[\s\p{Z}\p{C}]+$/u', '', $value);
+        if (null === $value || '' === $value) {
+            return null; // blank, or not valid UTF-8
+        }
 
-        return '' === $value ? null : $value;
+        return mb_substr($value, 0, self::MAX_TEXT_LENGTH);
     }
 }
