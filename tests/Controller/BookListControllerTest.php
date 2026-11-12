@@ -54,7 +54,7 @@ final class BookListControllerTest extends WebTestCase
         self::assertStringNotContainsString('5/5', $this->client->getResponse()->getContent());
     }
 
-    public function testAddBookButtonIsVisibleToAnonymousVisitorsAndLeadsThroughLogin(): void
+    public function testAddBookButtonIsVisibleToAnonymousVisitorsAndLoginAlwaysLandsOnTheBookList(): void
     {
         // Login throttling state is shared through the cache between tests; start from a clean slate.
         static::getContainer()->get('cache.rate_limiter')->clear();
@@ -74,7 +74,8 @@ final class BookListControllerTest extends WebTestCase
             '_password' => 'secret-pass',
         ]);
         $this->client->submit($form);
-        self::assertResponseRedirects('/books/new');
+        // The saved /books/new target is ignored on purpose: login always lands on the main page.
+        self::assertResponseRedirects('/books');
     }
 
     public function testLoggedInUserSeesTheAddBookButtonToo(): void

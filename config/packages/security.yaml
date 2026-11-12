@@ -23,11 +23,13 @@ security:
                 login_path: app_login
                 check_path: app_login
                 enable_csrf: true
-                default_target_path: home
+                default_target_path: book_index
+                # Always land on the main page, even if a protected URL (e.g. /books/new) was saved earlier in the session.
+                always_use_default_target_path: true
             logout:
                 path: app_logout
                 enable_csrf: true
-                target: home
+                target: book_index
             login_throttling:
                 max_attempts: 5
 

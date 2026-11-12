@@ -1,11 +1,6 @@
 app:
     name: Moja domowa biblioteka
 home:
-    title: Strona główna
-    greeting: 'Cześć, %email%!'
-    welcome:
-        heading: Witaj w domowej bibliotece
-        lead: Przeglądaj książki i zarządzaj domową biblioteką w jednym miejscu.
     recommendations:
         heading: Rekomendacje dla Ciebie
         empty: Przeczytaj i oceń kilka książek, aby dostać rekomendacje.

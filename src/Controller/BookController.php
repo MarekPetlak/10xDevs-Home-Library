@@ -14,6 +14,7 @@ use App\Form\MarkReadType;
 use App\Repository\BookRepository;
 use App\Repository\ReadBookRepository;
 use App\Service\BookManager;
+use App\Service\RecommendationService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\Request;
@@ -26,7 +27,7 @@ final class BookController extends AbstractController
 {
     // Public (FR-003): anonymous visitors get catalogue data only, personal data needs a signed-in user.
     #[Route('/books', name: 'book_index', methods: ['GET'])]
-    public function index(Request $request, BookRepository $bookRepository, ReadBookRepository $readBookRepository): Response
+    public function index(Request $request, BookRepository $bookRepository, ReadBookRepository $readBookRepository, RecommendationService $recommendations): Response
     {
         $user = $this->getUser();
         $search = BookSearch::fromQuery($request->query);
@@ -39,6 +40,8 @@ final class BookController extends AbstractController
             'pageCount' => max(1, (int) ceil(\count($paginator) / BookRepository::PER_PAGE)),
             'search' => $search,
             'readBooks' => $user instanceof User ? $readBookRepository->findByUserIndexedByBookId($user) : [],
+            // Main page: recommendations for signed-in users only, null (no block, no message) for visitors.
+            'recommendations' => $user instanceof User ? $recommendations->forUser($user) : null,
         ]);
     }
 

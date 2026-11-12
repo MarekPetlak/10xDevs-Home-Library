@@ -15,7 +15,7 @@ Make the book list (`/books`) and the book detail (`/books/{id}`) public (FR-003
 
 ## Desired End State
 
-- A logged-out visitor opens `/books`, filters by title, author and category, pages through results and opens any book. No page shows a read badge, rating, comment or comment form to them. The "Dodaj książkę" button and link are visible to them too; following it sends them to the login page and, after signing in, on to the add-book form.
+- A logged-out visitor opens `/books`, filters by title, author and category, pages through results and opens any book. No page shows a read badge, rating, comment or comment form to them. The "Dodaj książkę" button and link are visible to them too; following it sends them to the login page, and signing in always lands on `/books` (the saved add-book target is ignored).
 - A logged-in user sees the same pages with their read badge, the read form or their read record, and the comments, as today, plus the same search.
 - Search and filter state is in the URL (GET), so results are shareable and survive paging.
 - `/books` is the main page: opening `/` redirects to it. Logged-in users see their recommendations (up to three, as on the old home page) above the book list; logged-out visitors see only the list.
@@ -241,7 +241,7 @@ Turn `/books` into the landing page. `/` redirects to it, and the recommendation
 
 **Intent**: Send users straight to the main page after login and logout, so those flows do not take an extra redirect through `/`.
 
-**Contract**: `form_login.default_target_path` and `logout.target` become `book_index`; the already-signed-in redirect at `SecurityController.php:19` uses `book_index`. A saved target path (for example `/books/new` after an anonymous click on "Dodaj książkę") still wins over the default.
+**Contract**: `form_login.default_target_path` and `logout.target` become `book_index`; the already-signed-in redirect at `SecurityController.php:19` uses `book_index`. `form_login.always_use_default_target_path` is `true`, so a target path saved earlier in the session (for example `/books/new` after an anonymous click on "Dodaj książkę") is ignored and every login lands on `/books`. Decided during Phase 4 verification; it supersedes the Phase 1 wording that login returns to `/books/new` (Progress 1.6 title kept as is).
 
 #### 2. Book list controller and template
 
@@ -365,29 +365,29 @@ One migration, in Phase 2: it pins `book.title` to `utf8mb4_uca1400_as_ci` (a sm
 
 #### Automated
 
-- [x] 3.1 Controller tests pass: `bin/phpunit tests/Controller`
-- [x] 3.2 Whole suite passes: `bin/phpunit`
+- [x] 3.1 Controller tests pass: `bin/phpunit tests/Controller` — a33311b
+- [x] 3.2 Whole suite passes: `bin/phpunit` — a33311b
 
 #### Manual
 
-- [x] 3.3 Form and pager usable at desktop and one mobile width
-- [x] 3.4 Keyboard reaches every control with a visible focus
-- [x] 3.5 Filters survive paging and "clear" resets them
-- [x] 3.6 Logged-out and logged-in both work, nothing personal logged out
-- [x] 3.7 AGENTS.md describes the public list and detail routes
+- [x] 3.3 Form and pager usable at desktop and one mobile width — a33311b
+- [x] 3.4 Keyboard reaches every control with a visible focus — a33311b
+- [x] 3.5 Filters survive paging and "clear" resets them — a33311b
+- [x] 3.6 Logged-out and logged-in both work, nothing personal logged out — a33311b
+- [x] 3.7 AGENTS.md describes the public list and detail routes — a33311b
 
 ### Phase 4: `/books` as the main page with recommendations
 
 #### Automated
 
-- [ ] 4.1 Controller tests pass: `bin/phpunit tests/Controller`
-- [ ] 4.2 Whole suite passes: `bin/phpunit`
-- [ ] 4.3 `GET /` redirects to `/books`
+- [x] 4.1 Controller tests pass: `bin/phpunit tests/Controller`
+- [x] 4.2 Whole suite passes: `bin/phpunit`
+- [x] 4.3 `GET /` redirects to `/books`
 
 #### Manual
 
-- [ ] 4.4 Logging in lands on `/books` with up to three recommendations above the list
-- [ ] 4.5 A logged-in user with no reads sees the empty recommendation message above the list
-- [ ] 4.6 A logged-out visitor sees no recommendation block or message
-- [ ] 4.7 Searching or paging keeps the recommendation block at the top
-- [ ] 4.8 AGENTS.md describes `/` as a redirect to `/books` and the recommendations as part of the list page
+- [x] 4.4 Logging in lands on `/books` with up to three recommendations above the list
+- [x] 4.5 A logged-in user with no reads sees the empty recommendation message above the list
+- [x] 4.6 A logged-out visitor sees no recommendation block or message
+- [x] 4.7 Searching or paging keeps the recommendation block at the top
+- [x] 4.8 AGENTS.md describes `/` as a redirect to `/books` and the recommendations as part of the list page

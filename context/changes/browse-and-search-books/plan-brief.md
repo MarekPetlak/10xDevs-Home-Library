@@ -13,7 +13,7 @@ Anyone, logged in or not, should be able to browse and search the shared book co
 
 ## Desired End State
 
-A logged-out visitor can search by title and author in separate fields, pick a category, page through 20 books at a time and open any book, and never sees a read badge, rating or comment. The "Dodaj książkę" button is visible to them too and leads through login to the add-book form. A logged-in user sees the same pages with their personal parts, as today.
+A logged-out visitor can search by title and author in separate fields, pick a category, page through 20 books at a time and open any book, and never sees a read badge, rating or comment. The "Dodaj książkę" button is visible to them too and leads to the login page; every login lands on `/books`. A logged-in user sees the same pages with their personal parts, as today.
 
 ## Key Decisions Made
 
@@ -28,7 +28,7 @@ A logged-out visitor can search by title and author in separate fields, pick a c
 | Login/logout target | Straight to `book_index`, not through `/` | Avoids an extra redirect hop on every login and logout | Plan review |
 | Title collation | Migration pins `book.title` to `utf8mb4_uca1400_as_ci` | Title and author search then follow the same accent rule | Plan review |
 | Recommendations | Shown above the list for logged-in users, on every page | Same cards and rule as the old home page, moved | Plan |
-| Add-book button | Visible to anonymous visitors, `/books/new` stays login-only | Invites contribution; the click goes through login | Plan |
+| Add-book button | Visible to anonymous visitors, `/books/new` stays login-only | Invites contribution; login always lands on the main page | Plan |
 | Paging tool | Doctrine's built-in `Paginator`, no bundle | No new dependency; one list does not justify KnpPaginator or Pagerfanta | Research |
 | Privacy tests | Functional tests as anonymous and logged-in | Guards the roadmap's main risk | Plan |
 
