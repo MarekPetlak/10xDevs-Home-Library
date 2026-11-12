@@ -259,7 +259,7 @@ None: read-only feature on existing tables. S-08 (soft delete) must add its filt
 #### Manual
 
 - [x] 3.5 Logged in with two categories of rated reads: up to three cards with working links, category and average with rating count — ca5c073
-- [x] 3.6 Fresh account with no reads sees the empty-state message
-- [x] 3.7 Logged out, home page shows no recommendations and no message
+- [x] 3.6 Fresh account with no reads sees the empty-state message — ca5c073
+- [x] 3.7 Logged out, home page shows no recommendations and no message — ca5c073
 - [x] 3.8 After marking a recommended book as read, it disappears from `/` — ca5c073
-- [x] 3.9 Home page loads in under 2 s with realistic data
+- [x] 3.9 Home page loads in under 2 s with realistic data — ca5c073
