@@ -134,13 +134,24 @@ final class BookCommentsTest extends WebTestCase
         self::assertStringContainsString('Widoczny mimo błędu', $this->commentsBlock());
     }
 
-    public function testAnonymousIsRedirectedToLogin(): void
+    public function testAnonymousSeesTheBookButNoCommentsRatingsOrReadForm(): void
     {
         $this->read($this->anna, 4, 'Sekret', '2026-09-15');
 
         $this->client->request('GET', $this->showUrl());
 
-        self::assertResponseRedirects('/login');
+        self::assertResponseStatusCodeSame(200);
+        self::assertSelectorTextContains('h1', 'Solaris');
+        $html = $this->html();
+        self::assertStringNotContainsString('Sekret', $html);
+        self::assertStringNotContainsString('4/5', $html);
+        self::assertStringNotContainsString('a***@example.com', $html);
+        self::assertStringNotContainsString('anna@example.com', $html);
+        self::assertStringNotContainsString('Komentarze czytelników', $html);
+        self::assertStringNotContainsString('Brak komentarzy', $html);
+        self::assertSelectorNotExists('#comments');
+        self::assertSelectorNotExists('form[name="mark_read"]');
+        self::assertSelectorNotExists('form[action$="/read/remove"]');
     }
 
     private function read(User $user, int $rating, ?string $comment, string $readOn): void

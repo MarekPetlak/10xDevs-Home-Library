@@ -30,16 +30,58 @@ final class BookListControllerTest extends WebTestCase
         $this->client->loginUser($this->user);
     }
 
-    public function testAnonymousIsRedirectedToLoginOnBothPages(): void
+    public function testAnonymousCanOpenListAndDetailWithCatalogueDataOnly(): void
     {
+        $other = static::getContainer()->get(UserManager::class)->create('ola@example.com', 'secret-pass');
         $book = $this->createBook('Solaris', $this->user);
+        $this->createReadBook($other, $book, 5);
         $this->client->restart();
 
         $this->client->request('GET', '/books');
-        self::assertResponseRedirects('/login');
+        self::assertResponseStatusCodeSame(200);
+        self::assertSelectorTextContains('table', 'Solaris');
+        self::assertSelectorTextContains('table', 'Stanisław Lem');
+        self::assertSelectorTextNotContains('table', 'Przeczytana');
+        self::assertSelectorTextNotContains('table', 'Twój status');
+        self::assertStringNotContainsString('5/5', $this->client->getResponse()->getContent());
 
         $this->client->request('GET', '/books/'.$book->getId());
+        self::assertResponseStatusCodeSame(200);
+        self::assertSelectorTextContains('h1', 'Solaris');
+        self::assertSelectorNotExists('form[name="mark_read"]');
+        self::assertSelectorNotExists('#comments');
+        self::assertStringNotContainsString('5/5', $this->client->getResponse()->getContent());
+    }
+
+    public function testAddBookButtonIsVisibleToAnonymousVisitorsAndLeadsThroughLogin(): void
+    {
+        // Login throttling state is shared through the cache between tests; start from a clean slate.
+        static::getContainer()->get('cache.rate_limiter')->clear();
+        $this->client->restart();
+
+        $this->client->request('GET', '/books');
+        self::assertSelectorExists('main a.btn[href="/books/new"]');
+        self::assertSelectorExists('nav a[href="/books/new"]');
+        self::assertSelectorExists('nav a[href="/login"]');
+        self::assertSelectorNotExists('nav a[href*="/logout"]');
+
+        $this->client->request('GET', '/books/new');
         self::assertResponseRedirects('/login');
+        $this->client->followRedirect();
+        $form = $this->client->getCrawler()->selectButton('Zaloguj')->form([
+            '_username' => 'anna@example.com',
+            '_password' => 'secret-pass',
+        ]);
+        $this->client->submit($form);
+        self::assertResponseRedirects('/books/new');
+    }
+
+    public function testLoggedInUserSeesTheAddBookButtonToo(): void
+    {
+        $this->client->request('GET', '/books');
+
+        self::assertSelectorExists('main a.btn[href="/books/new"]');
+        self::assertSelectorExists('nav a[href="/books/new"]');
     }
 
     public function testListShowsEveryBookIncludingOnesAddedByOthers(): void

@@ -18,7 +18,7 @@
                         <th>{{ 'book.form.title'|trans }}</th>
                         <th>{{ 'book.form.authors'|trans }}</th>
                         <th>{{ 'book.form.category'|trans }}</th>
-                        <th>{{ 'book.index.read_state'|trans }}</th>
+                        {% if app.user %}<th>{{ 'book.index.read_state'|trans }}</th>{% endif %}
                     </tr>
                 </thead>
                 <tbody>
@@ -27,13 +27,15 @@
                             <td><a href="{{ path('book_show', {id: book.id}) }}">{{ book.title }}</a></td>
                             <td>{{ book.authors|map(a => a.fullName)|join(', ') }}</td>
                             <td>{{ book.category.translationKey|trans }}</td>
-                            <td>
-                                {% set readBook = readBooks[book.id] ?? null %}
-                                {% if readBook %}
-                                    <span class="badge text-bg-success">{{ 'book.index.read'|trans }}</span>
-                                    {{ 'book.index.rating'|trans({'%rating%': readBook.rating}) }}
-                                {% endif %}
-                            </td>
+                            {% if app.user %}
+                                <td>
+                                    {% set readBook = readBooks[book.id] ?? null %}
+                                    {% if readBook %}
+                                        <span class="badge text-bg-success">{{ 'book.index.read'|trans }}</span>
+                                        {{ 'book.index.rating'|trans({'%rating%': readBook.rating}) }}
+                                    {% endif %}
+                                </td>
+                            {% endif %}
                         </tr>
                     {% endfor %}
                 </tbody>
