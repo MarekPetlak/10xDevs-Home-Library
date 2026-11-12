@@ -21,7 +21,8 @@ class Book
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(length: 255)]
+    // Case-insensitive, accent-sensitive, like author and tag names: "Jose" does not find "José".
+    #[ORM\Column(length: 255, options: ['collation' => 'utf8mb4_uca1400_as_ci'])]
     private string $title = '';
 
     #[ORM\Column(length: 13)]

@@ -13,6 +13,7 @@ use App\Enum\Category;
 use App\Service\UserManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bridge\Doctrine\DataCollector\DoctrineDataCollector;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
@@ -180,10 +181,116 @@ final class BookListControllerTest extends WebTestCase
         self::assertSelectorExists('form[name="book"]');
     }
 
-    private function createBook(string $title, User $addedBy, Category $category = Category::Novel): Book
+    public function testTitleAuthorAndCategoryFiltersNarrowTheList(): void
     {
-        // One shared author, so this helper issues no SELECT that would skew the query count.
-        $author = $this->author ??= (new Author())->setFirstName('Stanisław')->setLastName('Lem');
+        $this->createBook('Solaris', $this->user);
+        $this->createBook('Dziady', $this->user, Category::Poetry, (new Author())->setFirstName('Adam')->setLastName('Mickiewicz'));
+
+        $this->client->request('GET', '/books?title=sol');
+        self::assertSelectorTextContains('table', 'Solaris');
+        self::assertSelectorTextNotContains('table', 'Dziady');
+
+        $this->client->request('GET', '/books?author=mickie');
+        self::assertSelectorTextContains('table', 'Dziady');
+        self::assertSelectorTextNotContains('table', 'Solaris');
+
+        $this->client->request('GET', '/books?category=poetry');
+        self::assertSelectorTextContains('table', 'Dziady');
+        self::assertSelectorTextNotContains('table', 'Solaris');
+
+        $this->client->request('GET', '/books?title=sol&category=poetry');
+        self::assertResponseStatusCodeSame(200);
+        self::assertSelectorNotExists('table');
+    }
+
+    public function testSearchWithNoMatchReturns200(): void
+    {
+        $this->createBook('Solaris', $this->user);
+
+        $this->client->request('GET', '/books?title=zzz');
+
+        self::assertResponseStatusCodeSame(200);
+        self::assertSelectorNotExists('table');
+    }
+
+    public function testFiltersWorkForAnonymousVisitors(): void
+    {
+        $this->createBook('Solaris', $this->user);
+        $this->createBook('Dziady', $this->user, Category::Poetry);
+        $this->client->restart();
+
+        $this->client->request('GET', '/books?category=poetry');
+
+        self::assertResponseStatusCodeSame(200);
+        self::assertSelectorTextContains('table', 'Dziady');
+        self::assertSelectorTextNotContains('table', 'Solaris');
+    }
+
+    /**
+     * @return iterable<string, array{string}>
+     */
+    public static function badQueries(): iterable
+    {
+        yield 'negative page' => ['page=-3'];
+        yield 'zero page' => ['page=0'];
+        yield 'text page' => ['page=abc'];
+        yield 'unknown category' => ['category=bogus'];
+        yield 'array title' => ['title[]=x'];
+        yield 'array page' => ['page[]=2'];
+        yield 'percent' => ['title=%25&author=_'];
+    }
+
+    #[DataProvider('badQueries')]
+    public function testHandEditedQueriesNeverBreakThePage(string $query): void
+    {
+        $this->createBook('Solaris', $this->user);
+
+        $this->client->request('GET', '/books?'.$query);
+
+        self::assertResponseStatusCodeSame(200);
+    }
+
+    public function testListIsPagedByTwentyAndPageTwoShowsTheRest(): void
+    {
+        for ($i = 1; $i <= 21; ++$i) {
+            $this->createBook(sprintf('Książka %02d', $i), $this->user);
+        }
+
+        $crawler = $this->client->request('GET', '/books');
+        self::assertCount(20, $crawler->filter('tbody tr'));
+        self::assertStringNotContainsString('Książka 01', $crawler->filter('tbody')->text());
+
+        $crawler = $this->client->request('GET', '/books?page=2');
+        self::assertCount(1, $crawler->filter('tbody tr'));
+        self::assertSelectorTextContains('tbody', 'Książka 01');
+
+        $this->client->request('GET', '/books?page=3');
+        self::assertResponseStatusCodeSame(200);
+        self::assertSelectorNotExists('tbody tr');
+    }
+
+    public function testFilteredListQueryCountDoesNotGrowWithBookCount(): void
+    {
+        $this->createBook('Pierwsza', $this->user);
+        $this->client->enableProfiler();
+        $this->client->request('GET', '/books?title=a&author=lem&category=novel');
+        $few = $this->queryCount();
+
+        for ($i = 0; $i < 10; ++$i) {
+            $this->createBook('Kolejna '.$i, $this->user);
+        }
+        $this->client->enableProfiler();
+        $this->client->request('GET', '/books?title=a&author=lem&category=novel');
+        $many = $this->queryCount();
+
+        self::assertGreaterThan(0, $few);
+        self::assertSame($few, $many);
+    }
+
+    private function createBook(string $title, User $addedBy, Category $category = Category::Novel, ?Author $author = null): Book
+    {
+        // One shared author by default, so this helper issues no SELECT that would skew the query count.
+        $author ??= $this->author ??= (new Author())->setFirstName('Stanisław')->setLastName('Lem');
         $book = (new Book())
             ->setTitle($title)
             ->setIsbn(sprintf('97883080%05d', ++$this->isbnCounter))

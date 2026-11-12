@@ -336,30 +336,30 @@ One migration, in Phase 2: it pins `book.title` to `utf8mb4_uca1400_as_ci` (a sm
 
 #### Automated
 
-- [x] 1.1 Controller tests pass: `bin/phpunit tests/Controller`
-- [x] 1.2 Whole suite passes: `bin/phpunit`
-- [x] 1.3 Anonymous book pages contain no other user's comment, rating, read form or read badge
+- [x] 1.1 Controller tests pass: `bin/phpunit tests/Controller` — 0a34d55
+- [x] 1.2 Whole suite passes: `bin/phpunit` — 0a34d55
+- [x] 1.3 Anonymous book pages contain no other user's comment, rating, read form or read badge — 0a34d55
 
 #### Manual
 
-- [x] 1.4 Private window opens list and detail with catalogue data only
-- [x] 1.5 Logging in shows read badge, rating and comments again
-- [x] 1.6 "Dodaj książkę" is visible when logged out and leads through login to the add-book form
+- [x] 1.4 Private window opens list and detail with catalogue data only — 0a34d55
+- [x] 1.5 Logging in shows read badge, rating and comments again — 0a34d55
+- [x] 1.6 "Dodaj książkę" is visible when logged out and leads through login to the add-book form — 0a34d55
 
 ### Phase 2: Search, category filter and paging
 
 #### Automated
 
-- [ ] 2.1 Repository and controller tests pass: `bin/phpunit tests/Repository tests/Controller`
-- [ ] 2.2 Whole suite passes: `bin/phpunit`
-- [ ] 2.3 Query-count test still passes with paging
-- [ ] 2.7 Migration applies cleanly and the schema is in sync: `bin/console doctrine:migrations:migrate --no-interaction` then `bin/console doctrine:schema:validate`
+- [x] 2.1 Repository and controller tests pass: `bin/phpunit tests/Repository tests/Controller`
+- [x] 2.2 Whole suite passes: `bin/phpunit`
+- [x] 2.3 Query-count test still passes with paging
+- [x] 2.7 Migration applies cleanly and the schema is in sync: `bin/console doctrine:migrations:migrate --no-interaction` then `bin/console doctrine:schema:validate`
 
 #### Manual
 
-- [ ] 2.4 Title, author and category searches return the expected books
-- [ ] 2.5 A search with no matches returns 200 with an empty result
-- [ ] 2.6 Hand-edited URLs (`page=-3`, `category=bogus`) do not break the page
+- [x] 2.4 Title, author and category searches return the expected books
+- [x] 2.5 A search with no matches returns 200 with an empty result
+- [x] 2.6 Hand-edited URLs (`page=-3`, `category=bogus`) do not break the page
 
 ### Phase 3: Search form, pager and empty states
 

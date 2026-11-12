@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
+use App\Dto\BookSearch;
 use App\Dto\MarkRead;
 use App\Dto\NewBook;
 use App\Entity\User;
@@ -25,12 +26,18 @@ final class BookController extends AbstractController
 {
     // Public (FR-003): anonymous visitors get catalogue data only, personal data needs a signed-in user.
     #[Route('/books', name: 'book_index', methods: ['GET'])]
-    public function index(BookRepository $bookRepository, ReadBookRepository $readBookRepository): Response
+    public function index(Request $request, BookRepository $bookRepository, ReadBookRepository $readBookRepository): Response
     {
         $user = $this->getUser();
+        $search = BookSearch::fromQuery($request->query);
+        $paginator = $bookRepository->search($search);
 
         return $this->render('book/index.html.twig', [
-            'books' => $bookRepository->findAllForList(),
+            'books' => iterator_to_array($paginator, false),
+            'total' => \count($paginator),
+            'page' => $search->page,
+            'pageCount' => max(1, (int) ceil(\count($paginator) / BookRepository::PER_PAGE)),
+            'search' => $search,
             'readBooks' => $user instanceof User ? $readBookRepository->findByUserIndexedByBookId($user) : [],
         ]);
     }
