@@ -414,7 +414,7 @@ No data migration. Phase 1 adds dev-only dependencies; production `composer inst
 
 #### Manual
 
-- [ ] 4.5 Each matrix cell is visible in the screenshots and error and loading are marked N/A with reasons
-- [ ] 4.6 The AGENTS.md UI block reads correctly and sits outside the CLI-managed block
-- [ ] 4.7 Any baseline delta is explained, not just accepted
-- [ ] 4.9 Every view's screenshots look right under the new palette, fonts and icons
+- [x] 4.5 Each matrix cell is visible in the screenshots and error and loading are marked N/A with reasons
+- [x] 4.6 The AGENTS.md UI block reads correctly and sits outside the CLI-managed block
+- [x] 4.7 Any baseline delta is explained, not just accepted
+- [x] 4.9 Every view's screenshots look right under the new palette, fonts and icons
