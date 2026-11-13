@@ -386,14 +386,14 @@ No data migration. Phase 1 adds dev-only dependencies; production `composer inst
 
 #### Automated
 
-- [x] 3.1 Existing list tests pass unchanged
-- [x] 3.2 New assertions for form role search and table caption pass
-- [x] 3.3 Twig templates lint
-- [x] 3.4 Read badge defined once
-- [x] 3.5 Pager markup no longer inline
-- [x] 3.9 Icons render as hidden inline SVG in the navbar
-- [x] 3.11 All controller tests pass unchanged
-- [x] 3.12 Error template renders for 404 and 500 without a user
+- [x] 3.1 Existing list tests pass unchanged — a8738d1
+- [x] 3.2 New assertions for form role search and table caption pass — a8738d1
+- [x] 3.3 Twig templates lint — a8738d1
+- [x] 3.4 Read badge defined once — a8738d1
+- [x] 3.5 Pager markup no longer inline — a8738d1
+- [x] 3.9 Icons render as hidden inline SVG in the navbar — a8738d1
+- [x] 3.11 All controller tests pass unchanged — a8738d1
+- [x] 3.12 Error template renders for 404 and 500 without a user — a8738d1
 
 #### Manual
 
@@ -408,15 +408,15 @@ No data migration. Phase 1 adds dev-only dependencies; production `composer inst
 
 #### Automated
 
-- [x] 4.1 Screenshot spec passes against committed baselines
-- [x] 4.2 Baseline files exist and are tracked
-- [x] 4.3 Hard-coded scan on the view, partials and app.css returns 0 matches
-- [x] 4.4 PHP suite passes
-- [x] 4.8 Spec covers every view
+- [x] 4.1 Screenshot spec passes against committed baselines — 09ed9ac
+- [x] 4.2 Baseline files exist and are tracked — 09ed9ac
+- [x] 4.3 Hard-coded scan on the view, partials and app.css returns 0 matches — 09ed9ac
+- [x] 4.4 PHP suite passes — 09ed9ac
+- [x] 4.8 Spec covers every view — 09ed9ac
 
 #### Manual
 
-- [x] 4.5 Each matrix cell is visible in the screenshots and error and loading are marked N/A with reasons
-- [x] 4.6 The AGENTS.md UI block reads correctly and sits outside the CLI-managed block
-- [x] 4.7 Any baseline delta is explained, not just accepted
-- [x] 4.9 Every view's screenshots look right under the new palette, fonts and icons
+- [x] 4.5 Each matrix cell is visible in the screenshots and error and loading are marked N/A with reasons — 2894441
+- [x] 4.6 The AGENTS.md UI block reads correctly and sits outside the CLI-managed block — 2894441
+- [x] 4.7 Any baseline delta is explained, not just accepted — 2894441
+- [x] 4.9 Every view's screenshots look right under the new palette, fonts and icons — 2894441
