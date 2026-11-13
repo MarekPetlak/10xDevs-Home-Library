@@ -395,22 +395,22 @@ No data migration. Phase 1 adds dev-only dependencies; production `composer inst
 
 #### Manual
 
-- [ ] 3.6 Empty library and no-results pages look clearly different
-- [ ] 3.7 Detail page still shows the read badge and rating for a read book
-- [ ] 3.8 Keyboard tab order shows a visible focus ring everywhere
-- [ ] 3.10 Icons follow the text colour and line up with their labels at desktop and 390 px
-- [ ] 3.13 Detail page, forms, login and flash alerts all use the new palette, fonts and icons
-- [ ] 3.14 Branded error page shows for 404 and 500
+- [x] 3.6 Empty library and no-results pages look clearly different — a8738d1
+- [x] 3.7 Detail page still shows the read badge and rating for a read book — a8738d1
+- [x] 3.8 Keyboard tab order shows a visible focus ring everywhere — a8738d1
+- [x] 3.10 Icons follow the text colour and line up with their labels at desktop and 390 px — a8738d1
+- [x] 3.13 Detail page, forms, login and flash alerts all use the new palette, fonts and icons — a8738d1
+- [x] 3.14 Branded error page shows for 404 and 500 — a8738d1
 
 ### Phase 4: States and visual gate
 
 #### Automated
 
-- [ ] 4.1 Screenshot spec passes against committed baselines
-- [ ] 4.2 Baseline files exist and are tracked
-- [ ] 4.3 Hard-coded scan on the view, partials and app.css returns 0 matches
-- [ ] 4.4 PHP suite passes
-- [ ] 4.8 Spec covers every view
+- [x] 4.1 Screenshot spec passes against committed baselines
+- [x] 4.2 Baseline files exist and are tracked
+- [x] 4.3 Hard-coded scan on the view, partials and app.css returns 0 matches
+- [x] 4.4 PHP suite passes
+- [x] 4.8 Spec covers every view
 
 #### Manual
 

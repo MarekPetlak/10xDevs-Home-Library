@@ -46,3 +46,11 @@
 - Rollback: `fly releases --image`, then `fly deploy --image <ref> --ha=false`. Migrations do not roll back; take a dump first.
 - CI builds from a clean checkout, so `assets/vendor/` (gitignored) is rebuilt by `importmap:install` in the Dockerfile, and `bin/console` needs mode 100755 (Git on Windows records 100644). A local `fly deploy` hides both problems.
 - Tests must use the local MariaDB, never the cyberfolks database; its whitelist only allows the app's egress IPs.
+
+## UI contract (change `ui-books-list`)
+
+- Tokens are Bootstrap variables, overridden in the token block of `assets/styles/app.css` (palette, fonts and contrast notes: `context/changes/ui-books-list/design-tokens.md`). Add or change colours there only. The add-on colour (`--app-accent-2`) never goes on small text; links on the page background use the derived accent text.
+- Icons: `ux_icon('bi:<name>', {class: 'icon'})` after `php bin/console ux:icons:import bi:<name>`. Never an icon font or a CDN.
+- Shared markup lives in `templates/book/_*.html.twig` (`_read_status`, `_pager`, `_empty_state`); check them before writing new markup. The form theme is `templates/form/theme.html.twig`, the error page `templates/bundles/TwigBundle/Exception/error.html.twig`.
+- No colour literals, `style=` or arbitrary values in views. Use `text-body-secondary`, not `text-muted`. Scan (must print nothing): `grep -nE '#[0-9a-fA-F]{3,8}\b|style=|rgb\(|text-muted|class="[^"]*\[' templates/book/index.html.twig templates/book/_*.html.twig`
+- Visual gate: `npm run e2e` compares `/books` states and every other view (desktop and 390 px) with the baselines in `e2e/__screenshots__/`. Update them (`npm run e2e:update`) only after you can explain the visual change.
