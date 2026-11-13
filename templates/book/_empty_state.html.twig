@@ -1,0 +1,15 @@
+{#
+    Empty state of the book list. Input: variant, 'empty' (no books in the collection) or 'no_results' (a search matched nothing).
+    The two variants differ in icon, heading and action so a visitor can tell them apart at a glance.
+#}
+<div class="text-center py-5">
+    {% if variant == 'empty' %}
+        {{ ux_icon('bi:book', {class: 'icon-lg icon-accent-2'}) }}
+        <h2 class="h4 mt-3">{{ 'book.index.empty'|trans }}</h2>
+        <a class="btn btn-primary mt-2" href="{{ path('book_new') }}">{{ ux_icon('bi:plus-circle', {class: 'icon'}) }} {{ 'book.index.empty_link'|trans }}</a>
+    {% else %}
+        {{ ux_icon('bi:search', {class: 'icon-lg icon-accent-2'}) }}
+        <h2 class="h4 mt-3">{{ 'book.index.no_results'|trans }}</h2>
+        <a class="btn btn-outline-secondary mt-2" href="{{ path('book_index') }}">{{ ux_icon('bi:x-circle', {class: 'icon'}) }} {{ 'book.index.no_results_link'|trans }}</a>
+    {% endif %}
+</div>

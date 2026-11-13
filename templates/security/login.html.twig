@@ -8,7 +8,7 @@
             <h1 class="h3 mb-3">{{ 'security.login.heading'|trans }}</h1>
 
             {% if error %}
-                <div class="alert alert-danger" role="alert">{% if throttled %}{{ error.messageKey|trans(error.messageData, 'security') }}{% else %}{{ 'security.login.error'|trans }}{% endif %}</div>
+                <div class="alert alert-danger d-flex align-items-start gap-2" role="alert">{{ ux_icon('bi:x-circle', {class: 'icon flex-shrink-0 mt-1'}) }}<div>{% if throttled %}{{ error.messageKey|trans(error.messageData, 'security') }}{% else %}{{ 'security.login.error'|trans }}{% endif %}</div></div>
             {% endif %}
 
             <form method="post" action="{{ path('app_login') }}">
@@ -21,7 +21,7 @@
                     <input type="password" id="login-password" name="_password" class="form-control" autocomplete="current-password" required>
                 </div>
                 <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
-                <button type="submit" class="btn btn-primary">{{ 'security.login.submit'|trans }}</button>
+                <button type="submit" class="btn btn-primary">{{ ux_icon('bi:box-arrow-in-right', {class: 'icon'}) }} {{ 'security.login.submit'|trans }}</button>
             </form>
         </div>
     </div>

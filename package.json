@@ -1,0 +1,19 @@
+{
+  "name": "10xdevs",
+  "version": "1.0.0",
+  "scripts": {
+    "e2e": "playwright test",
+    "e2e:update": "playwright test --update-snapshots"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MarekPetlak/10xDevs-Home-Library.git"
+  },
+  "description": "Local Playwright screenshot tests for the UI (dev only, not part of the app image)",
+  "devDependencies": {
+    "@playwright/test": "^1.65.0",
+    "@types/node": "^26.6.6"
+  },
+  "private": true,
+  "type": "module"
+}

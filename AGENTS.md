@@ -18,7 +18,7 @@
 ## Project Structure
 
 - `src/Controller`, `src/Entity`, `src/Repository`, `src/Service`, `src/Command`, `src/Enum`, `src/Dto`, `src/Form` (namespace `App\`): so far `User`, `UserManager`, the account commands, `Book`, `Author`, `Tag`, `Category` (enum in `src/Enum`), `BookManager`, `NameList`, the `NewBook` DTO with the `BookType` form, the add-book controller (`/books/new`), `ReadBook` (with `ReadBookRepository`), `ReadingManager`, `EmailMasker` (+ `EmailMaskExtension` in `src/Twig`), the `MarkRead` DTO with the `MarkReadType` form, the public book list and detail routes (`GET /books` `book_index` with title/author/category filters and 20-per-page paging via `BookSearch` and `BookRepository::search()`, `GET /books/{id}` `book_show`; read badge, rating, comments and the read form render only for a signed-in user), the read routes (`POST /books/{id}/read` `book_read`, `POST /books/{id}/read/remove` `book_read_remove`, CSRF token id `read_remove`) and the home, login and health controllers. `/` (`home`) only redirects to `/books`, which is the main page: signed-in users see up to three recommendations (`RecommendationService`) above the list; login and logout also land on `book_index`.
-- `templates/` (Twig), `assets/` + `importmap.php` (AssetMapper; no Node or bundler, add JS packages with `bin/console importmap:require`).
+- `templates/` (Twig), `assets/` + `importmap.php` (AssetMapper; the app has no Node or bundler, add JS packages with `bin/console importmap:require`). Node exists only for the local Playwright screenshot tests (`package.json`, `playwright.config.js`, `e2e/`: dev tooling, not in the app image, not run in CI). `assets/icons/` holds Bootstrap Icons imported with `bin/console ux:icons:import`; `assets/fonts/` holds self-hosted DM Sans and DM Serif Display (SIL OFL licences next to them). Demo data for the screenshots lives in `src/DataFixtures/` (groups `books-ui-catalogue` and `books-ui-empty`).
 - `migrations/`: schema changes go through migrations only.
 - `context/`: planning artifacts for the 10x workflow.
 
@@ -27,6 +27,7 @@
 - `docker compose up -d database mailer`: MariaDB 10.11 on host port 3307 (matches `DATABASE_URL` in `.env`) and Mailpit.
 - `symfony serve -d`: dev server.
 - `bin/console make:migration`, then `bin/console doctrine:migrations:migrate`: never `doctrine:schema:update`.
+- `npm run e2e`: local Playwright screenshot tests. They start `php -S` in the test environment on their own database `app_teste2e` (`TEST_TOKEN=e2e`), because `doctrine:fixtures:load` purges its target; never load fixtures with the default `.env` (development database `app`) or without `TEST_TOKEN`, which would fill `app_test` and break PHPUnit.
 - `bin/phpunit`: tests; need `docker compose up -d database` and use the root `DATABASE_URL` from `.env.test` (creates `app_test`); each test runs in a rolled-back transaction via `dama/doctrine-test-bundle`; never the production/cyberfolks DB (`phpunit.dist.xml` fails on deprecations, notices and warnings).
 - `bin/console app:user:create <email>` and `bin/console app:user:change-password <email>`: the owner's account tools. The password is asked through a hidden prompt (twice, minimum 8 characters); there is no password argument. On Fly use a real terminal: `fly ssh console -a 10xdevs-home-library --pty -C "php bin/console app:user:create <email>"`.
 - `composer audit`: the only dependency audit; none runs automatically.
@@ -45,3 +46,11 @@
 - Rollback: `fly releases --image`, then `fly deploy --image <ref> --ha=false`. Migrations do not roll back; take a dump first.
 - CI builds from a clean checkout, so `assets/vendor/` (gitignored) is rebuilt by `importmap:install` in the Dockerfile, and `bin/console` needs mode 100755 (Git on Windows records 100644). A local `fly deploy` hides both problems.
 - Tests must use the local MariaDB, never the cyberfolks database; its whitelist only allows the app's egress IPs.
+
+## UI contract (change `ui-books-list`)
+
+- Tokens are Bootstrap variables, overridden in the token block of `assets/styles/app.css` (palette, fonts and contrast notes: `context/changes/ui-books-list/design-tokens.md`). Add or change colours there only. The add-on colour (`--app-accent-2`) never goes on small text; links on the page background use the derived accent text.
+- Icons: `ux_icon('bi:<name>', {class: 'icon'})` after `php bin/console ux:icons:import bi:<name>`. Never an icon font or a CDN.
+- Shared markup lives in `templates/book/_*.html.twig` (`_read_status`, `_pager`, `_empty_state`); check them before writing new markup. The form theme is `templates/form/theme.html.twig`, the error page `templates/bundles/TwigBundle/Exception/error.html.twig`.
+- No colour literals, `style=` or arbitrary values in views. Use `text-body-secondary`, not `text-muted`. Scan (must print nothing): `grep -nE '#[0-9a-fA-F]{3,8}\b|style=|rgb\(|text-muted|class="[^"]*\[' templates/book/index.html.twig templates/book/_*.html.twig`
+- Visual gate: `npm run e2e` compares `/books` states and every other view (desktop and 390 px) with the baselines in `e2e/__screenshots__/`. Update them (`npm run e2e:update`) only after you can explain the visual change.

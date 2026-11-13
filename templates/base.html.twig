@@ -23,7 +23,7 @@
         {% block navbar %}
             <nav class="navbar navbar-expand-lg bg-body-tertiary">
                 <div class="container">
-                    <a class="navbar-brand" href="{{ path('home') }}">{{ 'app.name'|trans }}</a>
+                    <a class="navbar-brand" href="{{ path('home') }}">{{ ux_icon('bi:book', {class: 'icon icon-accent-2'}) }} {{ 'app.name'|trans }}</a>
                     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#main-navbar" aria-controls="main-navbar" aria-expanded="false" aria-label="{{ 'nav.toggle'|trans }}">
                         <span class="navbar-toggler-icon"></span>
                     </button>
@@ -31,12 +31,12 @@
                         {% block navbar_items %}
                             <ul class="navbar-nav ms-auto align-items-lg-center">
                                 <li class="nav-item"><a class="nav-link" href="{{ path('book_index') }}">{{ 'nav.book_index'|trans }}</a></li>
-                                <li class="nav-item"><a class="nav-link" href="{{ path('book_new') }}">{{ 'nav.book_new'|trans }}</a></li>
+                                <li class="nav-item"><a class="nav-link" href="{{ path('book_new') }}">{{ ux_icon('bi:plus-circle', {class: 'icon'}) }} {{ 'nav.book_new'|trans }}</a></li>
                                 {% if app.user %}
                                     <li class="nav-item"><span class="navbar-text me-lg-3">{{ app.user.userIdentifier }}</span></li>
-                                    <li class="nav-item"><a class="nav-link" href="{{ logout_path() }}">{{ 'security.logout'|trans }}</a></li>
+                                    <li class="nav-item"><a class="nav-link" href="{{ logout_path() }}">{{ ux_icon('bi:box-arrow-right', {class: 'icon'}) }} {{ 'security.logout'|trans }}</a></li>
                                 {% else %}
-                                    <li class="nav-item"><a class="nav-link" href="{{ path('app_login') }}">{{ 'security.login.submit'|trans }}</a></li>
+                                    <li class="nav-item"><a class="nav-link" href="{{ path('app_login') }}">{{ ux_icon('bi:box-arrow-in-right', {class: 'icon'}) }} {{ 'security.login.submit'|trans }}</a></li>
                                 {% endif %}
                             </ul>
                         {% endblock %}
@@ -47,9 +47,13 @@
 
         <main class="container py-4">
             {% block flash_messages %}
+                {% set flash_icons = {success: 'bi:check-circle', warning: 'bi:exclamation-triangle', error: 'bi:x-circle', danger: 'bi:x-circle'} %}
                 {% for type, messages in app.flashes %}
                     {% for message in messages %}
-                        <div class="alert alert-{{ type == 'error' ? 'danger' : type }}" role="alert">{{ message }}</div>
+                        <div class="alert alert-{{ type == 'error' ? 'danger' : type }} d-flex align-items-start gap-2" role="alert">
+                            {{ ux_icon(flash_icons[type] ?? 'bi:info-circle', {class: 'icon flex-shrink-0 mt-1'}) }}
+                            <div>{{ message }}</div>
+                        </div>
                     {% endfor %}
                 {% endfor %}
             {% endblock %}

@@ -5,22 +5,22 @@
 {% block body_content %}
     <div class="d-flex justify-content-between align-items-center mb-3">
         <h1 class="h3 mb-0">{{ 'book.index.heading'|trans }}</h1>
-        <a class="btn btn-primary" href="{{ path('book_new') }}">{{ 'nav.book_new'|trans }}</a>
+        <a class="btn btn-primary" href="{{ path('book_new') }}">{{ ux_icon('bi:plus-circle', {class: 'icon'}) }} {{ 'nav.book_new'|trans }}</a>
     </div>
 
     {% if app.user and recommendations is not null %}
         <section id="recommendations" class="pb-4">
             <h2 class="h4 mb-3">{{ 'book.index.recommendations.heading'|trans }}</h2>
             {% if recommendations is empty %}
-                <p class="text-muted">{{ 'book.index.recommendations.empty'|trans }}</p>
+                <p class="text-body-secondary">{{ 'book.index.recommendations.empty'|trans }}</p>
             {% else %}
                 <div class="row g-3">
                     {% for recommendation in recommendations %}
                         <div class="col-md-4">
-                            <div class="card h-100 recommendation-card">
+                            <div class="card h-100" data-testid="recommendation-card">
                                 <div class="card-body">
                                     <h3 class="h5 card-title"><a href="{{ path('book_show', {id: recommendation.bookId}) }}">{{ recommendation.title }}</a></h3>
-                                    <p class="card-subtitle text-muted mb-2">{{ recommendation.category.translationKey|trans }}</p>
+                                    <p class="card-subtitle text-body-secondary mb-2">{{ recommendation.category.translationKey|trans }}</p>
                                     <p class="card-text">{{ 'book.index.recommendations.rating'|trans({'%average%': recommendation.averageRating|number_format(1, ',', ''), '%count%': recommendation.ratingCount}) }}</p>
                                 </div>
                             </div>
@@ -32,7 +32,7 @@
     {% endif %}
 
     {% if total > 0 or search.isFiltered %}
-        <form method="get" action="{{ path('book_index') }}" class="row g-3 align-items-end mb-4">
+        <form method="get" action="{{ path('book_index') }}" role="search" aria-label="{{ 'book.index.search.label'|trans }}" class="row g-3 align-items-end mb-4">
             <div class="col-md">
                 <label for="search-title" class="form-label">{{ 'book.index.search.title'|trans }}</label>
                 <input type="text" class="form-control" id="search-title" name="title" value="{{ search.title }}">
@@ -51,19 +51,20 @@
                 </select>
             </div>
             <div class="col-md-auto">
-                <button type="submit" class="btn btn-primary">{{ 'book.index.search.submit'|trans }}</button>
-                <a class="btn btn-outline-secondary" href="{{ path('book_index') }}">{{ 'book.index.search.clear'|trans }}</a>
+                <button type="submit" class="btn btn-primary">{{ ux_icon('bi:search', {class: 'icon'}) }} {{ 'book.index.search.submit'|trans }}</button>
+                <a class="btn btn-outline-secondary" href="{{ path('book_index') }}">{{ ux_icon('bi:x-circle', {class: 'icon'}) }} {{ 'book.index.search.clear'|trans }}</a>
             </div>
         </form>
     {% endif %}
 
     {% if books is empty and total == 0 and not search.isFiltered %}
-        <p class="text-muted">{{ 'book.index.empty'|trans }} <a href="{{ path('book_new') }}">{{ 'book.index.empty_link'|trans }}</a></p>
+        {% include 'book/_empty_state.html.twig' with {variant: 'empty'} only %}
     {% elseif books is empty %}
-        <p class="text-muted">{{ 'book.index.no_results'|trans }} <a href="{{ path('book_index') }}">{{ 'book.index.no_results_link'|trans }}</a></p>
+        {% include 'book/_empty_state.html.twig' with {variant: 'no_results'} only %}
     {% else %}
         <div class="table-responsive">
             <table class="table table-hover align-middle">
+                <caption class="visually-hidden">{{ 'book.index.table_caption'|trans }}</caption>
                 <thead>
                     <tr>
                         <th>{{ 'book.form.title'|trans }}</th>
@@ -82,8 +83,7 @@
                                 <td>
                                     {% set readBook = readBooks[book.id] ?? null %}
                                     {% if readBook %}
-                                        <span class="badge text-bg-success">{{ 'book.index.read'|trans }}</span>
-                                        {{ 'book.index.rating'|trans({'%rating%': readBook.rating}) }}
+                                        {% include 'book/_read_status.html.twig' with {rating: readBook.rating} only %}
                                     {% endif %}
                                 </td>
                             {% endif %}
@@ -95,43 +95,6 @@
     {% endif %}
 
     {% if pageCount > 1 %}
-        <nav aria-label="{{ 'book.index.pager.label'|trans }}">
-            {# Window: first page, last page, the current page ±2, previous/next and gaps; keeps the filters in every link. #}
-            {% set windowEnd = min(pageCount, page + 2) %}
-            {% set windowStart = min(max(1, page - 2), windowEnd) %}
-            <ul class="pagination flex-wrap">
-                <li class="page-item{{ page <= 1 ? ' disabled' }}">
-                    {% if page > 1 %}
-                        <a class="page-link" href="{{ path('book_index', search.filters|merge({page: min(page - 1, pageCount)})) }}" rel="prev">{{ 'book.index.pager.previous'|trans }}</a>
-                    {% else %}
-                        <span class="page-link">{{ 'book.index.pager.previous'|trans }}</span>
-                    {% endif %}
-                </li>
-                {% if windowStart > 1 %}
-                    <li class="page-item"><a class="page-link" href="{{ path('book_index', search.filters|merge({page: 1})) }}">1</a></li>
-                    {% if windowStart > 2 %}
-                        <li class="page-item disabled" aria-hidden="true"><span class="page-link">&hellip;</span></li>
-                    {% endif %}
-                {% endif %}
-                {% for n in windowStart..windowEnd %}
-                    <li class="page-item{{ n == page ? ' active' }}">
-                        <a class="page-link" href="{{ path('book_index', search.filters|merge({page: n})) }}"{% if n == page %} aria-current="page"{% endif %}>{{ n }}</a>
-                    </li>
-                {% endfor %}
-                {% if windowEnd < pageCount %}
-                    {% if windowEnd < pageCount - 1 %}
-                        <li class="page-item disabled" aria-hidden="true"><span class="page-link">&hellip;</span></li>
-                    {% endif %}
-                    <li class="page-item"><a class="page-link" href="{{ path('book_index', search.filters|merge({page: pageCount})) }}">{{ pageCount }}</a></li>
-                {% endif %}
-                <li class="page-item{{ page >= pageCount ? ' disabled' }}">
-                    {% if page < pageCount %}
-                        <a class="page-link" href="{{ path('book_index', search.filters|merge({page: page + 1})) }}" rel="next">{{ 'book.index.pager.next'|trans }}</a>
-                    {% else %}
-                        <span class="page-link">{{ 'book.index.pager.next'|trans }}</span>
-                    {% endif %}
-                </li>
-            </ul>
-        </nav>
+        {% include 'book/_pager.html.twig' with {page: page, pageCount: pageCount, search: search} only %}
     {% endif %}
 {% endblock %}

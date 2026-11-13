@@ -1,4 +1,10 @@
+# The preview route renders the branded error template; the test environment gets it for the Playwright gate (e2e/).
 when@dev:
+    _errors:
+        resource: '@FrameworkBundle/Resources/config/routing/errors.php'
+        prefix: /_error
+
+when@test:
     _errors:
         resource: '@FrameworkBundle/Resources/config/routing/errors.php'
         prefix: /_error

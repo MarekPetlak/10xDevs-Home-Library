@@ -408,6 +408,37 @@ final class BookListControllerTest extends WebTestCase
         self::assertSame($few, $many);
     }
 
+    public function testSearchFormAndTableAreLandmarks(): void
+    {
+        $this->createBook('Solaris', $this->user);
+
+        $this->client->request('GET', '/books');
+
+        self::assertSelectorExists('form[method="get"][role="search"][aria-label="Wyszukiwanie książek"]');
+        self::assertSelectorExists('table caption');
+    }
+
+    public function testEmptyLibraryAndNoResultsStatesDifferInHeadingAndAction(): void
+    {
+        $this->client->request('GET', '/books');
+        self::assertSelectorTextContains('main .text-center h2', 'W kolekcji nie ma jeszcze żadnych książek.');
+        self::assertSelectorExists('main .text-center a.btn-primary[href="/books/new"]');
+
+        $this->createBook('Solaris', $this->user);
+        $this->client->request('GET', '/books?title=zzz');
+        self::assertSelectorTextContains('main .text-center h2', 'Żadna książka nie pasuje do wyszukiwania.');
+        self::assertSelectorExists('main .text-center a.btn-outline-secondary[href="/books"]');
+        self::assertSelectorNotExists('main .text-center a[href="/books/new"]');
+    }
+
+    public function testLayoutIconsAreDecorative(): void
+    {
+        $this->client->request('GET', '/books');
+
+        self::assertSelectorExists('nav svg[aria-hidden="true"]');
+        self::assertSelectorNotExists('nav svg:not([aria-hidden="true"])');
+    }
+
     private function createBook(string $title, User $addedBy, Category $category = Category::Novel, ?Author $author = null): Book
     {
         // One shared author by default, so this helper issues no SELECT that would skew the query count.
