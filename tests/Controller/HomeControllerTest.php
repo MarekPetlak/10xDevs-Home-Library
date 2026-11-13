@@ -73,7 +73,7 @@ final class HomeControllerTest extends WebTestCase
 
         self::assertResponseStatusCodeSame(200);
         self::assertSelectorNotExists('#recommendations');
-        self::assertSelectorNotExists('.recommendation-card');
+        self::assertSelectorNotExists('[data-testid="recommendation-card"]');
         self::assertSelectorTextNotContains('body', 'Rekomendacje dla Ciebie');
         self::assertSelectorTextNotContains('body', 'Przeczytaj i oceń kilka książek');
     }
@@ -89,7 +89,7 @@ final class HomeControllerTest extends WebTestCase
         self::assertResponseStatusCodeSame(200);
         self::assertSelectorTextContains('#recommendations h2', 'Rekomendacje dla Ciebie');
         self::assertSelectorTextContains('#recommendations', 'Przeczytaj i oceń kilka książek, aby dostać rekomendacje.');
-        self::assertSelectorNotExists('.recommendation-card');
+        self::assertSelectorNotExists('[data-testid="recommendation-card"]');
     }
 
     public function testLoggedInUserSeesTopThreeUnreadBooksWithLinkCategoryAndRating(): void
@@ -101,7 +101,7 @@ final class HomeControllerTest extends WebTestCase
         $crawler = $client->request('GET', '/books');
 
         self::assertResponseStatusCodeSame(200);
-        $cards = $crawler->filter('#recommendations .recommendation-card');
+        $cards = $crawler->filter('#recommendations [data-testid="recommendation-card"]');
         self::assertCount(3, $cards);
 
         $hit = $cards->eq(0);
@@ -136,7 +136,7 @@ final class HomeControllerTest extends WebTestCase
         self::assertLessThan(strpos($html, '<form method="get"'), strpos($html, 'id="recommendations"'));
 
         $client->request('GET', '/books?title=Hit&page=1');
-        self::assertSelectorExists('#recommendations .recommendation-card');
+        self::assertSelectorExists('#recommendations [data-testid="recommendation-card"]');
         self::assertSelectorTextContains('table', 'Hit');
     }
 

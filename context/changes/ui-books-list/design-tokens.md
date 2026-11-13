@@ -37,9 +37,9 @@ Raw values supplied by the participant on 2026-11-13 (palette and font definitio
 | --- | --- | --- |
 | Headings | DM Serif Display | literary character |
 | Body and interface | DM Sans | modern, readable |
-| Numeric data | DM Sans with tabular figures | `font-variant-numeric: tabular-nums`; to be verified against the font files |
+| Numeric data | DM Mono (substitute, participant decision 2026-11-13) | The supplied definition asked for DM Sans with tabular figures, but DM Sans has none: in Chromium, `1111` and `0000` keep different widths (49.9 px vs 109.5 px at 40 px) with `tabular-nums` and `"tnum"`, for the Fontsource variable `wght`, variable `opsz` and static 400 builds. Numbers use DM Mono through the `.num` class. |
 
-Source of font files: Fontsource packages `@fontsource-variable/dm-sans` and `@fontsource/dm-serif-display` (SIL Open Font License 1.1), subsets `latin` and `latin-ext` (Polish diacritics are in `latin-ext`). Files are copied into `assets/fonts/` and referenced from `app.css` with relative `url()`.
+Source of font files: Fontsource packages `@fontsource-variable/dm-sans`, `@fontsource/dm-serif-display` and `@fontsource/dm-mono` (SIL Open Font License 1.1), subsets `latin` and `latin-ext` (Polish diacritics are in `latin-ext`). Files are copied into `assets/fonts/` and referenced from `app.css` with relative `url()`.
 
 ## Icons
 

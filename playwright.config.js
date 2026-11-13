@@ -35,10 +35,10 @@ export default defineConfig({
   ],
 
   webServer: {
-    command: `php -S 127.0.0.1:${PORT} -t public public/index.php`,
+    command: `php -d variables_order=EGPCS -S 127.0.0.1:${PORT} -t public public/index.php`,
     url: `http://127.0.0.1:${PORT}/login`,
     reuseExistingServer: false,
     timeout: 60_000,
-    env: { APP_ENV: 'test', TEST_TOKEN: 'e2e', APP_DEBUG: '0' },
+    env: { APP_ENV: 'test', TEST_TOKEN: 'e2e', APP_DEBUG: '1' },
   },
 });

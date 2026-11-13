@@ -29,7 +29,7 @@ The view is already free of hard-coded values: the `grep` scan for hex/rgb/hsl/o
 
 ### C1. Dead class and deprecated muted role (missing tokens)
 
-- `recommendation-card` at `templates/book/index.html.twig:20` has no CSS anywhere: the only occurrence in `assets/` and `templates/` is this line, and `assets/styles/app.css` holds no rules.
+- `recommendation-card` at `templates/book/index.html.twig:20` has no CSS rule (`assets/styles/app.css` held none). **Correction (found while implementing phase 2):** it is not dead: `tests/Controller/HomeControllerTest.php:76, 92, 104, 139` use `.recommendation-card` as a selector, so it is a test hook. The original search covered only `assets/` and `templates/`, not `tests/`. Decision (participant, 2026-11-13): replace the class with `data-testid="recommendation-card"` in the template and in those four assertions, so test hooks and styling classes are separate.
 - `text-muted` appears 4 times in `index.html.twig` (lines 15, 23, 61, 63) and 3 times in `show.html.twig` (lines 9, 68, 75). Bootstrap 5.3 names this role `text-body-secondary`.
 - Impact: a styling hook that does nothing misleads the next agent into thinking cards are themed, and the muted role is spelled the old way in every empty-state message, so a future theme override has to chase two names.
 - Evidence level: observed for the class and counts. Verified against Bootstrap v5.3.8 docs (Context7, `site/src/content/docs/utilities/colors.mdx`): `.text-muted` is deprecated since v5.3.0, its value already points at `--bs-secondary-color`, and it is removed in v6.0.0. So the rename changes no pixels today; the gain is v6 readiness and one muted-role name.

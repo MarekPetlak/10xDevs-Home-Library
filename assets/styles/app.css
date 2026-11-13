@@ -1,1 +1,229 @@
-/* Application styles; Bootstrap is loaded from assets/app.js. */
+/*
+ * Application styles. Bootstrap (assets/vendor, loaded first from assets/app.js) is the design system;
+ * this file is its theme layer: the supplied palette and fonts mapped onto Bootstrap's variables.
+ *
+ * Source of the values: context/changes/ui-books-list/design-tokens.md (palette, fonts, contrast numbers).
+ * Rules for views: no colour literals, `style=` or arbitrary values in templates; use Bootstrap roles
+ * (`text-body-secondary`, `bg-body`, `btn-primary`, ...) and the `--app-*` properties below.
+ * Raw hex values live ONLY between the BEGIN/END markers of the token block.
+ */
+
+/* ---- Fonts: self-hosted (DM Sans, DM Serif Display, DM Mono), SIL OFL 1.1 (licences in assets/fonts/). latin-ext carries Polish diacritics. ---- */
+@font-face {
+    font-family: 'DM Sans';
+    font-style: normal;
+    font-weight: 100 1000;
+    font-display: swap;
+    src: url('../fonts/dm-sans-latin-ext-wght-normal.woff2') format('woff2-variations');
+    unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
+@font-face {
+    font-family: 'DM Sans';
+    font-style: normal;
+    font-weight: 100 1000;
+    font-display: swap;
+    src: url('../fonts/dm-sans-latin-wght-normal.woff2') format('woff2-variations');
+    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+    font-family: 'DM Serif Display';
+    font-style: normal;
+    font-weight: 400;
+    font-display: swap;
+    src: url('../fonts/dm-serif-display-latin-ext-400-normal.woff2') format('woff2');
+    unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
+@font-face {
+    font-family: 'DM Serif Display';
+    font-style: normal;
+    font-weight: 400;
+    font-display: swap;
+    src: url('../fonts/dm-serif-display-latin-400-normal.woff2') format('woff2');
+    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+    font-family: 'DM Mono';
+    font-style: normal;
+    font-weight: 400;
+    font-display: swap;
+    src: url('../fonts/dm-mono-latin-ext-400-normal.woff2') format('woff2');
+    unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
+@font-face {
+    font-family: 'DM Mono';
+    font-style: normal;
+    font-weight: 400;
+    font-display: swap;
+    src: url('../fonts/dm-mono-latin-400-normal.woff2') format('woff2');
+    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+/* ---- BEGIN tokens (light mode only) ---- */
+:root {
+    /* Supplied palette */
+    --app-bg: #F5F2EA;          /* background */
+    --app-surface: #FFFFFF;     /* cards, table, navbar, form controls */
+    --app-text: #282D29;        /* body text */
+    --app-accent: #68775B;      /* primary actions, active states, "read" status */
+    --app-accent-2: #BD7658;    /* add-on: icons, rules, large text only (3.2-3.6:1, below AA for small text) */
+
+    /* RGB triples of the above (Bootstrap composes rgba() from them) */
+    --app-bg-rgb: 245, 242, 234;
+    --app-text-rgb: 40, 45, 41;
+    --app-accent-rgb: 104, 119, 91;
+    --app-accent-2-rgb: 189, 118, 88;
+
+    /* Derived for contrast (design-tokens.md): the accent is 4.29:1 on the background, so text links use a darker mix */
+    --app-accent-text: color-mix(in srgb, var(--app-accent) 90%, var(--app-text));        /* #627056, 4.73:1 on bg */
+    --app-accent-text-rgb: 98, 112, 86;
+    --app-accent-hover: color-mix(in srgb, var(--app-accent) 75%, var(--app-text));       /* #58654F */
+    --app-accent-hover-rgb: 88, 101, 79;
+    --app-secondary: color-mix(in srgb, var(--app-text) 72%, var(--app-bg));              /* #61645F, white text 6.0:1 */
+    --app-secondary-rgb: 97, 100, 95;
+
+    /* Fonts */
+    --app-font-body: 'DM Sans', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    --app-font-heading: 'DM Serif Display', Georgia, 'Times New Roman', serif;
+    /* DM Sans has no tabular figures (checked: tnum changes nothing), so numeric data uses DM Mono, same family designer */
+    --app-font-numeric: 'DM Mono', ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
+
+    /* Bootstrap roles */
+    --bs-body-font-family: var(--app-font-body);
+    --bs-body-bg: var(--app-bg);
+    --bs-body-bg-rgb: var(--app-bg-rgb);
+    --bs-body-color: var(--app-text);
+    --bs-body-color-rgb: var(--app-text-rgb);
+    --bs-emphasis-color: var(--app-text);
+    --bs-emphasis-color-rgb: var(--app-text-rgb);
+    --bs-secondary-color: rgba(var(--app-text-rgb), 0.75);
+    --bs-secondary-color-rgb: var(--app-text-rgb);
+    --bs-tertiary-bg: color-mix(in srgb, var(--app-text) 4%, var(--app-bg));
+    --bs-tertiary-bg-rgb: 237, 234, 226;
+    --bs-secondary-bg: color-mix(in srgb, var(--app-text) 8%, var(--app-bg));
+    --bs-secondary-bg-rgb: 229, 226, 219;
+    --bs-border-color: color-mix(in srgb, var(--app-text) 14%, var(--app-bg));
+    --bs-border-color-translucent: rgba(var(--app-text-rgb), 0.15);
+
+    --bs-primary: var(--app-accent);
+    --bs-primary-rgb: var(--app-accent-rgb);
+    --bs-primary-text-emphasis: color-mix(in srgb, var(--app-accent) 40%, var(--app-text));
+    --bs-primary-bg-subtle: color-mix(in srgb, var(--app-accent) 16%, var(--app-surface));
+    --bs-primary-border-subtle: color-mix(in srgb, var(--app-accent) 40%, var(--app-surface));
+
+    /* "read" / success shares the accent so status colour and action colour agree */
+    --bs-success: var(--app-accent);
+    --bs-success-rgb: var(--app-accent-rgb);
+    --bs-success-text-emphasis: color-mix(in srgb, var(--app-accent) 40%, var(--app-text));   /* 7.4:1 on its subtle bg */
+    --bs-success-bg-subtle: color-mix(in srgb, var(--app-accent) 16%, var(--app-surface));
+    --bs-success-border-subtle: color-mix(in srgb, var(--app-accent) 40%, var(--app-surface));
+
+    /* warning takes the add-on colour; danger keeps Bootstrap's red so errors stay unmistakable */
+    --bs-warning: var(--app-accent-2);
+    --bs-warning-rgb: var(--app-accent-2-rgb);
+    --bs-warning-text-emphasis: color-mix(in srgb, var(--app-accent-2) 35%, var(--app-text)); /* 7.1:1 on its subtle bg */
+    --bs-warning-bg-subtle: color-mix(in srgb, var(--app-accent-2) 18%, var(--app-surface));
+    --bs-warning-border-subtle: color-mix(in srgb, var(--app-accent-2) 45%, var(--app-surface));
+
+    --bs-secondary: var(--app-secondary);
+    --bs-secondary-rgb: var(--app-secondary-rgb);
+
+    --bs-link-color: var(--app-accent-text);
+    --bs-link-color-rgb: var(--app-accent-text-rgb);
+    --bs-link-hover-color: var(--app-accent-hover);
+    --bs-link-hover-color-rgb: var(--app-accent-hover-rgb);
+
+    --bs-focus-ring-color: rgba(var(--app-accent-rgb), 0.4);
+}
+/* ---- END tokens ---- */
+
+/* ---- Type ---- */
+h1, h2, h3, h4, h5, h6,
+.h1, .h2, .h3, .h4, .h5, .h6,
+.navbar-brand {
+    font-family: var(--app-font-heading);
+    font-weight: 400; /* DM Serif Display ships one weight; avoid synthetic bold */
+}
+
+/* Numeric data (ratings, counts, page numbers): fixed-width digits so they line up. */
+.num {
+    font-family: var(--app-font-numeric);
+    font-variant-numeric: tabular-nums;
+}
+
+/* ---- Components that Bootstrap colours with literals instead of variables ---- */
+.btn-primary {
+    --bs-btn-bg: var(--app-accent);
+    --bs-btn-border-color: var(--app-accent);
+    --bs-btn-hover-bg: color-mix(in srgb, var(--app-accent) 85%, var(--app-text));
+    --bs-btn-hover-border-color: color-mix(in srgb, var(--app-accent) 80%, var(--app-text));
+    --bs-btn-active-bg: var(--app-accent-hover);
+    --bs-btn-active-border-color: var(--app-accent-hover);
+    --bs-btn-disabled-bg: var(--app-accent);
+    --bs-btn-disabled-border-color: var(--app-accent);
+    --bs-btn-focus-shadow-rgb: var(--app-accent-rgb);
+}
+
+.btn-outline-secondary {
+    --bs-btn-color: var(--app-secondary);
+    --bs-btn-border-color: var(--app-secondary);
+    --bs-btn-hover-bg: var(--app-secondary);
+    --bs-btn-hover-border-color: var(--app-secondary);
+    --bs-btn-active-bg: var(--app-secondary);
+    --bs-btn-active-border-color: var(--app-secondary);
+    --bs-btn-disabled-color: var(--app-secondary);
+    --bs-btn-disabled-border-color: var(--app-secondary);
+    --bs-btn-focus-shadow-rgb: var(--app-secondary-rgb);
+}
+
+.pagination {
+    --bs-pagination-bg: var(--app-surface);
+    --bs-pagination-active-bg: var(--app-accent);
+    --bs-pagination-active-border-color: var(--app-accent);
+    --bs-pagination-focus-box-shadow: 0 0 0 0.25rem rgba(var(--app-accent-rgb), 0.3);
+}
+
+.form-control,
+.form-select {
+    background-color: var(--app-surface);
+}
+
+.form-control:focus,
+.form-select:focus {
+    background-color: var(--app-surface);
+    border-color: var(--app-accent);
+    box-shadow: 0 0 0 0.25rem rgba(var(--app-accent-rgb), 0.3);
+}
+
+.form-check-input {
+    background-color: var(--app-surface);
+}
+
+.form-check-input:checked {
+    background-color: var(--app-accent);
+    border-color: var(--app-accent);
+}
+
+.form-check-input:focus {
+    border-color: var(--app-accent);
+    box-shadow: 0 0 0 0.25rem rgba(var(--app-accent-rgb), 0.3);
+}
+
+/* ---- Surfaces ---- */
+.card {
+    --bs-card-bg: var(--app-surface);
+}
+
+.table {
+    --bs-table-bg: var(--app-surface);
+    --bs-table-hover-bg: rgba(var(--app-accent-rgb), 0.07);
+}
+
+.navbar.bg-body-tertiary {
+    --bs-tertiary-bg-rgb: 255, 255, 255;
+    border-bottom: var(--bs-border-width) solid var(--bs-border-color);
+}

@@ -12,15 +12,15 @@
         <section id="recommendations" class="pb-4">
             <h2 class="h4 mb-3">{{ 'book.index.recommendations.heading'|trans }}</h2>
             {% if recommendations is empty %}
-                <p class="text-muted">{{ 'book.index.recommendations.empty'|trans }}</p>
+                <p class="text-body-secondary">{{ 'book.index.recommendations.empty'|trans }}</p>
             {% else %}
                 <div class="row g-3">
                     {% for recommendation in recommendations %}
                         <div class="col-md-4">
-                            <div class="card h-100 recommendation-card">
+                            <div class="card h-100" data-testid="recommendation-card">
                                 <div class="card-body">
                                     <h3 class="h5 card-title"><a href="{{ path('book_show', {id: recommendation.bookId}) }}">{{ recommendation.title }}</a></h3>
-                                    <p class="card-subtitle text-muted mb-2">{{ recommendation.category.translationKey|trans }}</p>
+                                    <p class="card-subtitle text-body-secondary mb-2">{{ recommendation.category.translationKey|trans }}</p>
                                     <p class="card-text">{{ 'book.index.recommendations.rating'|trans({'%average%': recommendation.averageRating|number_format(1, ',', ''), '%count%': recommendation.ratingCount}) }}</p>
                                 </div>
                             </div>
@@ -58,9 +58,9 @@
     {% endif %}
 
     {% if books is empty and total == 0 and not search.isFiltered %}
-        <p class="text-muted">{{ 'book.index.empty'|trans }} <a href="{{ path('book_new') }}">{{ 'book.index.empty_link'|trans }}</a></p>
+        <p class="text-body-secondary">{{ 'book.index.empty'|trans }} <a href="{{ path('book_new') }}">{{ 'book.index.empty_link'|trans }}</a></p>
     {% elseif books is empty %}
-        <p class="text-muted">{{ 'book.index.no_results'|trans }} <a href="{{ path('book_index') }}">{{ 'book.index.no_results_link'|trans }}</a></p>
+        <p class="text-body-secondary">{{ 'book.index.no_results'|trans }} <a href="{{ path('book_index') }}">{{ 'book.index.no_results_link'|trans }}</a></p>
     {% else %}
         <div class="table-responsive">
             <table class="table table-hover align-middle">
@@ -83,7 +83,7 @@
                                     {% set readBook = readBooks[book.id] ?? null %}
                                     {% if readBook %}
                                         <span class="badge text-bg-success">{{ 'book.index.read'|trans }}</span>
-                                        {{ 'book.index.rating'|trans({'%rating%': readBook.rating}) }}
+                                        <span class="num">{{ 'book.index.rating'|trans({'%rating%': readBook.rating}) }}</span>
                                     {% endif %}
                                 </td>
                             {% endif %}
@@ -108,21 +108,21 @@
                     {% endif %}
                 </li>
                 {% if windowStart > 1 %}
-                    <li class="page-item"><a class="page-link" href="{{ path('book_index', search.filters|merge({page: 1})) }}">1</a></li>
+                    <li class="page-item"><a class="page-link num" href="{{ path('book_index', search.filters|merge({page: 1})) }}">1</a></li>
                     {% if windowStart > 2 %}
                         <li class="page-item disabled" aria-hidden="true"><span class="page-link">&hellip;</span></li>
                     {% endif %}
                 {% endif %}
                 {% for n in windowStart..windowEnd %}
                     <li class="page-item{{ n == page ? ' active' }}">
-                        <a class="page-link" href="{{ path('book_index', search.filters|merge({page: n})) }}"{% if n == page %} aria-current="page"{% endif %}>{{ n }}</a>
+                        <a class="page-link num" href="{{ path('book_index', search.filters|merge({page: n})) }}"{% if n == page %} aria-current="page"{% endif %}>{{ n }}</a>
                     </li>
                 {% endfor %}
                 {% if windowEnd < pageCount %}
                     {% if windowEnd < pageCount - 1 %}
                         <li class="page-item disabled" aria-hidden="true"><span class="page-link">&hellip;</span></li>
                     {% endif %}
-                    <li class="page-item"><a class="page-link" href="{{ path('book_index', search.filters|merge({page: pageCount})) }}">{{ pageCount }}</a></li>
+                    <li class="page-item"><a class="page-link num" href="{{ path('book_index', search.filters|merge({page: pageCount})) }}">{{ pageCount }}</a></li>
                 {% endif %}
                 <li class="page-item{{ page >= pageCount ? ' disabled' }}">
                     {% if page < pageCount %}

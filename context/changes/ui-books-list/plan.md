@@ -351,34 +351,34 @@ No data migration. Phase 1 adds dev-only dependencies; production `composer inst
 
 #### Automated
 
-- [x] 1.1 Fixtures bundle installed and catalogue group loads in test env
-- [x] 1.2 Playwright lists the spec
-- [x] 1.3 Existing PHP suite still passes
-- [x] 1.6 UX Icons installed and a Bootstrap icon imports
-- [x] 1.7 Font files present
+- [x] 1.1 Fixtures bundle installed and catalogue group loads in test env — e943f49
+- [x] 1.2 Playwright lists the spec — e943f49
+- [x] 1.3 Existing PHP suite still passes — e943f49
+- [x] 1.6 UX Icons installed and a Bootstrap icon imports — e943f49
+- [x] 1.7 Font files present — e943f49
 
 #### Manual
 
-- [x] 1.4 package.json has only devDependencies and no Node artefact is referenced by the Dockerfile or deploy workflow
-- [x] 1.5 The fixture load hit the test database and the dev database content is unchanged
-- [x] 1.8 The font licence file is kept and production install still resolves symfony/ux-icons
+- [x] 1.4 package.json has only devDependencies and no Node artefact is referenced by the Dockerfile or deploy workflow — e943f49
+- [x] 1.5 The fixture load hit the test database and the dev database content is unchanged — e943f49
+- [x] 1.8 The font licence file is kept and production install still resolves symfony/ux-icons — e943f49
 
 ### Phase 2: Token values
 
 #### Automated
 
-- [ ] 2.1 No legacy role left in any view
-- [ ] 2.2 Dead class gone
-- [ ] 2.3 Hard-coded scan on index view and app.css returns 0 matches
-- [ ] 2.4 PHP suite passes
-- [ ] 2.6 Raw palette hex values appear only in the token block
-- [ ] 2.7 Font assets resolve through AssetMapper
+- [x] 2.1 No legacy role left in any view
+- [x] 2.2 Dead class gone
+- [x] 2.3 Hard-coded scan on index view and app.css returns 0 matches
+- [x] 2.4 PHP suite passes
+- [x] 2.6 Raw palette hex values appear only in the token block
+- [x] 2.7 Font assets resolve through AssetMapper
 
 #### Manual
 
-- [ ] 2.5 Text, links, buttons and the pager are readable on the new background and none uses the add-on colour for small text
-- [ ] 2.8 Polish diacritics render in DM Sans and DM Serif Display, not a fallback font
-- [ ] 2.9 Digits in the rating and pager line up
+- [x] 2.5 Text, links, buttons and the pager are readable on the new background and none uses the add-on colour for small text
+- [x] 2.8 Polish diacritics render in DM Sans and DM Serif Display, not a fallback font
+- [x] 2.9 Digits in the rating and pager line up
 
 ### Phase 3: The view
 
