@@ -3,7 +3,7 @@
 {% block title %}{{ book.title }} - {{ parent() }}{% endblock %}
 
 {% block body_content %}
-    <p><a href="{{ path('book_index') }}">&larr; {{ 'book.show.back'|trans }}</a></p>
+    <p><a href="{{ path('book_index') }}">{{ ux_icon('bi:arrow-left', {class: 'icon'}) }} {{ 'book.show.back'|trans }}</a></p>
 
     <h1 class="h3">{{ book.title }}</h1>
     <p class="text-body-secondary">{{ book.authors|map(a => a.fullName)|join(', ') }}</p>
@@ -36,11 +36,11 @@
         <section class="mb-4">
             {% if readBook %}
                 <h2 class="h5">
-                    <span class="badge text-bg-success">{{ 'book.index.read'|trans }}</span>
+                    {% include 'book/_read_status.html.twig' with {badge: true} only %}
                 </h2>
                 <dl class="row">
                     <dt class="col-sm-3">{{ 'reading.show.rating'|trans }}</dt>
-                    <dd class="col-sm-9">{{ 'book.index.rating'|trans({'%rating%': readBook.rating}) }}</dd>
+                    <dd class="col-sm-9">{% include 'book/_read_status.html.twig' with {badge: false, rating: readBook.rating} only %}</dd>
 
                     <dt class="col-sm-3">{{ 'reading.show.read_on'|trans }}</dt>
                     <dd class="col-sm-9">{{ readBook.readOn|date('d.m.Y') }}</dd>
@@ -67,7 +67,7 @@
                 <article class="border rounded p-3 mb-2">
                     <p class="mb-1 text-body-secondary small">
                         {{ entry.email|mask_email }}
-                        <span class="badge text-bg-secondary ms-1">{{ 'book.index.rating'|trans({'%rating%': entry.rating}) }}</span>
+                        <span class="badge text-bg-secondary ms-1 num">{{ 'book.index.rating'|trans({'%rating%': entry.rating}) }}</span>
                     </p>
                     <p class="mb-0">{{ entry.comment|nl2br }}</p>
                 </article>

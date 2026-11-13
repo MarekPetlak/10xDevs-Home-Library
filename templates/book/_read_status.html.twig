@@ -1,0 +1,9 @@
+{#
+    The signed-in user's read state of a book: the "read" badge and/or the rating.
+    Inputs: badge (bool, default true), rating (int or null, default null).
+    Icons are decorative (aria-hidden); the add-on colour is only used on the star, never on text.
+#}
+{%- if badge|default(true) -%}
+    <span class="badge text-bg-success">{{ ux_icon('bi:check-circle', {class: 'icon'}) }} {{ 'book.index.read'|trans }}</span>
+{%- endif -%}
+{%- if rating|default(null) is not null %} <span class="num">{{ ux_icon('bi:star-fill', {class: 'icon icon-accent-2'}) }} {{ 'book.index.rating'|trans({'%rating%': rating}) }}</span>{% endif -%}

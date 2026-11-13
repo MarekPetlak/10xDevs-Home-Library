@@ -367,31 +367,31 @@ No data migration. Phase 1 adds dev-only dependencies; production `composer inst
 
 #### Automated
 
-- [x] 2.1 No legacy role left in any view
-- [x] 2.2 Dead class gone
-- [x] 2.3 Hard-coded scan on index view and app.css returns 0 matches
-- [x] 2.4 PHP suite passes
-- [x] 2.6 Raw palette hex values appear only in the token block
-- [x] 2.7 Font assets resolve through AssetMapper
+- [x] 2.1 No legacy role left in any view — b96592f
+- [x] 2.2 Dead class gone — b96592f
+- [x] 2.3 Hard-coded scan on index view and app.css returns 0 matches — b96592f
+- [x] 2.4 PHP suite passes — b96592f
+- [x] 2.6 Raw palette hex values appear only in the token block — b96592f
+- [x] 2.7 Font assets resolve through AssetMapper — b96592f
 
 #### Manual
 
-- [x] 2.5 Text, links, buttons and the pager are readable on the new background and none uses the add-on colour for small text
-- [x] 2.8 Polish diacritics render in DM Sans and DM Serif Display, not a fallback font
-- [x] 2.9 Digits in the rating and pager line up
+- [x] 2.5 Text, links, buttons and the pager are readable on the new background and none uses the add-on colour for small text — b96592f
+- [x] 2.8 Polish diacritics render in DM Sans and DM Serif Display, not a fallback font — b96592f
+- [x] 2.9 Digits in the rating and pager line up — b96592f
 
 ### Phase 3: The view
 
 #### Automated
 
-- [ ] 3.1 Existing list tests pass unchanged
-- [ ] 3.2 New assertions for form role search and table caption pass
-- [ ] 3.3 Twig templates lint
-- [ ] 3.4 Read badge defined once
-- [ ] 3.5 Pager markup no longer inline
-- [ ] 3.9 Icons render as hidden inline SVG in the navbar
-- [ ] 3.11 All controller tests pass unchanged
-- [ ] 3.12 Error template renders for 404 and 500 without a user
+- [x] 3.1 Existing list tests pass unchanged
+- [x] 3.2 New assertions for form role search and table caption pass
+- [x] 3.3 Twig templates lint
+- [x] 3.4 Read badge defined once
+- [x] 3.5 Pager markup no longer inline
+- [x] 3.9 Icons render as hidden inline SVG in the navbar
+- [x] 3.11 All controller tests pass unchanged
+- [x] 3.12 Error template renders for 404 and 500 without a user
 
 #### Manual
 

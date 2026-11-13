@@ -32,11 +32,13 @@ book:
             all_categories: Wszystkie kategorie
             submit: Szukaj
             clear: Wyczyść
+            label: Wyszukiwanie książek
         pager:
             label: Strony wyników
             previous: Poprzednia
             next: Następna
         read_state: Twój status
+        table_caption: Lista książek we wspólnej kolekcji
         read: Przeczytana
         rating: '%rating%/5'
     show:
@@ -72,6 +74,12 @@ book:
         children: Dla dzieci
         poetry: Poezja
         other: Inne
+http_error:
+    title: 'Błąd %code%'
+    not_found: Nie znaleziono strony
+    not_found_text: Strony, której szukasz, nie ma albo została przeniesiona.
+    generic: Coś poszło nie tak
+    generic_text: Spróbuj ponownie za chwilę.
 comments:
     heading: Komentarze czytelników
     empty: Brak komentarzy do tej książki.

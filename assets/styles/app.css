@@ -227,3 +227,17 @@ h1, h2, h3, h4, h5, h6,
     --bs-tertiary-bg-rgb: 255, 255, 255;
     border-bottom: var(--bs-border-width) solid var(--bs-border-color);
 }
+
+/* ---- Icons (Symfony UX Icons: inline SVG, fill currentColor, 1em; see assets/icons/) ---- */
+.icon {
+    vertical-align: -0.125em;
+}
+
+/* Decorative only: the add-on colour is 3.2-3.6:1, enough for graphics (3:1) but not for text. */
+.icon-accent-2 {
+    color: var(--app-accent-2);
+}
+
+.icon-lg {
+    font-size: 3rem;
+}

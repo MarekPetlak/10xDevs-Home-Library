@@ -1,0 +1,13 @@
+{#
+    Form theme: the Bootstrap 5 theme plus a leading decorative icon on submit buttons.
+    The label text stays the button's accessible name, so tests and screen readers see the same text as before.
+#}
+{% extends 'bootstrap_5_layout.html.twig' %}
+
+{%- block submit_widget -%}
+    {%- set attr = attr|merge({class: (attr.class|default('btn-primary') ~ ' btn')|trim}) -%}
+    {%- set type = type|default('submit') -%}
+    <button type="{{ type }}" {{ block('button_attributes') }}>
+        {{- ux_icon('bi:check-lg', {class: 'icon'}) }} {{ block('form_label_content') -}}
+    </button>
+{%- endblock submit_widget -%}

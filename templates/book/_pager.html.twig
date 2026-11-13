@@ -1,0 +1,41 @@
+{#
+    Pager of the book list. Inputs: page (current, 1-based), pageCount (> 1), search (BookSearch: its filters are kept in every link).
+    Window: first page, last page, the current page ±2, previous/next and gaps.
+#}
+<nav aria-label="{{ 'book.index.pager.label'|trans }}">
+    {% set windowEnd = min(pageCount, page + 2) %}
+    {% set windowStart = min(max(1, page - 2), windowEnd) %}
+    <ul class="pagination flex-wrap">
+        <li class="page-item{{ page <= 1 ? ' disabled' }}">
+            {% if page > 1 %}
+                <a class="page-link" href="{{ path('book_index', search.filters|merge({page: min(page - 1, pageCount)})) }}" rel="prev">{{ ux_icon('bi:chevron-left', {class: 'icon'}) }} {{ 'book.index.pager.previous'|trans }}</a>
+            {% else %}
+                <span class="page-link">{{ ux_icon('bi:chevron-left', {class: 'icon'}) }} {{ 'book.index.pager.previous'|trans }}</span>
+            {% endif %}
+        </li>
+        {% if windowStart > 1 %}
+            <li class="page-item"><a class="page-link num" href="{{ path('book_index', search.filters|merge({page: 1})) }}">1</a></li>
+            {% if windowStart > 2 %}
+                <li class="page-item disabled" aria-hidden="true"><span class="page-link">&hellip;</span></li>
+            {% endif %}
+        {% endif %}
+        {% for n in windowStart..windowEnd %}
+            <li class="page-item{{ n == page ? ' active' }}">
+                <a class="page-link num" href="{{ path('book_index', search.filters|merge({page: n})) }}"{% if n == page %} aria-current="page"{% endif %}>{{ n }}</a>
+            </li>
+        {% endfor %}
+        {% if windowEnd < pageCount %}
+            {% if windowEnd < pageCount - 1 %}
+                <li class="page-item disabled" aria-hidden="true"><span class="page-link">&hellip;</span></li>
+            {% endif %}
+            <li class="page-item"><a class="page-link num" href="{{ path('book_index', search.filters|merge({page: pageCount})) }}">{{ pageCount }}</a></li>
+        {% endif %}
+        <li class="page-item{{ page >= pageCount ? ' disabled' }}">
+            {% if page < pageCount %}
+                <a class="page-link" href="{{ path('book_index', search.filters|merge({page: page + 1})) }}" rel="next">{{ 'book.index.pager.next'|trans }} {{ ux_icon('bi:chevron-right', {class: 'icon'}) }}</a>
+            {% else %}
+                <span class="page-link">{{ 'book.index.pager.next'|trans }} {{ ux_icon('bi:chevron-right', {class: 'icon'}) }}</span>
+            {% endif %}
+        </li>
+    </ul>
+</nav>
