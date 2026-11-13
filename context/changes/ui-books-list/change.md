@@ -1,7 +1,7 @@
 ---
 change_id: ui-books-list
 title: Design-system pass: new layout for all views
-status: implementing
+status: impl_reviewed
 created: 2026-11-13
 updated: 2026-11-13
 archived_at: null

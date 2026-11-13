@@ -6,6 +6,8 @@ Bring `/books` (route `book_index`) onto an explicit design-system contract: Boo
 
 Scope extension (participant, 2026-11-13): **every view must comply with the new layout**, not only `/books`. The views are `base.html.twig` (navbar and flash alerts), `book/index`, `book/show` (including the mark-read form with rating radios and the comments block), `book/new` (Symfony form through `bootstrap_5_layout.html.twig`, `config/packages/twig.yaml:3`), `security/login`, and the error pages (no template override exists today, so Symfony's default error pages are used). `/books` stays the audited view with the 7-state matrix; the others get the same palette, fonts, icons and shared partials plus a default and a validation-error screenshot. `/` only redirects (`src/Controller/HomeController.php:16-19`) and has no view.
 
+Scope addendum (participant decision, 2026-11-13): numbers use DM Mono instead of tabular DM Sans (see `design-tokens.md`); baselines live in `e2e/__screenshots__/`.
+
 Scope addendum (participant request, 2026-11-13): the change also adds an icon library (Symfony UX Icons with the Bootstrap Icons set) used in the layout, replaces Bootstrap's default colours with the supplied palette, and sets the supplied fonts (DM Serif Display for headings, DM Sans for text and interface, tabular figures for numbers). Palette, fonts and the navbar icons are global by nature (`base.html.twig`, `app.css`), and the other views are brought onto them explicitly in phase 3. Raw values and the contrast analysis are recorded in `design-tokens.md`.
 
 ## Current State Analysis
@@ -70,7 +72,7 @@ Add the two approved dev-only dependencies and the deterministic data and runner
 
 #### 2. Playwright runner
 
-**File**: new `package.json`, `package-lock.json`, `playwright.config.ts`, `tests/e2e/books.spec.ts` (skeleton)
+**File**: new `package.json`, `package-lock.json`, `playwright.config.ts`, `e2e/books.spec.js` (skeleton)
 
 **Intent**: Add `@playwright/test` as the only (dev) dependency, a config that starts the PHP app in test env on a fixed port, desktop and one mobile project (390 px wide), and an `e2e` npm script that refuses to run unless `APP_ENV=test`.
 
@@ -277,7 +279,7 @@ Cover the 7-state matrix with screenshots and leave the rule that keeps the cont
 
 #### 1. Screenshot spec
 
-**File**: `tests/e2e/books.spec.ts` and committed baselines
+**File**: `e2e/books.spec.js` and committed baselines
 
 **Intent**: Load the right fixture group, then screenshot `/books` per state at desktop and 390 px: default (catalogue), hover (row), focus-visible (search input and a pager link), disabled (previous on page 1), empty (empty group), plus the no-results state. Mask volatile regions. Because the new layout applies to every view, also screenshot, at desktop and 390 px, each remaining view in its default state and in its validation-error state where it has one: `/login` (default and wrong password), `/books/{id}` (anonymous, signed in unread with the mark-read form, signed in read with comments), `/books/new` (default and with validation errors) and the error page (rendered at `/_error/404` in the dev environment or through the test route). Error and loading are recorded as N/A with reasons in the spec header.
 
@@ -296,7 +298,7 @@ Cover the 7-state matrix with screenshots and leave the rule that keeps the cont
 #### Automated Verification:
 
 - Screenshot spec passes against committed baselines: `npm run e2e`
-- Baseline files exist and are tracked: `git ls-files tests/e2e | grep -c png` is greater than 0
+- Baseline files exist and are tracked: `git ls-files e2e | grep -c png` is greater than 0
 - Spec covers every view: `npx playwright test --list` includes the list states plus `/login`, `/books/{id}`, `/books/new` and the error page
 - Hard-coded scan on `templates/book/index.html.twig`, the three partials and `assets/styles/app.css` returns 0 matches
 - PHP suite passes: `php bin/phpunit`
