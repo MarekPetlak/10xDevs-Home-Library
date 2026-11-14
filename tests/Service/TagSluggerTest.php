@@ -56,6 +56,25 @@ final class TagSluggerTest extends KernelTestCase
         self::assertSame('klasyka-2', $this->slugger->slugFor('KLASYKA'));
     }
 
+    public function testTransliterationThatLengthensANameStillFitsTheColumn(): void
+    {
+        $first = $this->createTag(str_repeat('ß', 30)); // transliterates to 60 characters
+        $second = $this->createTag(str_repeat('ß', 29).'S');
+
+        self::assertSame(str_repeat('ss', 18), $first->getSlug());
+        self::assertSame(str_repeat('ss', 18).'-2', $second->getSlug());
+        self::assertLessThanOrEqual(40, \strlen($second->getSlug()));
+    }
+
+    public function testCutSlugNeverEndsWithAHyphen(): void
+    {
+        $slug = $this->slugger->slugFor(str_repeat('中', 10)); // "zhong-zhong-..." is longer than the limit
+
+        self::assertLessThanOrEqual(36, \strlen($slug));
+        self::assertStringEndsNotWith('-', $slug);
+        self::assertStringStartsWith('zhong-zhong', $slug);
+    }
+
     public function testRepositoryFindsATagBySlug(): void
     {
         $tag = $this->createTag('Science Fiction');

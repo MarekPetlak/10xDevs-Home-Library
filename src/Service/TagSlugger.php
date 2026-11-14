@@ -13,6 +13,9 @@ use Symfony\Component\String\Slugger\AsciiSlugger;
 final class TagSlugger
 {
     private const FALLBACK = 'tag';
+    // The slug column holds 40 characters; transliteration can lengthen a name ("ß" -> "ss", CJK -> pinyin),
+    // so the base is cut to leave room for a "-NNN" collision suffix.
+    private const MAX_BASE_LENGTH = 36;
 
     public function __construct(private readonly TagRepository $tagRepository)
     {
@@ -20,7 +23,7 @@ final class TagSlugger
 
     public function slugFor(string $name): string
     {
-        $base = strtolower((new AsciiSlugger('pl'))->slug($name)->toString());
+        $base = rtrim(substr(strtolower((new AsciiSlugger('pl'))->slug($name)->toString()), 0, self::MAX_BASE_LENGTH), '-');
         if ('' === $base) {
             $base = self::FALLBACK;
         }

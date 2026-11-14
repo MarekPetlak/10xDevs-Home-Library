@@ -105,6 +105,24 @@ final class BookManagerTest extends KernelTestCase
         $manager->add($this->input(), $this->user);
     }
 
+    public function testLostRaceOnASlugAloneBecomesABookConflictException(): void
+    {
+        // A concurrent request just stored "Zolw" (slug "zolw"); this request still sees neither the name nor the
+        // slug as taken, so it picks "zolw" for "żółw" and the unique slug index rejects the insert.
+        $this->entityManager->persist((new Tag())->setName('Zolw')->setSlug('zolw'));
+        $this->entityManager->flush();
+        $manager = new BookManager(
+            $this->entityManager,
+            self::getContainer()->get(AuthorRepository::class),
+            $this->createStub(TagRepository::class), // findOneByName() finds nothing
+            new TagSlugger($this->createStub(TagRepository::class)), // slugExists() says false
+        );
+
+        $this->expectException(BookConflictException::class);
+
+        $manager->add($this->input(tags: 'żółw'), $this->user);
+    }
+
     public function testNewTagsGetSlugsAndAccentVariantsGetDistinctOnes(): void
     {
         $this->bookManager->add($this->input(tags: 'Science Fiction, Zolw'), $this->user);
