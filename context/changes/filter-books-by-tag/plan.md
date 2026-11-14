@@ -285,12 +285,12 @@ The migration adds the column nullable, backfills, then tightens it, so it works
 
 #### Automated
 
-- [x] 3.1 Controller tests pass: `bin/phpunit tests/Controller`
-- [x] 3.2 Whole suite passes: `bin/phpunit`
-- [x] 3.3 Fixtures load without error
+- [x] 3.1 Controller tests pass: `bin/phpunit tests/Controller` — ebd2e4f
+- [x] 3.2 Whole suite passes: `bin/phpunit` — ebd2e4f
+- [x] 3.3 Fixtures load without error — ebd2e4f
 
 #### Manual
 
-- [x] 3.4 Clicking a tag on a book page opens its tag page; Back returns to the book
-- [x] 3.5 Tags with a space or accent in the name (`science fiction`, `żółw`) open their pages from the link
-- [x] 3.6 Tag links look like the previous badges and show a focus ring when tabbed to
+- [x] 3.4 Clicking a tag on a book page opens its tag page; Back returns to the book — ebd2e4f
+- [x] 3.5 Tags with a space or accent in the name (`science fiction`, `żółw`) open their pages from the link — ebd2e4f
+- [x] 3.6 Tag links look like the previous badges and show a focus ring when tabbed to — ebd2e4f

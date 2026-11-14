@@ -1,7 +1,7 @@
 ---
 change_id: filter-books-by-tag
 title: Filter books by tag
-status: implementing
+status: implemented
 created: 2026-11-14
 updated: 2026-11-14
 archived_at: null
