@@ -10,7 +10,7 @@ import { loadFixtures, prepareDatabase, READER } from './support/fixtures.js';
  *   error   N/A: BookSearch::fromQuery never fails, bad input means "no filter" (src/Dto/BookSearch.php).
  *   loading N/A: the page is rendered on the server, there is no asynchronous fetch.
  * The other views (/login, /books/{id}, /books/new, the error page) get a default shot and, where they have one,
- * a validation-error shot. Baselines are never updated just to turn a run green: explain the visual delta first.
+ * a validation-error shot; /books/new also has the duplicate-warning state (an existing ISBN). Baselines are never updated just to turn a run green: explain the visual delta first.
  */
 
 const shot = { fullPage: true };
@@ -144,6 +144,20 @@ test.describe('catalogue', () => {
     await submitWithoutBrowserValidation(page);
     await expect(page.locator('.invalid-feedback, .form-error-message').first()).toBeVisible();
     await expect(page).toHaveScreenshot('new-error.png', shot);
+  });
+
+  test('new book: duplicate warning', async ({ page }) => {
+    await signIn(page);
+    await page.goto('/books/new');
+    // 9788308000007 is the (valid) ISBN of the fixture "Wiedźmin: Ostatnie życzenie"; the title and author are new.
+    await page.fill('#book_title', 'Zupełnie inna książka');
+    await page.fill('#book_authors', 'Jan Kowalski');
+    await page.fill('#book_isbn', '9788308000007');
+    await page.fill('#book_publicationYear', '2020');
+    await page.selectOption('#book_category', { index: 1 });
+    await page.getByRole('button', { name: 'Zapisz książkę' }).click();
+    await expect(page.getByRole('alert').filter({ hasText: 'podobna książka' })).toBeVisible();
+    await expect(page).toHaveScreenshot('new-duplicate.png', shot);
   });
 
   test('error page: 404', async ({ page }) => {

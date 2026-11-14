@@ -245,23 +245,23 @@ None. No schema change; existing data is read as is.
 
 #### Automated
 
-- [x] 2.1 Controller tests pass: bin/phpunit tests/Controller/BookControllerTest.php
-- [x] 2.2 Whole suite passes: bin/phpunit
+- [x] 2.1 Controller tests pass: bin/phpunit tests/Controller/BookControllerTest.php — a269171
+- [x] 2.2 Whole suite passes: bin/phpunit — a269171
 
 #### Manual
 
-- [x] 2.3 Adding an existing book shows the warning with input kept, and "Add anyway" saves it
-- [x] 2.4 Adding a book with a new ISBN and title shows no warning and behaves as before
+- [x] 2.3 Adding an existing book shows the warning with input kept, and "Add anyway" saves it — a269171
+- [x] 2.4 Adding a book with a new ISBN and title shows no warning and behaves as before — a269171
 
 ### Phase 3: Warning UI and docs
 
 #### Automated
 
-- [ ] 3.1 UI-contract scan prints nothing
-- [ ] 3.2 Whole suite passes: bin/phpunit
-- [ ] 3.3 Screenshot gate passes after reviewed baseline update: npm run e2e
+- [x] 3.1 UI-contract scan prints nothing
+- [x] 3.2 Whole suite passes: bin/phpunit
+- [x] 3.3 Screenshot gate passes after reviewed baseline update: npm run e2e
 
 #### Manual
 
-- [ ] 3.4 Warning reads clearly at desktop and 390 px; links open the existing book in a new tab
-- [ ] 3.5 "Add anyway" is keyboard reachable with a visible focus ring
+- [x] 3.4 Warning reads clearly at desktop and 390 px; links open the existing book in a new tab
+- [x] 3.5 "Add anyway" is keyboard reachable with a visible focus ring
