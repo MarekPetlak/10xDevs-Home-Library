@@ -153,7 +153,7 @@ final class BookListControllerTest extends WebTestCase
     public function testDetailShowsAllBookFields(): void
     {
         $book = $this->createBook('Solaris', $this->user, Category::Novel);
-        $book->setDescription('Planeta-ocean.')->addTag((new Tag())->setName('sci-fi'));
+        $book->setDescription('Planeta-ocean.')->addTag((new Tag())->setName('sci-fi')->setSlug('sci-fi'));
         $this->entityManager()->persist($book->getTags()->first());
         $this->entityManager()->flush();
 

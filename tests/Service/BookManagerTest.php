@@ -14,6 +14,7 @@ use App\Exception\BookConflictException;
 use App\Repository\AuthorRepository;
 use App\Repository\TagRepository;
 use App\Service\BookManager;
+use App\Service\TagSlugger;
 use App\Service\UserManager;
 use Doctrine\DBAL\Driver\Exception as DriverException;
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
@@ -96,11 +97,26 @@ final class BookManagerTest extends KernelTestCase
             $entityManager,
             $this->createStub(AuthorRepository::class),
             $this->createStub(TagRepository::class),
+            new TagSlugger($this->createStub(TagRepository::class)),
         );
 
         $this->expectException(BookConflictException::class);
 
         $manager->add($this->input(), $this->user);
+    }
+
+    public function testNewTagsGetSlugsAndAccentVariantsGetDistinctOnes(): void
+    {
+        $this->bookManager->add($this->input(tags: 'Science Fiction, Zolw'), $this->user);
+        $this->bookManager->add($this->input(title: 'Inna', tags: 'żółw, science fiction'), $this->user);
+
+        $this->entityManager->clear();
+        $slugs = array_map(
+            static fn (Tag $t): string => $t->getSlug(),
+            $this->entityManager->getRepository(Tag::class)->findBy([], ['id' => 'ASC']),
+        );
+
+        self::assertSame(['science-fiction', 'zolw', 'zolw-2'], $slugs);
     }
 
     public function testNoTagsIsAllowed(): void

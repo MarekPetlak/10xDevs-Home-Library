@@ -24,6 +24,7 @@ final class BookManager
         private readonly EntityManagerInterface $entityManager,
         private readonly AuthorRepository $authorRepository,
         private readonly TagRepository $tagRepository,
+        private readonly TagSlugger $tagSlugger,
     ) {
     }
 
@@ -88,7 +89,7 @@ final class BookManager
         $tag = $this->tagRepository->findOneByName($name);
 
         if (null === $tag) {
-            $tag = (new Tag())->setName($name);
+            $tag = (new Tag())->setName($name)->setSlug($this->tagSlugger->slugFor($name));
             $this->entityManager->persist($tag);
             $this->entityManager->flush();
         }
