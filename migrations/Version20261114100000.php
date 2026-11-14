@@ -17,7 +17,9 @@ final class Version20261114100000 extends AbstractMigration
     }
 
     // MariaDB commits implicitly on DDL, so a wrapping transaction would be gone before Doctrine commits it
-    // ("There is no active transaction"). The migration manages its own transaction around the backfill.
+    // ("There is no active transaction"). Nested transactions are unsafe here too: after the implicit commit a
+    // savepoint no longer exists ("SAVEPOINT DOCTRINE_n does not exist"), so the backfill uses none and is
+    // instead deterministic and safe to re-run.
     public function isTransactional(): bool
     {
         return false;
@@ -61,23 +63,22 @@ final class Version20261114100000 extends AbstractMigration
         $slugger = new AsciiSlugger('pl');
         $taken = [];
         $tags = $this->connection->fetchAllAssociative('SELECT id, name FROM tag ORDER BY id');
-        // One transaction (DML is transactional): the backfill is all-or-nothing, and it gives the same slugs on a re-run.
-        $this->connection->transactional(function () use ($tags, $slugger, &$taken): void {
-            foreach ($tags as $row) {
-                // Cut to 36 characters so base plus a "-NNN" suffix fits VARCHAR(40) (transliteration can lengthen names).
-                $base = rtrim(substr(strtolower($slugger->slug((string) $row['name'])->toString()), 0, 36), '-');
-                if ('' === $base) {
-                    $base = 'tag';
-                }
-                $slug = $base;
-                // Slugs are lowercase ASCII, so an in-memory lookup matches the case-insensitive unique index.
-                for ($suffix = 2; isset($taken[$slug]); ++$suffix) {
-                    $slug = $base.'-'.$suffix;
-                }
-                $taken[$slug] = true;
-                $this->connection->executeStatement('UPDATE tag SET slug = ? WHERE id = ?', [$slug, $row['id']]);
+        // No transaction (see isTransactional()): tags are processed in id order, so a re-run after an interruption
+        // assigns exactly the same slugs.
+        foreach ($tags as $row) {
+            // Cut to 36 characters so base plus a "-NNN" suffix fits VARCHAR(40) (transliteration can lengthen names).
+            $base = rtrim(substr(strtolower($slugger->slug((string) $row['name'])->toString()), 0, 36), '-');
+            if ('' === $base) {
+                $base = 'tag';
             }
-        });
+            $slug = $base;
+            // Slugs are lowercase ASCII, so an in-memory lookup matches the case-insensitive unique index.
+            for ($suffix = 2; isset($taken[$slug]); ++$suffix) {
+                $slug = $base.'-'.$suffix;
+            }
+            $taken[$slug] = true;
+            $this->connection->executeStatement('UPDATE tag SET slug = ? WHERE id = ?', [$slug, $row['id']]);
+        }
 
         // Both statements are no-ops when a previous, interrupted run already applied them.
         $this->connection->executeStatement('ALTER TABLE tag CHANGE slug slug VARCHAR(40) NOT NULL COLLATE `utf8mb4_uca1400_as_ci`');
