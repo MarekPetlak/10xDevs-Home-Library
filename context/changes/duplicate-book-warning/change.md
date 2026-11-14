@@ -1,7 +1,7 @@
 ---
 change_id: duplicate-book-warning
 title: Duplicate book warning
-status: implementing
+status: implemented
 created: 2026-11-14
 updated: 2026-11-14
 archived_at: null

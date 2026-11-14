@@ -257,11 +257,11 @@ None. No schema change; existing data is read as is.
 
 #### Automated
 
-- [x] 3.1 UI-contract scan prints nothing
-- [x] 3.2 Whole suite passes: bin/phpunit
-- [x] 3.3 Screenshot gate passes after reviewed baseline update: npm run e2e
+- [x] 3.1 UI-contract scan prints nothing — 4a464f1
+- [x] 3.2 Whole suite passes: bin/phpunit — 4a464f1
+- [x] 3.3 Screenshot gate passes after reviewed baseline update: npm run e2e — 4a464f1
 
 #### Manual
 
-- [x] 3.4 Warning reads clearly at desktop and 390 px; links open the existing book in a new tab
-- [x] 3.5 "Add anyway" is keyboard reachable with a visible focus ring
+- [x] 3.4 Warning reads clearly at desktop and 390 px; links open the existing book in a new tab — 4a464f1
+- [x] 3.5 "Add anyway" is keyboard reachable with a visible focus ring — 4a464f1
