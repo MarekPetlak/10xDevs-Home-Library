@@ -269,28 +269,28 @@ The migration adds the column nullable, backfills, then tightens it, so it works
 
 #### Automated
 
-- [x] 2.1 Repository and controller tests pass: `bin/phpunit tests/Repository tests/Controller`
-- [x] 2.2 Whole suite passes: `bin/phpunit`
-- [x] 2.3 Query-count tests pass for `/books` and the tag page
-- [x] 2.4 Schema in sync: `bin/console doctrine:schema:validate`
+- [x] 2.1 Repository and controller tests pass: `bin/phpunit tests/Repository tests/Controller` — cbe945f
+- [x] 2.2 Whole suite passes: `bin/phpunit` — cbe945f
+- [x] 2.3 Query-count tests pass for `/books` and the tag page — cbe945f
+- [x] 2.4 Schema in sync: `bin/console doctrine:schema:validate` — cbe945f
 
 #### Manual
 
-- [x] 2.5 `/tags/klasyka` in a private window lists only books tagged `klasyka`, with no personal data
-- [x] 2.6 `/tags/does-not-exist` shows the normal 404 page
-- [x] 2.7 `/books` list and pager behave exactly as before
-- [x] 2.8 Tag page has no overflow at desktop and one mobile width; the back link is keyboard-reachable with a visible focus
+- [x] 2.5 `/tags/klasyka` in a private window lists only books tagged `klasyka`, with no personal data — cbe945f
+- [x] 2.6 `/tags/does-not-exist` shows the normal 404 page — cbe945f
+- [x] 2.7 `/books` list and pager behave exactly as before — cbe945f
+- [x] 2.8 Tag page has no overflow at desktop and one mobile width; the back link is keyboard-reachable with a visible focus — cbe945f
 
 ### Phase 3: Links and fixtures
 
 #### Automated
 
-- [ ] 3.1 Controller tests pass: `bin/phpunit tests/Controller`
-- [ ] 3.2 Whole suite passes: `bin/phpunit`
-- [ ] 3.3 Fixtures load without error
+- [x] 3.1 Controller tests pass: `bin/phpunit tests/Controller`
+- [x] 3.2 Whole suite passes: `bin/phpunit`
+- [x] 3.3 Fixtures load without error
 
 #### Manual
 
-- [ ] 3.4 Clicking a tag on a book page opens its tag page; Back returns to the book
-- [ ] 3.5 Tags with a space or accent in the name (`science fiction`, `żółw`) open their pages from the link
-- [ ] 3.6 Tag links look like the previous badges and show a focus ring when tabbed to
+- [x] 3.4 Clicking a tag on a book page opens its tag page; Back returns to the book
+- [x] 3.5 Tags with a space or accent in the name (`science fiction`, `żółw`) open their pages from the link
+- [x] 3.6 Tag links look like the previous badges and show a focus ring when tabbed to
