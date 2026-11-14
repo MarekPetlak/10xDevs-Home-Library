@@ -55,6 +55,11 @@ final class BookType extends AbstractType
             ])
             ->add('submit', SubmitType::class, [
                 'label' => 'book.form.submit',
+            ])
+            // Rendered only next to the duplicate warning; being clicked records the user's decision.
+            ->add('confirm_duplicate', SubmitType::class, [
+                'label' => 'book.form.confirm_duplicate',
+                'attr' => ['class' => 'btn-outline-secondary'],
             ]);
 
         // Strip spaces and hyphens and upper-case, so validators see the stored form.

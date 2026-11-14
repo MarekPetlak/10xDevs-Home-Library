@@ -23,6 +23,7 @@ final class BookControllerTest extends WebTestCase
 {
     private const EMAIL = 'anna@example.com';
     private const SUBMIT = 'Zapisz książkę';
+    private const CONFIRM = 'Dodaj mimo to';
 
     private KernelBrowser $client;
 
@@ -191,6 +192,95 @@ final class BookControllerTest extends WebTestCase
 
         self::assertResponseStatusCodeSame(400);
         self::assertCount(0, $this->entityManager()->getRepository(Book::class)->findAll());
+    }
+
+    public function testDuplicateIsbnWarnsAndSavesNothing(): void
+    {
+        $this->submit([]);
+        $this->submit(['book[title]' => 'Pan Tadeusz', 'book[authors]' => 'Jan Kowalski']);
+
+        self::assertResponseStatusCodeSame(400);
+        self::assertSelectorTextContains('.alert-warning', 'ten sam ISBN');
+        self::assertSelectorTextContains('.alert-warning a[href^="/books/"][target="_blank"]', 'Dziady');
+        self::assertSelectorExists('button[name="book[confirm_duplicate]"]');
+        self::assertInputValueSame('book[title]', 'Pan Tadeusz');
+        self::assertInputValueSame('book[authors]', 'Jan Kowalski');
+        self::assertCount(1, $this->entityManager()->getRepository(Book::class)->findAll());
+    }
+
+    public function testSameTitleAndSharedAuthorWarns(): void
+    {
+        $this->submit([]);
+        $this->submit(['book[title]' => '  dziady ', 'book[authors]' => 'Adam Mickiewicz, Jan Kowalski', 'book[isbn]' => '9788324031283']);
+
+        self::assertResponseStatusCodeSame(400);
+        self::assertSelectorTextContains('.alert-warning', 'ten sam tytuł i autor');
+        self::assertSelectorTextNotContains('.alert-warning', 'ten sam ISBN');
+        self::assertCount(1, $this->entityManager()->getRepository(Book::class)->findAll());
+    }
+
+    public function testIsbn10AgainstStoredIsbn13Warns(): void
+    {
+        $this->submit([]);
+        // ISBN-10 form of 978-83-7327-189-0.
+        $this->submit(['book[title]' => 'Inny tytuł', 'book[authors]' => 'Jan Kowalski', 'book[isbn]' => '8373271899']);
+
+        self::assertResponseStatusCodeSame(400);
+        self::assertSelectorTextContains('.alert-warning', 'ten sam ISBN');
+    }
+
+    public function testAddAnywaySavesTheDuplicateAndRedirectsWithFlash(): void
+    {
+        $this->submit([]);
+        $this->submit([]);
+        self::assertResponseStatusCodeSame(400);
+
+        $this->client->submit($this->client->getCrawler()->selectButton(self::CONFIRM)->form());
+
+        self::assertResponseRedirects('/books/new');
+        $this->client->followRedirect();
+        self::assertSelectorTextContains('.alert-success', 'Książka została dodana do kolekcji.');
+        self::assertSelectorNotExists('.alert-warning');
+        self::assertCount(2, $this->entityManager()->getRepository(Book::class)->findAll());
+    }
+
+    public function testSubmittingTheSameDuplicateWithTheNormalButtonWarnsAgain(): void
+    {
+        $this->submit([]);
+        $this->submit([]);
+        $this->client->submit($this->client->getCrawler()->selectButton(self::SUBMIT)->form());
+
+        self::assertResponseStatusCodeSame(400);
+        self::assertSelectorExists('.alert-warning');
+        self::assertCount(1, $this->entityManager()->getRepository(Book::class)->findAll());
+    }
+
+    public function testNonDuplicateSavesWithoutWarningOrConfirmButton(): void
+    {
+        $this->client->request('GET', '/books/new');
+        self::assertSelectorNotExists('button[name="book[confirm_duplicate]"]');
+
+        $this->submit([]);
+        self::assertResponseRedirects('/books/new');
+
+        $this->client->request('GET', '/books/new');
+        self::assertSelectorNotExists('.alert-warning');
+        self::assertSelectorNotExists('button[name="book[confirm_duplicate]"]');
+
+        $this->submit(['book[title]' => 'Pan Tadeusz', 'book[isbn]' => '9788324031283']);
+        self::assertResponseRedirects('/books/new');
+        self::assertCount(2, $this->entityManager()->getRepository(Book::class)->findAll());
+    }
+
+    public function testInvalidFormShowsErrorsButNoDuplicateWarning(): void
+    {
+        $this->submit([]);
+        $this->submit(['book[authors]' => 'Homer']);
+
+        self::assertResponseStatusCodeSame(400);
+        self::assertSelectorExists('.invalid-feedback');
+        self::assertSelectorNotExists('.alert-warning');
+        self::assertSelectorNotExists('button[name="book[confirm_duplicate]"]');
     }
 
     /**

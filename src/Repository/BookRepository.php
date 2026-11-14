@@ -6,6 +6,7 @@ namespace App\Repository;
 
 use App\Dto\BookSearch;
 use App\Dto\RecommendationView;
+use App\Entity\Author;
 use App\Entity\Book;
 use App\Entity\ReadBook;
 use App\Entity\Tag;
@@ -62,6 +63,51 @@ class BookRepository extends ServiceEntityRepository
         }
 
         return new Paginator($qb->getQuery(), fetchJoinCollection: true);
+    }
+
+    /**
+     * Existing books that look like a new one, newest first, authors loaded: the ISBN is one of the given
+     * forms, OR the title is equal (trimmed; case ignored, accents not, by the *_as_ci column collation)
+     * AND the book shares at least one of the given authors. No authors means the title rule cannot match;
+     * no ISBNs means the ISBN rule cannot match. Both EXISTS-style, so the limit applies to books, not
+     * book-author rows. The S-08 soft-delete filter must be added here too (search() documents the same).
+     *
+     * @param list<Author> $authors persisted authors
+     * @param list<string> $isbns   every spelling of the ISBN (see IsbnForms)
+     *
+     * @return list<Book>
+     */
+    public function findDuplicates(string $title, array $authors, array $isbns, int $limit = 3): array
+    {
+        $qb = $this->createQueryBuilder('b')
+            ->addSelect('a')
+            ->leftJoin('b.authors', 'a')
+            ->orderBy('b.createdAt', 'DESC')
+            ->addOrderBy('b.id', 'DESC')
+            ->setMaxResults($limit);
+
+        $rules = [];
+        if ([] !== $isbns) {
+            $rules[] = $qb->expr()->in('b.isbn', ':isbns');
+            $qb->setParameter('isbns', $isbns);
+        }
+        if ([] !== $authors) {
+            $rules[] = $qb->expr()->andX(
+                'b.title = :title',
+                $qb->expr()->exists(
+                    'SELECT sb.id FROM '.Book::class.' sb JOIN sb.authors sa WHERE sb.id = b.id AND sa.id IN (:authorIds)',
+                ),
+            );
+            $qb->setParameter('title', trim($title))
+                ->setParameter('authorIds', array_map(static fn (Author $a): ?int => $a->getId(), $authors));
+        }
+        if ([] === $rules) {
+            return [];
+        }
+        $qb->andWhere($qb->expr()->orX(...$rules));
+
+        // The Paginator applies the limit to distinct books even though the authors are fetch-joined.
+        return array_values(iterator_to_array(new Paginator($qb->getQuery(), fetchJoinCollection: true), false));
     }
 
     /**

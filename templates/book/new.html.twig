@@ -7,6 +7,13 @@
         <div class="col-md-8 col-lg-6">
             <h1 class="h3 mb-3">{{ 'book.new.heading'|trans }}</h1>
 
+            {% if duplicates is defined and duplicates is not empty %}
+                {{ include('book/_duplicate_warning.html.twig') }}
+            {% else %}
+                {# "Add anyway" only exists next to the warning; mark it rendered so form() skips it. #}
+                {% do form.confirm_duplicate.setRendered %}
+            {% endif %}
+
             {{ form(form) }}
         </div>
     </div>
