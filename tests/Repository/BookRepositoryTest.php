@@ -291,6 +291,82 @@ final class BookRepositoryTest extends KernelTestCase
         self::assertCount(1, iterator_to_array($this->repository->search(new BookSearch(page: 2)), false));
     }
 
+    public function testDuplicatesMatchTheSameIsbnInTheSameAndTheOtherForm(): void
+    {
+        $book = $this->book('Dziady', Category::Poetry, authors: [$this->author('Adam', 'Mickiewicz')]);
+        $book->setIsbn('9788373271890');
+        $this->entityManager->flush();
+
+        self::assertSame([$book], $this->repository->findDuplicates('Inny tytuł', [], ['9788373271890']));
+        self::assertSame([$book], $this->repository->findDuplicates('Inny tytuł', [], ['8373271899', '9788373271890']));
+        self::assertSame([], $this->repository->findDuplicates('Inny tytuł', [], ['8373271899']));
+    }
+
+    public function testDuplicatesMatchTitleIgnoringCaseAndSurroundingWhitespaceWithASharedAuthor(): void
+    {
+        $adam = $this->author('Adam', 'Mickiewicz');
+        $book = $this->book('Dziady', Category::Poetry, authors: [$adam]);
+
+        self::assertSame([$book], $this->repository->findDuplicates('  dZIADY ', [$adam], ['0000000000']));
+    }
+
+    public function testDuplicatesMatchWithAnExtraOrMissingCoAuthor(): void
+    {
+        $adam = $this->author('Adam', 'Mickiewicz');
+        $ewa = $this->author('Ewa', 'Nowak');
+        $jan = $this->author('Jan', 'Kowalski');
+        $book = $this->book('Dziady', Category::Poetry, authors: [$adam, $ewa]);
+
+        self::assertSame([$book], $this->repository->findDuplicates('Dziady', [$adam], []));
+        self::assertSame([$book], $this->repository->findDuplicates('Dziady', [$adam, $ewa, $jan], []));
+        self::assertCount(2, $this->repository->findDuplicates('Dziady', [$adam], [])[0]->getAuthors());
+    }
+
+    public function testSameTitleWithoutASharedAuthorDoesNotMatch(): void
+    {
+        $adam = $this->author('Adam', 'Mickiewicz');
+        $jan = $this->author('Jan', 'Kowalski');
+        $this->book('Dziady', Category::Poetry, authors: [$adam]);
+
+        self::assertSame([], $this->repository->findDuplicates('Dziady', [$jan], []));
+        self::assertSame([], $this->repository->findDuplicates('Dziady', [], []));
+        self::assertSame([], $this->repository->findDuplicates('Dziady', [], ['0000000000']));
+    }
+
+    public function testDuplicatesAreAccentSensitiveForTitleAndAuthor(): void
+    {
+        $jose = $this->author('José', 'Saramago');
+        $jose2 = $this->author('Jose', 'Saramago');
+        $this->book('Ensaio', Category::Novel, authors: [$jose]);
+        $this->book('Żółw', Category::Novel, authors: [$jose]);
+
+        self::assertSame([], $this->repository->findDuplicates('Ensaio', [$jose2], []));
+        self::assertSame([], $this->repository->findDuplicates('Zolw', [$jose], []));
+        self::assertCount(1, $this->repository->findDuplicates('ŻÓŁW', [$jose], []));
+    }
+
+    public function testDuplicatesAreLimitedToBooksNewestFirst(): void
+    {
+        $adam = $this->author('Adam', 'Mickiewicz');
+        $first = $this->book('Dziady', Category::Poetry, authors: [$adam, $this->author('Ewa', 'Nowak')]);
+        $second = $this->book('Dziady', Category::Poetry, authors: [$adam, $this->author('Jan', 'Kowalski')]);
+        $third = $this->book('Dziady', Category::Poetry, authors: [$adam]);
+        $fourth = $this->book('Dziady', Category::Poetry, authors: [$adam, $this->author('Ola', 'Lis')]);
+
+        $result = $this->repository->findDuplicates('Dziady', [$adam], []);
+
+        self::assertSame([$fourth, $third, $second], $result);
+        self::assertSame([$fourth, $third], $this->repository->findDuplicates('Dziady', [$adam], [], 2));
+        self::assertNotContains($first, $result);
+    }
+
+    public function testDuplicatesWithNothingToMatchReturnNothing(): void
+    {
+        $this->book('Dziady', Category::Poetry);
+
+        self::assertSame([], $this->repository->findDuplicates('Dziady', [], []));
+    }
+
     /**
      * @param list<Author> $authors
      */
