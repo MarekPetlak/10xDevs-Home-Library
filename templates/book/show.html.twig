@@ -21,7 +21,7 @@
         {% if book.tags is not empty %}
             <dt class="col-sm-3">{{ 'book.form.tags'|trans }}</dt>
             <dd class="col-sm-9">
-                {% for tag in book.tags %}<span class="badge text-bg-secondary me-1">{{ tag.name }}</span>{% endfor %}
+                {% for tag in book.tags %}<a class="badge text-bg-secondary text-decoration-none me-1" href="{{ path('tag_show', {slug: tag.slug}) }}">{{ tag.name }}</a>{% endfor %}
             </dd>
         {% endif %}
 

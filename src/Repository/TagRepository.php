@@ -25,4 +25,14 @@ class TagRepository extends ServiceEntityRepository
     {
         return $this->findOneBy(['name' => trim($name)]);
     }
+
+    public function findOneBySlug(string $slug): ?Tag
+    {
+        return $this->findOneBy(['slug' => $slug]);
+    }
+
+    public function slugExists(string $slug): bool
+    {
+        return null !== $this->findOneBy(['slug' => $slug]);
+    }
 }

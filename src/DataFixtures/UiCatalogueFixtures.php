@@ -58,8 +58,8 @@ final class UiCatalogueFixtures extends Fixture implements FixtureGroupInterface
 
         $authors = [];
         $tags = [
-            'klasyka' => (new Tag())->setName('klasyka'),
-            'science fiction' => (new Tag())->setName('science fiction'),
+            'klasyka' => (new Tag())->setName('klasyka')->setSlug('klasyka'),
+            'science fiction' => (new Tag())->setName('science fiction')->setSlug('science-fiction'),
         ];
         foreach ($tags as $tag) {
             $manager->persist($tag);
