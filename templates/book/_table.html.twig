@@ -1,0 +1,33 @@
+{#
+    Books table shared by the book list and the tag page. Inputs: books, readBooks (book id => ReadBook, signed-in users only).
+#}
+<div class="table-responsive">
+    <table class="table table-hover align-middle">
+        <caption class="visually-hidden">{{ 'book.index.table_caption'|trans }}</caption>
+        <thead>
+            <tr>
+                <th>{{ 'book.form.title'|trans }}</th>
+                <th>{{ 'book.form.authors'|trans }}</th>
+                <th>{{ 'book.form.category'|trans }}</th>
+                {% if app.user %}<th>{{ 'book.index.read_state'|trans }}</th>{% endif %}
+            </tr>
+        </thead>
+        <tbody>
+            {% for book in books %}
+                <tr>
+                    <td><a href="{{ path('book_show', {id: book.id}) }}">{{ book.title }}</a></td>
+                    <td>{{ book.authors|map(a => a.fullName)|join(', ') }}</td>
+                    <td>{{ book.category.translationKey|trans }}</td>
+                    {% if app.user %}
+                        <td>
+                            {% set readBook = readBooks[book.id] ?? null %}
+                            {% if readBook %}
+                                {% include 'book/_read_status.html.twig' with {rating: readBook.rating} only %}
+                            {% endif %}
+                        </td>
+                    {% endif %}
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>

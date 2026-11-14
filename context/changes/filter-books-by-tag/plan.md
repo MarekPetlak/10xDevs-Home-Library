@@ -256,30 +256,30 @@ The migration adds the column nullable, backfills, then tightens it, so it works
 
 #### Automated
 
-- [x] 1.1 Slug service and book manager tests pass: `bin/phpunit tests/Service`
-- [x] 1.2 Migration applies cleanly and the schema is in sync
-- [x] 1.3 Migration rolls back and re-applies
-- [x] 1.4 Whole suite passes: `bin/phpunit`
+- [x] 1.1 Slug service and book manager tests pass: `bin/phpunit tests/Service` — 527bbf1
+- [x] 1.2 Migration applies cleanly and the schema is in sync — 527bbf1
+- [x] 1.3 Migration rolls back and re-applies — 527bbf1
+- [x] 1.4 Whole suite passes: `bin/phpunit` — 527bbf1
 
 #### Manual
 
-- [x] 1.5 After migrating a database with existing tags (including `zolw` and `żółw`), every tag has a distinct, non-empty slug
+- [x] 1.5 After migrating a database with existing tags (including `zolw` and `żółw`), every tag has a distinct, non-empty slug — 527bbf1
 
 ### Phase 2: Tag page
 
 #### Automated
 
-- [ ] 2.1 Repository and controller tests pass: `bin/phpunit tests/Repository tests/Controller`
-- [ ] 2.2 Whole suite passes: `bin/phpunit`
-- [ ] 2.3 Query-count tests pass for `/books` and the tag page
-- [ ] 2.4 Schema in sync: `bin/console doctrine:schema:validate`
+- [x] 2.1 Repository and controller tests pass: `bin/phpunit tests/Repository tests/Controller`
+- [x] 2.2 Whole suite passes: `bin/phpunit`
+- [x] 2.3 Query-count tests pass for `/books` and the tag page
+- [x] 2.4 Schema in sync: `bin/console doctrine:schema:validate`
 
 #### Manual
 
-- [ ] 2.5 `/tags/klasyka` in a private window lists only books tagged `klasyka`, with no personal data
-- [ ] 2.6 `/tags/does-not-exist` shows the normal 404 page
-- [ ] 2.7 `/books` list and pager behave exactly as before
-- [ ] 2.8 Tag page has no overflow at desktop and one mobile width; the back link is keyboard-reachable with a visible focus
+- [x] 2.5 `/tags/klasyka` in a private window lists only books tagged `klasyka`, with no personal data
+- [x] 2.6 `/tags/does-not-exist` shows the normal 404 page
+- [x] 2.7 `/books` list and pager behave exactly as before
+- [x] 2.8 Tag page has no overflow at desktop and one mobile width; the back link is keyboard-reachable with a visible focus
 
 ### Phase 3: Links and fixtures
 

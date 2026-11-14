@@ -74,6 +74,11 @@ book:
         children: Dla dzieci
         poetry: Poezja
         other: Inne
+tag:
+    show:
+        title: 'Książki z tagiem: %name%'
+        heading: 'Książki z tagiem: %name%'
+        back: Wszystkie książki
 http_error:
     title: 'Błąd %code%'
     not_found: Nie znaleziono strony

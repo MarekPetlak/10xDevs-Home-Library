@@ -9,6 +9,7 @@ use App\Dto\RecommendationView;
 use App\Entity\Author;
 use App\Entity\Book;
 use App\Entity\ReadBook;
+use App\Entity\Tag;
 use App\Entity\User;
 use App\Enum\Category;
 use App\Repository\BookRepository;
@@ -291,10 +292,71 @@ final class BookRepositoryTest extends KernelTestCase
         self::assertCount(1, iterator_to_array($this->repository->search(new BookSearch(page: 2)), false));
     }
 
+    public function testFindByTagReturnsOnlyBooksWithThatTag(): void
+    {
+        $klasyka = $this->tag('Klasyka');
+        $other = $this->tag('Inny');
+        $this->book('Solaris', Category::Novel, tags: [$klasyka]);
+        $this->book('Dziady', Category::Poetry, tags: [$other]);
+        $this->book('Bez tagu', Category::Novel);
+
+        $result = $this->repository->findByTag($klasyka, 1);
+
+        self::assertSame(['Solaris'], $this->searchTitles($result));
+        self::assertCount(1, $result);
+    }
+
+    public function testFindByTagListsABookWithTwoTagsOnceWithAllItsAuthors(): void
+    {
+        $klasyka = $this->tag('Klasyka');
+        $this->book('Piknik', Category::Novel, authors: [$this->author('Arkadij', 'Strugacki'), $this->author('Boris', 'Strugacki')], tags: [$klasyka, $this->tag('Sci-fi')]);
+        $this->entityManager->clear();
+
+        $books = iterator_to_array($this->repository->findByTag($klasyka, 1), false);
+
+        self::assertCount(1, $books);
+        self::assertCount(2, $books[0]->getAuthors());
+    }
+
+    public function testFindByTagIsPagedByTwentyNewestFirst(): void
+    {
+        $tag = $this->tag('Klasyka');
+        for ($i = 1; $i <= 21; ++$i) {
+            $this->book(sprintf('Książka %02d', $i), Category::Novel, tags: [$tag]);
+        }
+
+        $first = $this->repository->findByTag($tag, 1);
+
+        self::assertCount(21, $first);
+        self::assertCount(20, iterator_to_array($first, false));
+        self::assertSame('Książka 21', $this->searchTitles($first)[0]);
+        self::assertSame(['Książka 01'], $this->searchTitles($this->repository->findByTag($tag, 2)));
+        self::assertSame([], $this->searchTitles($this->repository->findByTag($tag, 3)));
+    }
+
+    public function testFindByTagLoadsAuthorsEagerlySoQueryCountDoesNotGrowWithBookCount(): void
+    {
+        $tag = $this->tag('Klasyka');
+        for ($i = 0; $i < 5; ++$i) {
+            $this->book('Książka '.$i, Category::Novel, authors: [$this->author('Jan'.$i, 'Nowak'), $this->author('Ewa'.$i, 'Nowak')], tags: [$tag]);
+        }
+        $this->entityManager->clear();
+
+        $books = iterator_to_array($this->repository->findByTag($tag, 1), false);
+
+        // An initialised collection means no lazy load per book, hence no N+1 whatever the number of books.
+        self::assertCount(5, $books);
+        foreach ($books as $book) {
+            self::assertTrue($book->getAuthors()->isInitialized());
+            self::assertCount(2, $book->getAuthors());
+        }
+    }
+
     /**
      * @param list<Author> $authors
+     * @param list<Tag>    $tags
      */
-    private function book(string $title, Category $category, ?User $addedBy = null, array $authors = []): Book
+    private function book(string $title, Category $category, ?User $addedBy = null, array $authors = [], array $tags = []): Book
     {
         $book = (new Book())
             ->setTitle($title)
@@ -305,10 +367,21 @@ final class BookRepositoryTest extends KernelTestCase
         foreach ($authors as $author) {
             $book->addAuthor($author);
         }
+        foreach ($tags as $tag) {
+            $book->addTag($tag);
+        }
         $this->entityManager->persist($book);
         $this->entityManager->flush();
 
         return $book;
+    }
+
+    private function tag(string $name): Tag
+    {
+        $tag = (new Tag())->setName($name)->setSlug(strtolower($name));
+        $this->entityManager->persist($tag);
+
+        return $tag;
     }
 
     private function author(string $firstName, string $lastName): Author
