@@ -28,8 +28,8 @@ final class BookMappingTest extends KernelTestCase
         $user = (new User())->setEmail('mapping@example.com')->setPassword('hash');
         $first = (new Author())->setFirstName('Stanisław')->setLastName('Lem');
         $second = (new Author())->setFirstName('Olga')->setLastName('Tokarczuk');
-        $fiction = (new Tag())->setName('sci-fi');
-        $classic = (new Tag())->setName('klasyka');
+        $fiction = (new Tag())->setName('sci-fi')->setSlug('sci-fi');
+        $classic = (new Tag())->setName('klasyka')->setSlug('klasyka');
 
         $book = (new Book())
             ->setTitle('Solaris')

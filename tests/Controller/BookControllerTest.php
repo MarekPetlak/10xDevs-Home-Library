@@ -10,6 +10,7 @@ use App\Entity\Tag;
 use App\Repository\AuthorRepository;
 use App\Repository\TagRepository;
 use App\Service\BookManager;
+use App\Service\TagSlugger;
 use App\Service\UserManager;
 use Doctrine\DBAL\Driver\Exception as DriverException;
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
@@ -142,6 +143,7 @@ final class BookControllerTest extends WebTestCase
             $failing,
             static::getContainer()->get(AuthorRepository::class),
             static::getContainer()->get(TagRepository::class),
+            static::getContainer()->get(TagSlugger::class),
         ));
 
         $this->submit([]);

@@ -9,6 +9,7 @@ use App\Dto\RecommendationView;
 use App\Entity\Author;
 use App\Entity\Book;
 use App\Entity\ReadBook;
+use App\Entity\Tag;
 use App\Entity\User;
 use App\Enum\Category;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
@@ -107,6 +108,29 @@ class BookRepository extends ServiceEntityRepository
 
         // The Paginator applies the limit to distinct books even though the authors are fetch-joined.
         return array_values(iterator_to_array(new Paginator($qb->getQuery(), fetchJoinCollection: true), false));
+    }
+
+    /**
+     * One page of the books carrying a tag, same order, paging and eager loading as search(). The tag
+     * condition is an EXISTS subquery, so each listed book still carries all of its authors. Also a
+     * place for the future soft-delete filter (S-08), like search().
+     *
+     * @return Paginator<Book>
+     */
+    public function findByTag(Tag $tag, int $page): Paginator
+    {
+        $qb = $this->createQueryBuilder('b')
+            ->addSelect('a')
+            ->leftJoin('b.authors', 'a')
+            ->orderBy('b.createdAt', 'DESC')
+            ->addOrderBy('b.id', 'DESC')
+            ->setFirstResult((max(1, $page) - 1) * self::PER_PAGE)
+            ->setMaxResults(self::PER_PAGE);
+        $qb->andWhere($qb->expr()->exists(
+            'SELECT tb.id FROM '.Book::class.' tb JOIN tb.tags tt WHERE tb.id = b.id AND tt.id = :tag',
+        ))->setParameter('tag', $tag->getId());
+
+        return new Paginator($qb->getQuery(), fetchJoinCollection: true);
     }
 
     private static function contains(string $text): string

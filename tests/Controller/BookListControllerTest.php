@@ -153,7 +153,7 @@ final class BookListControllerTest extends WebTestCase
     public function testDetailShowsAllBookFields(): void
     {
         $book = $this->createBook('Solaris', $this->user, Category::Novel);
-        $book->setDescription('Planeta-ocean.')->addTag((new Tag())->setName('sci-fi'));
+        $book->setDescription('Planeta-ocean.')->addTag((new Tag())->setName('sci-fi')->setSlug('sci-fi'));
         $this->entityManager()->persist($book->getTags()->first());
         $this->entityManager()->flush();
 
@@ -165,6 +165,41 @@ final class BookListControllerTest extends WebTestCase
         foreach (['Stanisław Lem', $book->getIsbn(), '1961', 'Powieść', 'sci-fi', 'Planeta-ocean.'] as $expected) {
             self::assertStringContainsString($expected, $text);
         }
+    }
+
+    public function testDetailLinksEachTagToItsTagPage(): void
+    {
+        $book = $this->createBook('Solaris', $this->user);
+        $this->addTags($book, ['science fiction' => 'science-fiction', 'klasyka' => 'klasyka']);
+
+        $crawler = $this->client->request('GET', '/books/'.$book->getId());
+
+        self::assertResponseStatusCodeSame(200);
+        self::assertCount(2, $crawler->filter('dd a.badge'));
+        self::assertSame('science fiction', trim($crawler->filter('a.badge[href="/tags/science-fiction"]')->text()));
+        self::assertSame('klasyka', trim($crawler->filter('a.badge[href="/tags/klasyka"]')->text()));
+    }
+
+    public function testDetailEscapesTagNames(): void
+    {
+        $book = $this->createBook('Solaris', $this->user);
+        $this->addTags($book, ['<b>x</b>' => 'b-x-b']);
+
+        $crawler = $this->client->request('GET', '/books/'.$book->getId());
+
+        self::assertStringNotContainsString('<b>x</b>', $this->client->getResponse()->getContent());
+        self::assertSame('<b>x</b>', trim($crawler->filter('a.badge[href="/tags/b-x-b"]')->text()));
+    }
+
+    public function testDetailOfABookWithoutTagsShowsNoTagsRow(): void
+    {
+        $book = $this->createBook('Solaris', $this->user);
+
+        $crawler = $this->client->request('GET', '/books/'.$book->getId());
+
+        self::assertResponseStatusCodeSame(200);
+        self::assertCount(0, $crawler->filter('a.badge'));
+        self::assertSelectorTextNotContains('main dl', 'Tagi');
     }
 
     public function testMissingBookReturns404(): void
@@ -455,6 +490,19 @@ final class BookListControllerTest extends WebTestCase
         $this->entityManager()->flush();
 
         return $book;
+    }
+
+    /**
+     * @param array<string, string> $tags name => slug
+     */
+    private function addTags(Book $book, array $tags): void
+    {
+        foreach ($tags as $name => $slug) {
+            $tag = (new Tag())->setName((string) $name)->setSlug($slug);
+            $this->entityManager()->persist($tag);
+            $book->addTag($tag);
+        }
+        $this->entityManager()->flush();
     }
 
     private function createReadBook(User $user, Book $book, int $rating): void
