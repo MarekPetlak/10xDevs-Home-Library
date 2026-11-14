@@ -58,6 +58,13 @@ book:
         tags_help: do pięciu, oddzielone przecinkami
         description: Opis
         submit: Zapisz książkę
+        confirm_duplicate: Dodaj mimo to
+    duplicate:
+        heading: W kolekcji jest już podobna książka
+        hint: To tylko ostrzeżenie. Sprawdź wymienione książki i zdecyduj, czy mimo to dodać nową.
+        reason:
+            isbn: ten sam ISBN
+            title_author: ten sam tytuł i autor
     error:
         conflict: Nie udało się zapisać książki, bo ktoś równocześnie dodał tego samego autora lub tag. Spróbuj ponownie.
     flash:

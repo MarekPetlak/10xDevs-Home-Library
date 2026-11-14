@@ -232,26 +232,26 @@ None. No schema change; existing data is read as is.
 
 #### Automated
 
-- [x] 1.1 ISBN conversion tests pass (10→13, 13→10 incl. X check digit, 979 has no ISBN-10)
-- [x] 1.2 Repository tests pass (ISBN same and cross form, title case-insensitive, shared author, no shared author, accent, limit, order)
-- [x] 1.3 DuplicateFinder service test passes (flags, unknown author, both flags)
-- [x] 1.4 Whole suite passes: bin/phpunit
+- [x] 1.1 ISBN conversion tests pass (10→13, 13→10 incl. X check digit, 979 has no ISBN-10) — 2d8dadb
+- [x] 1.2 Repository tests pass (ISBN same and cross form, title case-insensitive, shared author, no shared author, accent, limit, order) — 2d8dadb
+- [x] 1.3 DuplicateFinder service test passes (flags, unknown author, both flags) — 2d8dadb
+- [x] 1.4 Whole suite passes: bin/phpunit — 2d8dadb
 
 #### Manual
 
-- [x] 1.5 Reviewer confirms the query is read-only and the S-08 comment is present
+- [x] 1.5 Reviewer confirms the query is read-only and the S-08 comment is present — 2d8dadb
 
 ### Phase 2: Controller and form flow
 
 #### Automated
 
-- [ ] 2.1 Controller tests pass: bin/phpunit tests/Controller/BookControllerTest.php
-- [ ] 2.2 Whole suite passes: bin/phpunit
+- [x] 2.1 Controller tests pass: bin/phpunit tests/Controller/BookControllerTest.php
+- [x] 2.2 Whole suite passes: bin/phpunit
 
 #### Manual
 
-- [ ] 2.3 Adding an existing book shows the warning with input kept, and "Add anyway" saves it
-- [ ] 2.4 Adding a book with a new ISBN and title shows no warning and behaves as before
+- [x] 2.3 Adding an existing book shows the warning with input kept, and "Add anyway" saves it
+- [x] 2.4 Adding a book with a new ISBN and title shows no warning and behaves as before
 
 ### Phase 3: Warning UI and docs
 

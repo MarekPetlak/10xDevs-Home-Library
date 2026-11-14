@@ -14,9 +14,11 @@ use App\Form\MarkReadType;
 use App\Repository\BookRepository;
 use App\Repository\ReadBookRepository;
 use App\Service\BookManager;
+use App\Service\DuplicateFinder;
 use App\Service\RecommendationService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\FormError;
+use Symfony\Component\Form\SubmitButton;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -75,7 +77,7 @@ final class BookController extends AbstractController
 
     #[Route('/books/new', name: 'book_new', methods: ['GET', 'POST'])]
     #[IsGranted('ROLE_USER')]
-    public function new(Request $request, BookManager $bookManager, TranslatorInterface $translator): Response
+    public function new(Request $request, BookManager $bookManager, DuplicateFinder $duplicateFinder, TranslatorInterface $translator): Response
     {
         $form = $this->createForm(BookType::class, new NewBook());
         $form->handleRequest($request);
@@ -83,6 +85,16 @@ final class BookController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $user = $this->getUser();
             \assert($user instanceof User);
+
+            // The clicked button is the user's decision; the warning never blocks a confirmed save (FR-005).
+            $confirmButton = $form->get('confirm_duplicate');
+            \assert($confirmButton instanceof SubmitButton);
+            if (!$confirmButton->isClicked()) {
+                $duplicates = $duplicateFinder->find($form->getData());
+                if ([] !== $duplicates) {
+                    return $this->render('book/new.html.twig', ['form' => $form, 'duplicates' => $duplicates], new Response(status: Response::HTTP_BAD_REQUEST));
+                }
+            }
 
             try {
                 $bookManager->add($form->getData(), $user);
