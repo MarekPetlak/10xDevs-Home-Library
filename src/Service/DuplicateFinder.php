@@ -34,10 +34,13 @@ final class DuplicateFinder
 
         $matches = [];
         foreach ($this->bookRepository->findDuplicates($title, $authors, $isbns) as $book) {
+            $sameIsbn = in_array($book->getIsbn(), $isbns, true);
+            // A hit that is not an ISBN hit came from the title rule, so trust it: PHP case folding can disagree
+            // with the column collation (ß/ss) and would leave the warning without any reason.
             $matches[] = new DuplicateMatch(
                 $book,
-                in_array($book->getIsbn(), $isbns, true),
-                $this->sameTitleAndAuthor($book, $title, $authors),
+                $sameIsbn,
+                !$sameIsbn || $this->sameTitleAndAuthor($book, $title, $authors),
             );
         }
 

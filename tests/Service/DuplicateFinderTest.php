@@ -80,6 +80,19 @@ final class DuplicateFinderTest extends KernelTestCase
         self::assertSame([], $this->finder->find($this->input('Ensaio', 'Jose Saramago', '9780306406157')));
     }
 
+    public function testTitleMatchedByCollationOnlyStillGetsItsReason(): void
+    {
+        // The column collation treats Greek capital and small sigma spellings as equal, PHP's mb_strtolower does not
+        // (final sigma): the hit must still say why.
+        $this->stored('ΟΔΟΣ', 'Adam Mickiewicz', '9788373271890');
+
+        $matches = $this->finder->find($this->input('οδοσ', 'Adam Mickiewicz', '9780306406157'));
+
+        self::assertCount(1, $matches);
+        self::assertFalse($matches[0]->sameIsbn);
+        self::assertTrue($matches[0]->sameTitleAndAuthor);
+    }
+
     public function testNothingStoredMeansNoMatches(): void
     {
         self::assertSame([], $this->finder->find($this->input('Dziady', 'Adam Mickiewicz', '9788373271890')));
