@@ -50,6 +50,7 @@ Użytkownik nie pamięta, jakie książki ma w domowej bibliotece i które przec
 | S-07  | edit-own-book-entry            | user can edit a book they added, after confirmation                     | S-02          | FR-006        | proposed |
 | S-08  | soft-delete-own-book           | user can delete a book they added without losing others' ratings        | S-02, S-03    | FR-007        | proposed |
 | S-09  | reader-comments-privacy           | comment author can mark a reader comment public or private                    | S-03          | FR-009        | proposed |
+| S-10  | filter-books-by-tag            | anyone can filter books by clicking a tag badge                         | S-02          | FR-003        | proposed |
 
 ## Baseline
 
@@ -141,7 +142,7 @@ Brak. Warstwy oznaczone w Baseline jako `partial` (dane, auth, interfejs) są wp
 - **Change ID:** duplicate-book-warning
 - **PRD refs:** FR-005, US-01
 - **Prerequisites:** S-02
-- **Parallel with:** S-03, S-04, S-05, S-07
+- **Parallel with:** S-03, S-04, S-05, S-07, S-10
 - **Blockers:** —
 - **Unknowns:**
   - Czy ISBN jest polem wymaganym i jak łączą się dopasowania po ISBN oraz po tytule i autorze — Owner: user. Block: no.
@@ -187,6 +188,19 @@ Brak. Warstwy oznaczone w Baseline jako `partial` (dane, auth, interfejs) są wp
 - **Risk:** Do czasu tej zmiany komentarze są widoczne dla wszystkich zalogowanych, co przeczy regule PRD o osobistych komentarzach; zmiana wymaga migracji istniejących komentarzy.
 - **Status:** proposed
 
+### S-10: Filtrowanie książek po tagu
+
+- **Outcome:** anyone, also when not logged in, can filter books by clicking a tag badge (na liście i w szczegółach książki); filtr łączy się z wyszukiwaniem po tytule, autorze i kategorii oraz można go wyczyścić.
+- **Change ID:** filter-books-by-tag
+- **PRD refs:** FR-003
+- **Prerequisites:** S-02
+- **Parallel with:** S-06
+- **Blockers:** —
+- **Unknowns:**
+  - Czy kliknięcie tagu zastępuje pozostałe filtry, czy dodaje się do nich — Owner: user. Block: no.
+- **Risk:** Rozszerza `BookSearch` i `BookRepository::search()` (S-05), więc trzeba zachować publiczny widok bez danych osobistych oraz paginację; dopasowanie tagu to dokładna nazwa, nie „zawiera”.
+- **Status:** proposed
+
 ## Backlog Handoff
 
 | Roadmap ID | Change ID                     | Suggested issue title                                      | Ready for `/10x-plan` | Notes |
@@ -200,6 +214,7 @@ Brak. Warstwy oznaczone w Baseline jako `partial` (dane, auth, interfejs) są wp
 | S-07       | edit-own-book-entry           | Edycja własnej książki z potwierdzeniem                    | no                    | Czeka na S-02 |
 | S-08       | soft-delete-own-book          | Usuwanie własnej książki bez kasowania cudzych ocen        | no                    | Czeka na S-02 i S-03 |
 | S-09       | reader-comments-privacy          | Prywatność komentarzy czytelników (publiczna lub prywatna)    | no                    | Czeka na S-03 |
+| S-10       | filter-books-by-tag           | Filtrowanie książek po kliknięciu tagu                     | no                    | Czeka na S-02 |
 
 ## Open Roadmap Questions
 
