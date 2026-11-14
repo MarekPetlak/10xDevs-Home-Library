@@ -50,7 +50,7 @@ Użytkownik nie pamięta, jakie książki ma w domowej bibliotece i które przec
 | S-07  | edit-own-book-entry            | user can edit a book they added, after confirmation                     | S-02          | FR-006        | proposed |
 | S-08  | soft-delete-own-book           | user can delete a book they added without losing others' ratings        | S-02, S-03    | FR-007        | proposed |
 | S-09  | reader-comments-privacy           | comment author can mark a reader comment public or private                    | S-03          | FR-009        | proposed |
-| S-10  | filter-books-by-tag            | anyone can filter books by clicking a tag badge                         | S-02          | FR-003        | proposed |
+| S-10  | filter-books-by-tag            | anyone can open a tag page from a book's tag and see books with that tag | S-02          | FR-003        | done |
 
 ## Baseline
 
@@ -190,16 +190,16 @@ Brak. Warstwy oznaczone w Baseline jako `partial` (dane, auth, interfejs) są wp
 
 ### S-10: Filtrowanie książek po tagu
 
-- **Outcome:** anyone, also when not logged in, can filter books by clicking a tag badge (na liście i w szczegółach książki); filtr łączy się z wyszukiwaniem po tytule, autorze i kategorii oraz można go wyczyścić.
+- **Outcome:** anyone, also when not logged in, can open a tag page from a tag on a book's detail page and see the books with that tag (strona `/tags/{slug}`, jeden tag, ta sama tabela i paginacja co lista książek, bez danych osobistych); tag nie jest polem formularza wyszukiwania i nie łączy się z filtrami tytułu, autora i kategorii.
 - **Change ID:** filter-books-by-tag
 - **PRD refs:** FR-003
 - **Prerequisites:** S-02
 - **Parallel with:** S-06
 - **Blockers:** —
 - **Unknowns:**
-  - Czy kliknięcie tagu zastępuje pozostałe filtry, czy dodaje się do nich — Owner: user. Block: no.
-- **Risk:** Rozszerza `BookSearch` i `BookRepository::search()` (S-05), więc trzeba zachować publiczny widok bez danych osobistych oraz paginację; dopasowanie tagu to dokładna nazwa, nie „zawiera”.
-- **Status:** proposed
+  - Czy kliknięcie tagu zastępuje pozostałe filtry, czy dodaje się do nich — Owner: user. Block: no. Resolved: tag ma własną stronę `/tags/{slug}` i nie łączy się z pozostałymi filtrami; pole filtra w formularzu wyszukiwania wypadło.
+- **Risk:** Tag dostał unikalny `slug` (migracja z uzupełnieniem istniejących tagów, MariaDB 10.10+); strona tagu zachowuje publiczny widok bez danych osobistych oraz paginację.
+- **Status:** done
 
 ## Backlog Handoff
 
@@ -256,3 +256,4 @@ Brak. Warstwy oznaczone w Baseline jako `partial` (dane, auth, interfejs) są wp
 - **S-04: user can see up to three recommended books on the home page, chosen by the PRD rule (najwyższe średnie oceny, kategorie najczęściej czytane w ostatnim roku, nieprzeczytane; druga kategoria jako uzupełnienie), or a message when none can be generated.** — Archived 2026-11-12 → `context/archive/2026-11-12-home-recommendations/`. Lesson: —.
 - **S-05: anyone, also when not logged in, can browse and search books by title, author and category (bez ocen, komentarzy i statusu przeczytania).** — Archived 2026-11-12 → `context/archive/2026-11-12-browse-and-search-books/`. Lesson: —.
 - **S-06: user is warned about a duplicate (tytuł i autor bez względu na wielkość liter i zbędne spacje, oraz ISBN) before a book is saved, and decides whether to add it anyway.** — Archived 2026-11-14 → `context/archive/2026-11-14-duplicate-book-warning/`. Lesson: —.
+- **S-10: anyone, also when not logged in, can open a tag page from a tag on a book's detail page and see the books with that tag (strona `/tags/{slug}`, jeden tag, ta sama tabela i paginacja co lista książek, bez danych osobistych).** — Archived 2026-11-14 → `context/archive/2026-11-14-filter-books-by-tag/`. Lesson: —.
