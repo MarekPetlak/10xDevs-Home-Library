@@ -241,6 +241,7 @@ Brak. Warstwy oznaczone w Baseline jako `partial` (dane, auth, interfejs) są wp
 - **Import wielu książek naraz** — Why parked: PRD Non-Goals; książki dodawane pojedynczo.
 - **Notatki AI jako dodatkowy sygnał rekomendacji i uzasadnienie rekomendacji** — Why parked: PRD Success Criteria (Secondary), poza kamieniem milowym przy celu `speed`.
 - **Własna domena** — Why parked: plan wdrożenia pomija ją; aplikacja działa na domenie platformy.
+- **Sprzątanie osieroconych autorów i tagów (`cleanup-orphan-authors-tags`)** — Why parked: skutek uboczny edycji z S-07 (ustalenie F3 przeglądu `context/changes/edit-own-book-entry/reviews/impl-review.md`), poza zakresem kamienia milowego M-1 przy celu `speed`; osierocone wiersze `Author`/`Tag` zostają w bazie, a pozostaje do sprawdzenia, czy listy i strony tagów pokazują wpisy bez książek. Wróć do tego jako osobny wycinek po S-07 (niewiadome: sprzątanie przy edycji czy osobno, 404 dla usuniętego tagu).
 
 ## Milestone History
 

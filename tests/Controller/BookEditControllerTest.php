@@ -11,8 +11,13 @@ use App\Entity\ReadBook;
 use App\Entity\Tag;
 use App\Entity\User;
 use App\Enum\Category;
+use App\Repository\AuthorRepository;
+use App\Repository\TagRepository;
 use App\Service\BookManager;
+use App\Service\TagSlugger;
 use App\Service\UserManager;
+use Doctrine\DBAL\Driver\Exception as DriverException;
+use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
@@ -47,7 +52,14 @@ final class BookEditControllerTest extends WebTestCase
         $input->tags = 'klasyka';
         $input->description = 'Dramat romantyczny.';
         // No clear() here: the user created above must stay managed.
-        $this->book = static::getContainer()->get(BookManager::class)->add($input, $this->owner);
+        // Built by hand: fetching the BookManager service would initialize it and stop a test from replacing it.
+        $container = static::getContainer();
+        $this->book = (new BookManager(
+            $container->get(EntityManagerInterface::class),
+            $container->get(AuthorRepository::class),
+            $container->get(TagRepository::class),
+            $container->get(TagSlugger::class),
+        ))->add($input, $this->owner);
     }
 
     protected function tearDown(): void
@@ -239,6 +251,29 @@ final class BookEditControllerTest extends WebTestCase
         $this->client->request('GET', $this->showUrl());
         self::assertSelectorTextContains('dl', 'Zaktualizowano');
         self::assertSelectorTextContains('dl', '17.11.2026');
+    }
+
+    public function testLostUpdateRaceShowsATryAgainErrorInsteadOfA500(): void
+    {
+        // Without this the client reboots the kernel between requests and drops the replaced service.
+        $this->client->disableReboot();
+        $failing = $this->createStub(EntityManagerInterface::class);
+        $failing->method('wrapInTransaction')->willThrowException(
+            new UniqueConstraintViolationException($this->createStub(DriverException::class), null),
+        );
+        static::getContainer()->set(BookManager::class, new BookManager(
+            $failing,
+            static::getContainer()->get(AuthorRepository::class),
+            static::getContainer()->get(TagRepository::class),
+            static::getContainer()->get(TagSlugger::class),
+        ));
+
+        $this->submit(['book[title]' => 'Pan Tadeusz']);
+
+        self::assertResponseStatusCodeSame(400);
+        self::assertSelectorTextContains('.invalid-feedback, .alert-danger, .form-error-message', 'Spróbuj ponownie');
+        self::assertInputValueSame('book[title]', 'Pan Tadeusz');
+        $this->assertBookUntouched();
     }
 
     public function testUnknownBookReturns404(): void

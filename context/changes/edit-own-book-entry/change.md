@@ -1,7 +1,7 @@
 ---
 change_id: edit-own-book-entry
 title: Edit own book entry
-status: implemented
+status: impl_reviewed
 created: 2026-11-17
 updated: 2026-11-17
 archived_at: null

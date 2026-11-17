@@ -25,7 +25,7 @@ final class Version20261117201022 extends AbstractMigration
     {
         $this->abortIf(
             !$this->connection->getDatabasePlatform() instanceof MariaDBPlatform,
-            'This migration is written and verified for MariaDB 10.3+ (production and CI run 10.11).',
+            'This migration is written and verified for MariaDB (production and CI run 10.11).',
         );
 
         // A nullable ADD COLUMN without a default expression is an instant, metadata-only operation on
