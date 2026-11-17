@@ -187,9 +187,9 @@ None. New or changed files are tests and one documentation file.
 
 #### Automated
 
-- [x] 3.1 No TBD left in §6.3 and §6.4 of `test-plan.md`
-- [x] 3.2 Suite still green: `php bin/phpunit`
+- [x] 3.1 No TBD left in §6.3 and §6.4 of `test-plan.md` — f36a034
+- [x] 3.2 Suite still green: `php bin/phpunit` — f36a034
 
 #### Manual
 
-- [x] 3.3 §6.3 and §6.4 are enough to add an ownership test and a privacy test without other help
+- [x] 3.3 §6.3 and §6.4 are enough to add an ownership test and a privacy test without other help — f36a034
