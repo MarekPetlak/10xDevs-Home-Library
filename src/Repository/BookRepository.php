@@ -74,10 +74,11 @@ class BookRepository extends ServiceEntityRepository
      *
      * @param list<Author> $authors persisted authors
      * @param list<string> $isbns   every spelling of the ISBN (see IsbnForms)
+     * @param int|null     $excludeBookId never returned, so an edited book does not duplicate itself
      *
      * @return list<Book>
      */
-    public function findDuplicates(string $title, array $authors, array $isbns, int $limit = 3): array
+    public function findDuplicates(string $title, array $authors, array $isbns, int $limit = 3, ?int $excludeBookId = null): array
     {
         $qb = $this->createQueryBuilder('b')
             ->addSelect('a')
@@ -105,6 +106,9 @@ class BookRepository extends ServiceEntityRepository
             return [];
         }
         $qb->andWhere($qb->expr()->orX(...$rules));
+        if (null !== $excludeBookId) {
+            $qb->andWhere('b.id != :excludeId')->setParameter('excludeId', $excludeBookId);
+        }
 
         // The Paginator applies the limit to distinct books even though the authors are fetch-joined.
         return array_values(iterator_to_array(new Paginator($qb->getQuery(), fetchJoinCollection: true), false));

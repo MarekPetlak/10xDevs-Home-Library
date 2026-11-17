@@ -41,6 +41,10 @@ class Book
     #[ORM\Column]
     private \DateTimeImmutable $createdAt;
 
+    // Null means the entry was never edited.
+    #[ORM\Column(nullable: true)]
+    private ?\DateTimeImmutable $updatedAt = null;
+
     #[ORM\ManyToOne(targetEntity: User::class)]
     #[ORM\JoinColumn(nullable: false, onDelete: 'RESTRICT')]
     private User $addedBy;
@@ -130,6 +134,18 @@ class Book
     public function getCreatedAt(): \DateTimeImmutable
     {
         return $this->createdAt;
+    }
+
+    public function getUpdatedAt(): ?\DateTimeImmutable
+    {
+        return $this->updatedAt;
+    }
+
+    public function setUpdatedAt(\DateTimeImmutable $updatedAt): static
+    {
+        $this->updatedAt = $updatedAt;
+
+        return $this;
     }
 
     public function getAddedBy(): User

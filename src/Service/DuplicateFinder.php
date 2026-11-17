@@ -24,16 +24,18 @@ final class DuplicateFinder
     }
 
     /**
+     * @param int|null $excludeBookId a book that never counts as a duplicate (the one being edited)
+     *
      * @return list<DuplicateMatch>
      */
-    public function find(NewBook $input): array
+    public function find(NewBook $input, ?int $excludeBookId = null): array
     {
         $title = trim((string) $input->title);
         $isbns = '' === trim((string) $input->isbn) ? [] : IsbnForms::of(strtoupper(trim((string) $input->isbn)));
         $authors = $this->resolveAuthors((string) $input->authors);
 
         $matches = [];
-        foreach ($this->bookRepository->findDuplicates($title, $authors, $isbns) as $book) {
+        foreach ($this->bookRepository->findDuplicates($title, $authors, $isbns, excludeBookId: $excludeBookId) as $book) {
             $sameIsbn = in_array($book->getIsbn(), $isbns, true);
             // A hit that is not an ISBN hit came from the title rule, so trust it: PHP case folding can disagree
             // with the column collation (ß/ss) and would leave the warning without any reason.
