@@ -170,18 +170,18 @@ None. New or changed files are tests and one documentation file.
 
 #### Automated
 
-- [x] 1.1 New test passes: `php bin/phpunit tests/Controller/ReadBookControllerTest.php`
-- [x] 1.2 Full suite passes: `php bin/phpunit`
-- [x] 1.3 Mutation check: breaking `ReadingManager::remove` on purpose turns the new test red; file restored via git
+- [x] 1.1 New test passes: `php bin/phpunit tests/Controller/ReadBookControllerTest.php` — 1f897b6
+- [x] 1.2 Full suite passes: `php bin/phpunit` — 1f897b6
+- [x] 1.3 Mutation check: breaking `ReadingManager::remove` on purpose turns the new test red; file restored via git — 1f897b6
 
 ### Phase 2: Privacy matrix
 
 #### Automated
 
-- [ ] 2.1 Matrix test passes: `php bin/phpunit tests/Controller/PrivacyMatrixTest.php`
-- [ ] 2.2 Full suite passes: `php bin/phpunit`
-- [ ] 2.3 Mutation check: removing `r.comment IS NOT NULL` on purpose turns a matrix case red; file restored via git
-- [ ] 2.4 Mutation check: removing `mask_email` on purpose turns a matrix case red; file restored via git
+- [x] 2.1 Matrix test passes: `php bin/phpunit tests/Controller/PrivacyMatrixTest.php`
+- [x] 2.2 Full suite passes: `php bin/phpunit`
+- [x] 2.3 Mutation check: removing `r.comment IS NOT NULL` on purpose turns a matrix case red; file restored via git
+- [x] 2.4 Mutation check: removing `mask_email` on purpose turns a matrix case red; file restored via git
 
 ### Phase 3: Cookbook and gate
 
