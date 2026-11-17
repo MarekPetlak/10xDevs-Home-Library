@@ -6,7 +6,7 @@
 >
 > Refresh: uruchom ponownie `/10x-test-plan --refresh`, gdy plan się zestarzeje (zobacz §8).
 >
-> Last updated: 2026-11-17
+> Last updated: 2026-11-17 (§3 Faza 1, §5, §6.3, §6.4, §6.6)
 
 ## 1. Strategy
 
@@ -62,12 +62,14 @@ Każdy wiersz to osobna faza wdrożenia, która otworzy własny folder zmiany pr
 
 | # | Phase name | Goal (one line) | Risks covered | Test types | Status | Change folder |
 |---|------------|-----------------|---------------|------------|--------|---------------|
-| 1 | Własność i prywatność | Obcy użytkownik nie zarządza cudzą książką, rekordem ani komentarzem, a dane osobiste widzi tylko uprawniony | #1, #2, #3 | integration (functional, wiele ról) | change opened | testing-ownership-and-privacy |
+| 1 | Własność i prywatność | Obcy użytkownik nie zarządza cudzą książką, rekordem ani komentarzem, a dane osobiste widzi tylko uprawniony | #1, #2, #3 | integration (functional, wiele ról) | complete | testing-ownership-and-privacy |
 | 2 | Trwałość danych i duplikaty | Soft delete i edycja nie gubią cudzych danych, a ostrzeżenie o duplikacie działa po wdrożeniu filtra usuniętych | #4, #5 | integration z bazą, unit | not started | — |
 | 3 | Reguła rekomendacji | Granice reguły: rok, remisy, limit trzech, brak danych | #6 | unit, integration | not started | — |
 | 4 | Jakość testów i bramki | Testy mutacyjne ujawniają słabe asercje; bramka CI dla testów i analizy statycznej | #7 | mutation testing, gates | not started | — |
 
 Uwaga: fazy 1 i 2 zależą od S-07/S-08/S-09 z roadmapy. Jeśli kod tych zmian jeszcze nie istnieje, faza testuje stan bieżący, a `/10x-research` oznacza, co czeka na S-07/S-08/S-09.
+
+Faza 1 zamknięta dla stanu bieżącego (ryzyka #2 i #3). Ryzyko #1 oraz widoczność komentarzy (S-09) czekają na S-07/S-08/S-09; zob. §6.3, §6.4 i §6.6.
 
 ## 4. Stack
 
@@ -93,7 +95,7 @@ Baza testów: `meaningful` (skonfigurowany PHPUnit, 30 plików testowych rozpros
 | Gate | Where | Required? | Catches |
 |------|-------|-----------|---------|
 | unit + integration (`bin/phpunit`) | local + CI | required (już podłączona w CI) | regresje logiki |
-| ownership / privacy integration | CI | required after §3 Phase 1 | obejście kontroli własności i wyciek danych |
+| ownership / privacy integration | CI | required (spełniona przez krok `php bin/phpunit` w CI, `.github/workflows/deploy.yml:53`; od §3 Phase 1) | obejście kontroli własności i wyciek danych |
 | mutation testing | local, CI optional | required after §3 Phase 4 | słabe asercje |
 | lint + analiza statyczna | local + CI | required after §3 Phase 4 | dryf składniowy i typów |
 | `composer audit` | CI | required after §3 Phase 4 | podatne zależności |
@@ -111,16 +113,31 @@ Jak dodawać testy w tym projekcie. Każda podsekcja jest wypełniana po dostarc
 - TBD — see §3 Phase 2 (wzorzec dla zapytań z bazą i zachowania danych po soft delete).
 
 ### 6.3 Adding an ownership / authorization test
-- TBD — see §3 Phase 1 (wzorzec odmowy dostępu obcemu użytkownikowi i sprawdzania stanu bazy).
+- **Gdzie:** `tests/Controller/`, w pliku kontrolera, którego trasę chroni test (dla rekordów przeczytania: `ReadBookControllerTest.php`). Nazwa zaczyna się od `test` i mówi, kto działa i co ma zostać nietknięte (np. `testRemoveByUserWithoutOwnRecordLeavesAnotherUsersRecordUntouched`).
+- **Wzorzec:** dwóch użytkowników (`UserManager::create`), użytkownik A ma rekord, użytkownik B wykonuje żądanie z poprawnym tokenem CSRF. Asercje: przekierowanie albo odmowa (kod odpowiedzi, nie tekst komunikatu) oraz stan bazy odczytany po `$em->clear()` — rekord A istnieje z niezmienionymi wartościami.
+- **Test referencyjny:** `ReadBookControllerTest::testRemoveByUserWithoutOwnRecordLeavesAnotherUsersRecordUntouched` (uzupełnia `testRemoveOnlyAffectsTheCurrentUsersOwnRecord`).
+- **Uruchomienie:** `php bin/phpunit tests/Controller/ReadBookControllerTest.php`
+- **Pułapka:** `tokenFromSession()` w tym pliku kasuje wszystkie rekordy przeczytania; w teście z cudzym rekordem pobierz token z tymczasowego rekordu drugiego użytkownika i usuń tylko jego rekordy.
+- **Sprawdź, że test chroni:** na chwilę zepsuj kod produkcyjny (np. wyszukiwanie rekordu tylko po książce w `ReadingManager::remove`), potwierdź czerwony wynik i przywróć plik przez `git checkout --`.
+- **Oczekuje na S-07/S-08:** testy odmowy edycji i usuwania cudzej książki (ryzyko #1) trzeba dodać razem z tymi zmianami. Tam trasy przyjmują identyfikator książki, więc wzorzec zmienia się z „brak identyfikatora do podmiany” na „podmiana identyfikatora cudzej książki”.
 
 ### 6.4 Adding a privacy-per-role test
-- TBD — see §3 Phase 1 (wzorzec sprawdzania treści odpowiedzi dla anonima, innego użytkownika i autora).
+- **Gdzie:** `tests/Controller/PrivacyMatrixTest.php`. Nowy przypadek to nowy wiersz w data providerze `roleByPage` (nazwany `<rola> on <strona>`), a nie nowy plik.
+- **Wzorzec:** jeden zestaw danych (książka z tagiem, rekord z komentarzem, rekord z oceną bez komentarza, trzeci użytkownik jako „inny”), każda strona żądana jako anonim, inny użytkownik i autor. Asercje na pełnej treści odpowiedzi: unikalny znacznik komentarza, surowe i zamaskowane e-maile oraz tekst oceny muszą być obecne albo nieobecne zgodnie z macierzą. Komunikat porażki zawiera rolę i stronę. Macierz wynika z PRD (Guardrails) i test-planu §2 #3, nie z obecnego HTML.
+- **Wartości wyróżniające:** unikalne e-maile i ocena rekordu bez komentarza (inna niż pozostałe liczby na stronie), żeby wyciek dało się wykryć wyszukaniem ciągu.
+- **Uruchomienie:** `php bin/phpunit tests/Controller/PrivacyMatrixTest.php`
+- **Sprawdź, że test chroni:** usuń warunek `r.comment IS NOT NULL` w `ReadBookRepository::findCommentsForBook` albo filtr `mask_email` w `templates/book/show.html.twig`; macierz musi zaświecić na czerwono. Przywróć pliki przez `git checkout --`.
+- **Zaakceptowane odsłonięcie:** średnia i liczba ocen w rekomendacjach (PRD, `prd.md:97`); test sprawdza tylko brak e-maila, komentarza i pojedynczej oceny w bloku.
+- **Oczekuje na S-09:** widoczność komentarzy publiczna/prywatna trzeba dodać do macierzy (nowa rola lub nowy stan danych) razem z tą zmianą.
 
 ### 6.5 Running mutation testing
 - TBD — see §3 Phase 4.
 
 ### 6.6 Per-rollout-phase notes
 (Opcjonalne. Po każdej fazie `/10x-implement` dopisuje 2–3 linie o niespodziankach.)
+
+- **Faza 1 (własność i prywatność):** własność rekordów przeczytania wynika z konstrukcji (rekord szukany po parze użytkownik + książka), więc cudzego rekordu nie da się wskazać identyfikatorem. Test #2 sprawdza więc stan bazy po żądaniu obcego użytkownika. Własny e-mail zalogowanego pojawia się w nawigacji, dlatego macierz sprawdza dane innych, nie własne. Pomocnik `tokenFromSession()` kasuje wszystkie rekordy przeczytania, więc nie nadaje się do testów z dwoma użytkownikami.
+- **Faza 1, niepokryte:** ryzyko #1 (edycja i usuwanie cudzej książki) czeka na S-07/S-08; widoczność komentarzy czeka na S-09.
 
 ## 7. What We Deliberately Don't Test
 

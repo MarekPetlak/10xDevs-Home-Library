@@ -263,6 +263,33 @@ final class ReadBookControllerTest extends WebTestCase
         self::assertSame(5, $rows[0]->getRating());
     }
 
+    public function testRemoveByUserWithoutOwnRecordLeavesAnotherUsersRecordUntouched(): void
+    {
+        $this->submit(['mark_read[rating]' => '5', 'mark_read[readOn]' => '2026-10-01', 'mark_read[comment]' => 'Komentarz Anny']);
+
+        $other = static::getContainer()->get(UserManager::class)->create('ola@example.com', 'secret-pass');
+        $this->client->loginUser($other);
+
+        // The remove form is only rendered for a user with a record. The token is per session, so take it
+        // from a temporary record of the other user and delete only that record, leaving Anna's row alone.
+        $this->submit(['mark_read[rating]' => '1']);
+        $crawler = $this->client->request('GET', $this->showUrl());
+        $token = (string) $crawler->filter('form[action$="/read/remove"] input[name="_token"]')->attr('value');
+        $this->entityManager()->createQuery('DELETE FROM '.ReadBook::class.' r WHERE r.user = :user')
+            ->setParameter('user', $other->getId())
+            ->execute();
+
+        $this->client->request('POST', $this->readUrl().'/remove', ['_token' => $token]);
+
+        self::assertResponseRedirects($this->showUrl());
+        $rows = $this->entityManager()->getRepository(ReadBook::class)->findAll();
+        self::assertCount(1, $rows);
+        self::assertSame('anna@example.com', $rows[0]->getUser()->getEmail());
+        self::assertSame(5, $rows[0]->getRating());
+        self::assertSame('Komentarz Anny', $rows[0]->getComment());
+        self::assertSame('2026-10-01', $rows[0]->getReadOn()->format('Y-m-d'));
+    }
+
     /**
      * Submits the real form from the detail page.
      *
