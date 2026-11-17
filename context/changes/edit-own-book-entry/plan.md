@@ -262,26 +262,26 @@ Jedna migracja dodaje nullable kolumnę `book.updated_at` (bez backfillu: `null`
 
 #### Automated
 
-- [x] 2.1 Testy przechodzą: `vendor/bin/phpunit`
-- [x] 2.2 Analiza statyczna przechodzi: `vendor/bin/phpstan analyse --no-progress --memory-limit=1G`
-- [x] 2.3 Kontener i trasy poprawne: `php bin/console lint:container` i `php bin/console debug:router book_edit`
-- [x] 2.4 Szablony poprawne: `php bin/console lint:twig templates`
+- [x] 2.1 Testy przechodzą: `vendor/bin/phpunit` — 4746aec
+- [x] 2.2 Analiza statyczna przechodzi: `vendor/bin/phpstan analyse --no-progress --memory-limit=1G` — 4746aec
+- [x] 2.3 Kontener i trasy poprawne: `php bin/console lint:container` i `php bin/console debug:router book_edit` — 4746aec
+- [x] 2.4 Szablony poprawne: `php bin/console lint:twig templates` — 4746aec
 
 #### Manual
 
-- [x] 2.5 Właściciel widzi „Edytuj” na własnej książce, formularz jest wypełniony, zapis zmienia dane i pokazuje flash
-- [x] 2.6 Na cudzej książce nie ma linku, a wejście na `/books/{id}/edit` daje 403
-- [x] 2.7 Zmiana ISBN na istniejący w innej książce pokazuje ostrzeżenie z „zapisz mimo to”
-- [x] 2.8 Oceny i komentarze innych użytkowników nadal widoczne po edycji
-- [x] 2.9 Po edycji strona książki pokazuje „Zaktualizowano” z dzisiejszą datą, a nieedytowana książka tego wiersza nie ma
+- [x] 2.5 Właściciel widzi „Edytuj” na własnej książce, formularz jest wypełniony, zapis zmienia dane i pokazuje flash — 4746aec
+- [x] 2.6 Na cudzej książce nie ma linku, a wejście na `/books/{id}/edit` daje 403 — 4746aec
+- [x] 2.7 Zmiana ISBN na istniejący w innej książce pokazuje ostrzeżenie z „zapisz mimo to” — 4746aec
+- [x] 2.8 Oceny i komentarze innych użytkowników nadal widoczne po edycji — 4746aec
+- [x] 2.9 Po edycji strona książki pokazuje „Zaktualizowano” z dzisiejszą datą, a nieedytowana książka tego wiersza nie ma — 4746aec
 
 ### Phase 3: Tests
 
 #### Automated
 
-- [ ] 3.1 Wszystkie testy przechodzą: `vendor/bin/phpunit`
-- [ ] 3.2 Analiza statyczna przechodzi: `vendor/bin/phpstan analyse --no-progress --memory-limit=1G`
+- [x] 3.1 Wszystkie testy przechodzą: `vendor/bin/phpunit`
+- [x] 3.2 Analiza statyczna przechodzi: `vendor/bin/phpstan analyse --no-progress --memory-limit=1G`
 
 #### Manual
 
-- [ ] 3.3 Przegląd, że wiersze w `PrivacyMatrixTest` jasno opisują regułę własności
+- [x] 3.3 Przegląd, że wiersze w `PrivacyMatrixTest` jasno opisują regułę własności
