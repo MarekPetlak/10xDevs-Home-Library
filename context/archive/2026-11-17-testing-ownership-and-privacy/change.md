@@ -1,10 +1,10 @@
 ---
 change_id: testing-ownership-and-privacy
 title: Testing ownership and privacy
-status: impl_reviewed
+status: archived
 created: 2026-11-17
 updated: 2026-11-17
-archived_at: null
+archived_at: 2026-11-17T19:05:17Z
 ---
 
 ## Notes
