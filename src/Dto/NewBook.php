@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace App\Dto;
 
+use App\Entity\Author;
+use App\Entity\Book;
+use App\Entity\Tag;
 use App\Enum\Category;
 use App\Service\NameList;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -48,6 +51,23 @@ final class NewBook
     #[Assert\Length(max: 2000)]
     public ?string $description = null {
         set => null === $value || '' === trim($value) ? null : trim($value);
+    }
+
+    /**
+     * Prefill for the edit form: authors and tags become the comma-separated text the form shows.
+     */
+    public static function fromBook(Book $book): self
+    {
+        $input = new self();
+        $input->title = $book->getTitle();
+        $input->authors = implode(', ', $book->getAuthors()->map(static fn (Author $a): string => $a->getFullName())->toArray());
+        $input->isbn = $book->getIsbn();
+        $input->publicationYear = $book->getPublicationYear();
+        $input->category = $book->getCategory();
+        $input->tags = implode(', ', $book->getTags()->map(static fn (Tag $t): string => $t->getName())->toArray());
+        $input->description = $book->getDescription();
+
+        return $input;
     }
 
     #[Assert\Callback]

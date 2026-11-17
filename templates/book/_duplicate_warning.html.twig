@@ -1,10 +1,11 @@
 {#
-    Warning shown above the add-book form when similar books already exist. Input: duplicates, a list of DuplicateMatch.
-    It only warns; the "Add anyway" button in the form is the user's decision.
+    Warning shown above the add/edit-book form when similar books already exist. Input: duplicates, a list of DuplicateMatch;
+    optional hint, a translation key replacing the default hint text.
+    It only warns; the "save anyway" button in the form is the user's decision.
 #}
 <div class="alert alert-warning" role="alert">
     <h2 class="h5 alert-heading">{{ ux_icon('bi:exclamation-triangle', {class: 'icon'}) }} {{ 'book.duplicate.heading'|trans }}</h2>
-    <p>{{ 'book.duplicate.hint'|trans }}</p>
+    <p>{{ (hint|default('book.duplicate.hint'))|trans }}</p>
     <ul class="mb-0">
         {% for match in duplicates %}
             <li>

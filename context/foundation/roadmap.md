@@ -3,7 +3,7 @@ project: "My home library"
 version: 1
 status: draft
 created: 2026-11-02
-updated: 2026-11-14
+updated: 2026-11-17
 prd_version: 3
 main_goal: speed
 top_blocker: decisions
@@ -47,7 +47,7 @@ Użytkownik nie pamięta, jakie książki ma w domowej bibliotece i które przec
 | S-04  | home-recommendations           | user can see up to three recommended books on the home page             | S-03          | FR-010, US-01 | done |
 | S-05  | browse-and-search-books        | anyone can browse and search books by title, author and category        | S-02          | FR-003        | done |
 | S-06  | duplicate-book-warning         | user is warned about a duplicate before adding a book                   | S-02          | FR-005, US-01 | done |
-| S-07  | edit-own-book-entry            | user can edit a book they added, after confirmation                     | S-02          | FR-006        | proposed |
+| S-07  | edit-own-book-entry            | user can edit a book they added, after confirmation                     | S-02          | FR-006        | in-progress |
 | S-08  | soft-delete-own-book           | user can delete a book they added without losing others' ratings        | S-02, S-03    | FR-007        | proposed |
 | S-09  | reader-comments-privacy           | comment author can mark a reader comment public or private                    | S-03          | FR-009        | proposed |
 | S-10  | filter-books-by-tag            | anyone can open a tag page from a book's tag and see books with that tag | S-02          | FR-003        | done |
@@ -159,7 +159,7 @@ Brak. Warstwy oznaczone w Baseline jako `partial` (dane, auth, interfejs) są wp
 - **Blockers:** —
 - **Unknowns:** —
 - **Risk:** Wymaga sprawdzenia, że tylko autor wpisu może edytować; edycja nie może gubić ocen i komentarzy (guardrail).
-- **Status:** proposed
+- **Status:** in-progress
 
 ### S-08: Usuwanie własnej książki
 
@@ -241,6 +241,7 @@ Brak. Warstwy oznaczone w Baseline jako `partial` (dane, auth, interfejs) są wp
 - **Import wielu książek naraz** — Why parked: PRD Non-Goals; książki dodawane pojedynczo.
 - **Notatki AI jako dodatkowy sygnał rekomendacji i uzasadnienie rekomendacji** — Why parked: PRD Success Criteria (Secondary), poza kamieniem milowym przy celu `speed`.
 - **Własna domena** — Why parked: plan wdrożenia pomija ją; aplikacja działa na domenie platformy.
+- **Sprzątanie osieroconych autorów i tagów (`cleanup-orphan-authors-tags`)** — Why parked: skutek uboczny edycji z S-07 (ustalenie F3 przeglądu `context/changes/edit-own-book-entry/reviews/impl-review.md`), poza zakresem kamienia milowego M-1 przy celu `speed`; osierocone wiersze `Author`/`Tag` zostają w bazie, a pozostaje do sprawdzenia, czy listy i strony tagów pokazują wpisy bez książek. Wróć do tego jako osobny wycinek po S-07 (niewiadome: sprzątanie przy edycji czy osobno, 404 dla usuniętego tagu).
 
 ## Milestone History
 

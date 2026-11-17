@@ -24,6 +24,8 @@ use Symfony\Component\Clock\NativeClock;
  *
  * Seed: Solaris (tag "klasyka") read by Anna (rating 4 + comment), Ola (rating 1, NO comment) and
  * Ewa, who only read an unrelated novel and is the "other signed-in user".
+ *
+ * Ownership (S-07): only Anna, who added Solaris, may open its edit page or see the "Edytuj" link.
  */
 final class PrivacyMatrixTest extends WebTestCase
 {
@@ -93,7 +95,7 @@ final class PrivacyMatrixTest extends WebTestCase
         $everything = [self::MARKER, self::ANNA_EMAIL, self::OLA_EMAIL, self::ANNA_MASKED, self::OLA_MASKED, self::ANNA_RATING, self::OLA_RATING];
 
         yield 'anonymous on /books' => ['anonymous', 'books', ['Solaris'], $everything, ['#recommendations', '[data-testid="recommendation-card"]', 'form[name="mark_read"]']];
-        yield 'anonymous on /books/{id}' => ['anonymous', 'show', ['Solaris'], $everything, ['#comments', 'form[name="mark_read"]', 'form[action$="/read/remove"]']];
+        yield 'anonymous on /books/{id}' => ['anonymous', 'show', ['Solaris'], $everything, ['#comments', 'form[name="mark_read"]', 'form[action$="/read/remove"]', 'a[href$="/edit"]']];
         yield 'anonymous on /tags/{slug}' => ['anonymous', 'tag', ['Solaris'], $everything, ['#recommendations', 'form[name="mark_read"]']];
 
         // Another reader sees catalogue data only on the list pages; the book page adds the commented record.
@@ -103,7 +105,7 @@ final class PrivacyMatrixTest extends WebTestCase
             'other', 'show',
             [self::MARKER, self::ANNA_MASKED, self::ANNA_RATING],
             [self::ANNA_EMAIL, self::OLA_EMAIL, self::OLA_MASKED, self::OLA_RATING],
-            [],
+            ['a[href$="/edit"]'],
         ];
         yield 'other user on /tags/{slug}' => ['other', 'tag', ['Solaris'], $notOnListPages, []];
 
@@ -172,6 +174,54 @@ final class PrivacyMatrixTest extends WebTestCase
         self::assertCount(0, $this->client->getCrawler()->filter('section#comments article'), $where.' nobody else commented');
     }
 
+    public function testEditLinkIsShownOnlyToTheOwnerOfTheBook(): void
+    {
+        $this->actAs('author');
+        $this->client->request('GET', $this->url('show'));
+
+        self::assertResponseStatusCodeSame(200);
+        self::assertSelectorTextContains('a[href="'.$this->url('edit').'"]', 'Edytuj');
+
+        // Ownership is Book::addedBy: another signed-in user does not get the link (anonymous is in the matrix above).
+        $this->actAs('other');
+        $this->client->request('GET', $this->url('show'));
+
+        self::assertResponseStatusCodeSame(200);
+        self::assertSelectorNotExists('a[href="'.$this->url('edit').'"]');
+    }
+
+    public function testAnonymousIsSentToLoginFromTheEditPage(): void
+    {
+        $this->client->request('GET', $this->url('edit'));
+        self::assertResponseRedirects('/login');
+
+        $this->client->request('POST', $this->url('edit'));
+        self::assertResponseRedirects('/login');
+    }
+
+    public function testSignedInNonOwnerGets403OnTheEditPageForGetAndPost(): void
+    {
+        $this->actAs('other');
+
+        $this->client->request('GET', $this->url('edit'));
+        self::assertResponseStatusCodeSame(403);
+        self::assertSelectorNotExists('form[name="book"]', 'the 403 page must not render the form');
+
+        $this->client->request('POST', $this->url('edit'), ['book' => ['title' => 'Przejęta', 'authors' => 'Jan Kowalski', 'isbn' => '9788373271890', 'publicationYear' => '1822', 'category' => 'poetry']]);
+        self::assertResponseStatusCodeSame(403);
+        self::assertSame('Solaris', $this->em()->getRepository(Book::class)->find($this->book->getId())?->getTitle());
+    }
+
+    public function testOwnerMayOpenTheEditPage(): void
+    {
+        $this->actAs('author');
+
+        $this->client->request('GET', $this->url('edit'));
+
+        self::assertResponseStatusCodeSame(200);
+        self::assertInputValueSame('book[title]', 'Solaris');
+    }
+
     public function testRecommendationBlockShowsAggregateWithoutEmailsOrComments(): void
     {
         $this->actAs('other');
@@ -204,6 +254,7 @@ final class PrivacyMatrixTest extends WebTestCase
         return match ($page) {
             'books' => '/books',
             'show' => '/books/'.$this->book->getId(),
+            'edit' => '/books/'.$this->book->getId().'/edit',
             'tag' => '/tags/klasyka',
         };
     }

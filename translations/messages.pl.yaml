@@ -43,9 +43,15 @@ book:
         rating: '%rating%/5'
     show:
         back: Wróć do listy książek
+        edit: Edytuj
+        updated: Zaktualizowano
     new:
         title: Dodaj książkę
         heading: Dodaj książkę do wspólnej kolekcji
+    edit:
+        title: Edytuj książkę
+        heading: Edytuj książkę
+        back: Wróć do szczegółów książki
     form:
         title: Tytuł
         authors: Autorzy
@@ -59,9 +65,11 @@ book:
         description: Opis
         submit: Zapisz książkę
         confirm_duplicate: Dodaj mimo to
+        confirm_duplicate_edit: Zapisz mimo to
     duplicate:
         heading: W kolekcji jest już podobna książka
         hint: To tylko ostrzeżenie. Sprawdź wymienione książki i zdecyduj, czy mimo to dodać nową.
+        hint_edit: To tylko ostrzeżenie. Sprawdź wymienione książki i zdecyduj, czy mimo to zapisać zmiany.
         reason:
             isbn: ten sam ISBN
             title_author: ten sam tytuł i autor
@@ -69,6 +77,7 @@ book:
         conflict: Nie udało się zapisać książki, bo ktoś równocześnie dodał tego samego autora lub tag. Spróbuj ponownie.
     flash:
         added: Książka została dodana do kolekcji.
+        updated: Zmiany w książce zostały zapisane.
     category:
         novel: Powieść
         crime: Kryminał

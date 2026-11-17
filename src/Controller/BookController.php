@@ -13,6 +13,7 @@ use App\Form\BookType;
 use App\Form\MarkReadType;
 use App\Repository\BookRepository;
 use App\Repository\ReadBookRepository;
+use App\Security\BookVoter;
 use App\Service\BookManager;
 use App\Service\DuplicateFinder;
 use App\Service\RecommendationService;
@@ -114,5 +115,47 @@ final class BookController extends AbstractController
         $response = new Response(status: $form->isSubmitted() ? Response::HTTP_BAD_REQUEST : Response::HTTP_OK);
 
         return $this->render('book/new.html.twig', ['form' => $form], $response);
+    }
+
+    #[Route('/books/{id}/edit', name: 'book_edit', requirements: ['id' => '\d+'], methods: ['GET', 'POST'])]
+    #[IsGranted('ROLE_USER')]
+    public function edit(int $id, Request $request, BookRepository $bookRepository, BookManager $bookManager, DuplicateFinder $duplicateFinder, TranslatorInterface $translator): Response
+    {
+        $book = $bookRepository->find($id) ?? throw $this->createNotFoundException();
+        $this->denyAccessUnlessGranted(BookVoter::EDIT, $book);
+
+        $form = $this->createForm(BookType::class, NewBook::fromBook($book), ['confirm_label' => 'book.form.confirm_duplicate_edit']);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            // The clicked button is the user's decision; the warning never blocks a confirmed save (FR-005).
+            $confirmButton = $form->get('confirm_duplicate');
+            \assert($confirmButton instanceof SubmitButton);
+            if (!$confirmButton->isClicked()) {
+                // The edited book must not warn about itself.
+                $duplicates = $duplicateFinder->find($form->getData(), $book->getId());
+                if ([] !== $duplicates) {
+                    return $this->render('book/edit.html.twig', ['book' => $book, 'form' => $form, 'duplicates' => $duplicates], new Response(status: Response::HTTP_BAD_REQUEST));
+                }
+            }
+
+            try {
+                $bookManager->update($book, $form->getData());
+            } catch (BookConflictException) {
+                // A concurrent request created the same author or tag first: keep the input, ask to retry.
+                $form->addError(new FormError($translator->trans('book.error.conflict')));
+
+                return $this->render('book/edit.html.twig', ['book' => $book, 'form' => $form], new Response(status: Response::HTTP_BAD_REQUEST));
+            }
+
+            $this->addFlash('success', $translator->trans('book.flash.updated'));
+
+            return $this->redirectToRoute('book_show', ['id' => $id]);
+        }
+
+        // An explicit 400 response keeps render() from switching an invalid form to 422.
+        $response = new Response(status: $form->isSubmitted() ? Response::HTTP_BAD_REQUEST : Response::HTTP_OK);
+
+        return $this->render('book/edit.html.twig', ['book' => $book, 'form' => $form], $response);
     }
 }

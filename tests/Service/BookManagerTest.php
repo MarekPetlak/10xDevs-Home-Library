@@ -20,6 +20,9 @@ use Doctrine\DBAL\Driver\Exception as DriverException;
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
+use Symfony\Component\Clock\Clock;
+use Symfony\Component\Clock\MockClock;
+use Symfony\Component\Clock\NativeClock;
 
 final class BookManagerTest extends KernelTestCase
 {
@@ -34,6 +37,12 @@ final class BookManagerTest extends KernelTestCase
         $this->bookManager = $container->get(BookManager::class);
         $this->entityManager = $container->get(EntityManagerInterface::class);
         $this->user = $container->get(UserManager::class)->create('anna@example.com', 'secret-pass');
+    }
+
+    protected function tearDown(): void
+    {
+        Clock::set(new NativeClock());
+        parent::tearDown();
     }
 
     public function testAddStoresBookAuthorsTagsAndAddedBy(): void
@@ -166,6 +175,80 @@ final class BookManagerTest extends KernelTestCase
         self::assertSame('Poemat dramatyczny.', $with->getDescription());
         self::assertNull($blank->getDescription());
         self::assertNull($none->getDescription());
+    }
+
+    public function testUpdateReplacesAuthorsAndTagsAndKeepsAddedByAndCreatedAt(): void
+    {
+        Clock::set(new MockClock('2026-11-17 10:00:00', 'Europe/Warsaw'));
+        $book = $this->bookManager->add($this->input(authors: 'Adam Mickiewicz, Anna Nowak', tags: 'poezja, klasyka'), $this->user);
+        $createdAt = $book->getCreatedAt();
+        $bookId = $book->getId();
+
+        $edit = $this->input(title: 'Pan Tadeusz', authors: 'Anna Nowak, Jan Kowalski', tags: 'Klasyka, epopeja', description: 'Epopeja.');
+        $edit->publicationYear = 1834;
+        $edit->category = Category::Novel;
+        $this->bookManager->update($book, $edit);
+
+        $this->entityManager->clear();
+        $stored = $this->entityManager->getRepository(Book::class)->find($bookId);
+
+        self::assertNotNull($stored);
+        self::assertSame('Pan Tadeusz', $stored->getTitle());
+        self::assertSame(1834, $stored->getPublicationYear());
+        self::assertSame(Category::Novel, $stored->getCategory());
+        self::assertSame('Epopeja.', $stored->getDescription());
+        self::assertEqualsCanonicalizing(['Anna Nowak', 'Jan Kowalski'], $stored->getAuthors()->map(static fn (Author $a): string => $a->getFullName())->toArray());
+        self::assertEqualsCanonicalizing(['klasyka', 'epopeja'], $stored->getTags()->map(static fn (Tag $t): string => $t->getName())->toArray());
+        self::assertSame('anna@example.com', $stored->getAddedBy()->getEmail());
+        self::assertSame($createdAt->getTimestamp(), $stored->getCreatedAt()->getTimestamp());
+        // The Tag "poezja" and Author "Adam Mickiewicz" are left orphaned on purpose, not deleted.
+        self::assertCount(3, $this->entityManager->getRepository(Author::class)->findAll());
+        self::assertCount(3, $this->entityManager->getRepository(Tag::class)->findAll());
+    }
+
+    public function testUpdateSetsUpdatedAtFromTheClockOnEverySave(): void
+    {
+        $book = $this->bookManager->add($this->input(), $this->user);
+        $neverEdited = $book->getUpdatedAt();
+        self::assertNull($neverEdited);
+
+        Clock::set(new MockClock('2026-11-17 10:00:00', 'Europe/Warsaw'));
+        $this->bookManager->update($book, $this->input());
+        self::assertSame((new \DateTimeImmutable('2026-11-17 10:00:00 Europe/Warsaw'))->getTimestamp(), $book->getUpdatedAt()?->getTimestamp());
+
+        Clock::set(new MockClock('2026-11-18 08:30:00', 'Europe/Warsaw'));
+        $this->bookManager->update($book, $this->input());
+
+        $this->entityManager->clear();
+        $stored = $this->entityManager->getRepository(Book::class)->find($book->getId());
+        self::assertSame((new \DateTimeImmutable('2026-11-18 08:30:00 Europe/Warsaw'))->getTimestamp(), $stored?->getUpdatedAt()?->getTimestamp());
+    }
+
+    public function testUpdateWithEmptyTagsRemovesAllTags(): void
+    {
+        $book = $this->bookManager->add($this->input(tags: 'poezja'), $this->user);
+
+        $this->bookManager->update($book, $this->input(tags: ''));
+
+        self::assertCount(0, $book->getTags());
+    }
+
+    public function testLostRaceDuringUpdateBecomesABookConflictException(): void
+    {
+        $entityManager = $this->createMock(EntityManagerInterface::class);
+        $entityManager->expects(self::once())->method('wrapInTransaction')->willThrowException(
+            new UniqueConstraintViolationException($this->createStub(DriverException::class), null),
+        );
+        $manager = new BookManager(
+            $entityManager,
+            $this->createStub(AuthorRepository::class),
+            $this->createStub(TagRepository::class),
+            new TagSlugger($this->createStub(TagRepository::class)),
+        );
+
+        $this->expectException(BookConflictException::class);
+
+        $manager->update(new Book(), $this->input());
     }
 
     private function input(

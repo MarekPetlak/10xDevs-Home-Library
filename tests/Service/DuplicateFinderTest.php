@@ -93,6 +93,27 @@ final class DuplicateFinderTest extends KernelTestCase
         self::assertTrue($matches[0]->sameTitleAndAuthor);
     }
 
+    public function testExcludedBookIsNeverReportedAsItsOwnDuplicate(): void
+    {
+        $edited = $this->stored('Dziady', 'Adam Mickiewicz', '9788373271890');
+        $other = $this->stored('Inna', 'Jan Kowalski', '9788373271890');
+        $input = $this->input('Dziady', 'Adam Mickiewicz', '9788373271890');
+
+        self::assertCount(2, $this->finder->find($input));
+
+        $matches = $this->finder->find($input, $edited->getId());
+
+        self::assertCount(1, $matches);
+        self::assertSame($other, $matches[0]->book);
+    }
+
+    public function testExcludingTheOnlyMatchingBookLeavesNoMatches(): void
+    {
+        $edited = $this->stored('Dziady', 'Adam Mickiewicz', '9788373271890');
+
+        self::assertSame([], $this->finder->find($this->input('Dziady', 'Adam Mickiewicz', '9788373271890'), $edited->getId()));
+    }
+
     public function testNothingStoredMeansNoMatches(): void
     {
         self::assertSame([], $this->finder->find($this->input('Dziady', 'Adam Mickiewicz', '9788373271890')));

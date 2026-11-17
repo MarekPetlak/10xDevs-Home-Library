@@ -14,9 +14,10 @@ use App\Repository\AuthorRepository;
 use App\Repository\TagRepository;
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\Clock\Clock;
 
 /**
- * Creates a Book from already validated input.
+ * Creates and updates a Book from already validated input.
  */
 final class BookManager
 {
@@ -41,30 +42,77 @@ final class BookManager
         }
     }
 
+    /**
+     * Replaces the editable fields, authors and tags; addedBy and createdAt stay as they are.
+     *
+     * @throws BookConflictException when a concurrent request created the same author or tag first
+     */
+    public function update(Book $book, NewBook $input): Book
+    {
+        try {
+            return $this->entityManager->wrapInTransaction(function () use ($book, $input): Book {
+                $this->applyFields($book, $input);
+                $book->setUpdatedAt(Clock::get()->now());
+                $this->entityManager->flush();
+
+                return $book;
+            });
+        } catch (UniqueConstraintViolationException $e) {
+            // Doctrine closed the EntityManager, so nothing may use it after this point.
+            throw new BookConflictException(previous: $e);
+        }
+    }
+
     private function save(NewBook $input, User $user): Book
     {
         return $this->entityManager->wrapInTransaction(function () use ($input, $user): Book {
-            $book = (new Book())
-                ->setTitle((string) $input->title)
-                ->setIsbn((string) $input->isbn)
-                ->setPublicationYear((int) $input->publicationYear)
-                ->setCategory($input->category)
-                ->setDescription($input->description)
-                ->setAddedBy($user);
-
-            foreach (NameList::parse($input->authors ?? '') as $entry) {
-                $book->addAuthor($this->findOrCreateAuthor($entry));
-            }
-
-            foreach (NameList::parse($input->tags ?? '') as $name) {
-                $book->addTag($this->findOrCreateTag($name));
-            }
+            $book = (new Book())->setAddedBy($user);
+            $this->applyFields($book, $input);
 
             $this->entityManager->persist($book);
             $this->entityManager->flush();
 
             return $book;
         });
+    }
+
+    /**
+     * Copies the form fields onto the book and makes its authors and tags exactly the listed ones.
+     */
+    private function applyFields(Book $book, NewBook $input): void
+    {
+        $book
+            ->setTitle((string) $input->title)
+            ->setIsbn((string) $input->isbn)
+            ->setPublicationYear((int) $input->publicationYear)
+            ->setCategory($input->category)
+            ->setDescription($input->description);
+
+        $authors = [];
+        foreach (NameList::parse($input->authors ?? '') as $entry) {
+            $authors[] = $this->findOrCreateAuthor($entry);
+        }
+        foreach ($book->getAuthors()->toArray() as $existing) {
+            if (!in_array($existing, $authors, true)) {
+                $book->removeAuthor($existing);
+            }
+        }
+        foreach ($authors as $author) {
+            $book->addAuthor($author);
+        }
+
+        $tags = [];
+        foreach (NameList::parse($input->tags ?? '') as $name) {
+            $tags[] = $this->findOrCreateTag($name);
+        }
+        foreach ($book->getTags()->toArray() as $existing) {
+            if (!in_array($existing, $tags, true)) {
+                $book->removeTag($existing);
+            }
+        }
+        foreach ($tags as $tag) {
+            $book->addTag($tag);
+        }
     }
 
     private function findOrCreateAuthor(string $entry): Author

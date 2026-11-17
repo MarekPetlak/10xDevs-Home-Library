@@ -5,7 +5,12 @@
 {% block body_content %}
     <p><a href="{{ path('book_index') }}">{{ ux_icon('bi:arrow-left', {class: 'icon'}) }} {{ 'book.show.back'|trans }}</a></p>
 
-    <h1 class="h3">{{ book.title }}</h1>
+    <div class="d-flex flex-wrap justify-content-between align-items-start gap-2 mb-1">
+        <h1 class="h3 mb-0">{{ book.title }}</h1>
+        {% if is_granted('BOOK_EDIT', book) %}
+            <a class="btn btn-primary btn-sm" href="{{ path('book_edit', {id: book.id}) }}">{{ 'book.show.edit'|trans }}</a>
+        {% endif %}
+    </div>
     <p class="text-body-secondary">{{ book.authors|map(a => a.fullName)|join(', ') }}</p>
 
     <dl class="row">
@@ -28,6 +33,11 @@
         {% if book.description %}
             <dt class="col-sm-3">{{ 'book.form.description'|trans }}</dt>
             <dd class="col-sm-9">{{ book.description|nl2br }}</dd>
+        {% endif %}
+
+        {% if book.updatedAt is not null %}
+            <dt class="col-sm-3">{{ 'book.show.updated'|trans }}</dt>
+            <dd class="col-sm-9">{{ book.updatedAt|date('d.m.Y') }}</dd>
         {% endif %}
     </dl>
 
