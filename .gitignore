@@ -35,3 +35,5 @@ node_modules/
 /.claude/skills/*
 !/.claude/settings.json
 !/.claude/hooks/
+/.claude/prompts/
+/.claude/.10x-cli-manifest.json
