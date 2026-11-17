@@ -1,0 +1,22 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ 'book.edit.title'|trans }} - {{ parent() }}{% endblock %}
+
+{% block body_content %}
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <p><a href="{{ path('book_show', {id: book.id}) }}">{{ ux_icon('bi:arrow-left', {class: 'icon'}) }} {{ 'book.edit.back'|trans }}</a></p>
+
+            <h1 class="h3 mb-3">{{ 'book.edit.heading'|trans }}</h1>
+
+            {% if duplicates is defined and duplicates is not empty %}
+                {{ include('book/_duplicate_warning.html.twig', {hint: 'book.duplicate.hint_edit'}) }}
+            {% else %}
+                {# "Save anyway" only exists next to the warning; mark it rendered so form() skips it. #}
+                {% do form.confirm_duplicate.setRendered %}
+            {% endif %}
+
+            {{ form(form) }}
+        </div>
+    </div>
+{% endblock %}

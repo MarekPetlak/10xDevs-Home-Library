@@ -58,7 +58,7 @@ final class BookType extends AbstractType
             ])
             // Rendered only next to the duplicate warning; being clicked records the user's decision.
             ->add('confirm_duplicate', SubmitType::class, [
-                'label' => 'book.form.confirm_duplicate',
+                'label' => $options['confirm_label'],
                 'attr' => ['class' => 'btn-outline-secondary'],
             ]);
 
@@ -75,6 +75,9 @@ final class BookType extends AbstractType
     {
         $resolver->setDefaults([
             'data_class' => NewBook::class,
+            // Translation key of the "save despite the warning" button; the edit form words it differently.
+            'confirm_label' => 'book.form.confirm_duplicate',
         ]);
+        $resolver->setAllowedTypes('confirm_label', 'string');
     }
 }

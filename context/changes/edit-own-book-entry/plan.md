@@ -253,27 +253,27 @@ Jedna migracja dodaje nullable kolumnę `book.updated_at` (bez backfillu: `null`
 
 #### Automated
 
-- [x] 1.1 Istniejące testy dodawania i duplikatów przechodzą: `vendor/bin/phpunit tests/Controller/BookControllerTest.php`
-- [x] 1.2 Analiza statyczna przechodzi: `vendor/bin/phpstan analyse --no-progress --memory-limit=1G`
-- [x] 1.3 Testy jednostkowe/serwisowe dla `BookVoter`, `BookManager::update` i `DuplicateFinder` z wykluczeniem przechodzą: `vendor/bin/phpunit tests/Service tests/Security`
-- [x] 1.4 Migracja `updated_at` stosuje się, a schemat jest zgodny: `php bin/console doctrine:migrations:migrate --no-interaction` i `php bin/console doctrine:schema:validate`
+- [x] 1.1 Istniejące testy dodawania i duplikatów przechodzą: `vendor/bin/phpunit tests/Controller/BookControllerTest.php` — a36d9d2
+- [x] 1.2 Analiza statyczna przechodzi: `vendor/bin/phpstan analyse --no-progress --memory-limit=1G` — a36d9d2
+- [x] 1.3 Testy jednostkowe/serwisowe dla `BookVoter`, `BookManager::update` i `DuplicateFinder` z wykluczeniem przechodzą: `vendor/bin/phpunit tests/Service tests/Security` — a36d9d2
+- [x] 1.4 Migracja `updated_at` stosuje się, a schemat jest zgodny: `php bin/console doctrine:migrations:migrate --no-interaction` i `php bin/console doctrine:schema:validate` — a36d9d2
 
 ### Phase 2: Edit route and UI
 
 #### Automated
 
-- [ ] 2.1 Testy przechodzą: `vendor/bin/phpunit`
-- [ ] 2.2 Analiza statyczna przechodzi: `vendor/bin/phpstan analyse --no-progress --memory-limit=1G`
-- [ ] 2.3 Kontener i trasy poprawne: `php bin/console lint:container` i `php bin/console debug:router book_edit`
-- [ ] 2.4 Szablony poprawne: `php bin/console lint:twig templates`
+- [x] 2.1 Testy przechodzą: `vendor/bin/phpunit`
+- [x] 2.2 Analiza statyczna przechodzi: `vendor/bin/phpstan analyse --no-progress --memory-limit=1G`
+- [x] 2.3 Kontener i trasy poprawne: `php bin/console lint:container` i `php bin/console debug:router book_edit`
+- [x] 2.4 Szablony poprawne: `php bin/console lint:twig templates`
 
 #### Manual
 
-- [ ] 2.5 Właściciel widzi „Edytuj” na własnej książce, formularz jest wypełniony, zapis zmienia dane i pokazuje flash
-- [ ] 2.6 Na cudzej książce nie ma linku, a wejście na `/books/{id}/edit` daje 403
-- [ ] 2.7 Zmiana ISBN na istniejący w innej książce pokazuje ostrzeżenie z „zapisz mimo to”
-- [ ] 2.8 Oceny i komentarze innych użytkowników nadal widoczne po edycji
-- [ ] 2.9 Po edycji strona książki pokazuje „Zaktualizowano” z dzisiejszą datą, a nieedytowana książka tego wiersza nie ma
+- [x] 2.5 Właściciel widzi „Edytuj” na własnej książce, formularz jest wypełniony, zapis zmienia dane i pokazuje flash
+- [x] 2.6 Na cudzej książce nie ma linku, a wejście na `/books/{id}/edit` daje 403
+- [x] 2.7 Zmiana ISBN na istniejący w innej książce pokazuje ostrzeżenie z „zapisz mimo to”
+- [x] 2.8 Oceny i komentarze innych użytkowników nadal widoczne po edycji
+- [x] 2.9 Po edycji strona książki pokazuje „Zaktualizowano” z dzisiejszą datą, a nieedytowana książka tego wiersza nie ma
 
 ### Phase 3: Tests
 
