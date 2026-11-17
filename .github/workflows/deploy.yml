@@ -43,6 +43,12 @@ jobs:
       - name: Install dependencies
         run: composer install --no-interaction --prefer-dist --no-progress
 
+      - name: Warm up dev container (PHPStan reads it)
+        run: php bin/console cache:warmup --env=dev
+
+      - name: Static analysis (PHPStan)
+        run: vendor/bin/phpstan analyse --no-progress --memory-limit=1G
+
       - name: Create test database
         run: php bin/console doctrine:database:create --if-not-exists
 

@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "scripts": {
     "e2e": "playwright test",
-    "e2e:update": "playwright test --update-snapshots"
+    "e2e:update": "playwright test --update-snapshots",
+    "test:hooks": "node --test tests/hooks/agent-hooks.test.mjs"
   },
   "repository": {
     "type": "git",

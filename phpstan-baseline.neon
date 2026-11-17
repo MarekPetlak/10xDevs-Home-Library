@@ -1,0 +1,43 @@
+parameters:
+	ignoreErrors:
+		-
+			message: '#^Parameter \#1 \$array \(list\<mixed\>\) of array_values is already a list, call has no effect\.$#'
+			identifier: arrayValues.list
+			count: 1
+			path: src/Repository/BookRepository.php
+
+		-
+			message: '#^Call to an undefined method DOMNode\:\:getAttribute\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: tests/Controller/BookListControllerTest.php
+
+		-
+			message: '#^Match expression does not handle remaining value\: string$#'
+			identifier: match.unhandled
+			count: 2
+			path: tests/Controller/PrivacyMatrixTest.php
+
+		-
+			message: '#^Parameter \#1 \$query of static method App\\Dto\\BookSearch\:\:fromQuery\(\) expects Symfony\\Component\\HttpFoundation\\InputBag\<string\>, Symfony\\Component\\HttpFoundation\\InputBag\<bool\|float\|int\|string\|null\> given\.$#'
+			identifier: argument.type
+			count: 8
+			path: tests/Dto/BookSearchTest.php
+
+		-
+			message: '#^Call to an undefined method Doctrine\\Common\\Collections\\Collection\<int, App\\Entity\\Author\>\:\:isInitialized\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: tests/Repository/BookRepositoryTest.php
+
+		-
+			message: '#^Parameter \#1 \$array \(list\<string\>\) of array_values is already a list, call has no effect\.$#'
+			identifier: arrayValues.list
+			count: 1
+			path: tests/Repository/BookRepositoryTest.php
+
+		-
+			message: '#^Call to function method_exists\(\) with ''Symfony\\\\Component\\\\Dotenv\\\\Dotenv'' and ''bootEnv'' will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
+			count: 1
+			path: tests/bootstrap.php
