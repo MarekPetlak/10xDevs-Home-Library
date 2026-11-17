@@ -178,18 +178,18 @@ None. New or changed files are tests and one documentation file.
 
 #### Automated
 
-- [x] 2.1 Matrix test passes: `php bin/phpunit tests/Controller/PrivacyMatrixTest.php`
-- [x] 2.2 Full suite passes: `php bin/phpunit`
-- [x] 2.3 Mutation check: removing `r.comment IS NOT NULL` on purpose turns a matrix case red; file restored via git
-- [x] 2.4 Mutation check: removing `mask_email` on purpose turns a matrix case red; file restored via git
+- [x] 2.1 Matrix test passes: `php bin/phpunit tests/Controller/PrivacyMatrixTest.php` — 4821691
+- [x] 2.2 Full suite passes: `php bin/phpunit` — 4821691
+- [x] 2.3 Mutation check: removing `r.comment IS NOT NULL` on purpose turns a matrix case red; file restored via git — 4821691
+- [x] 2.4 Mutation check: removing `mask_email` on purpose turns a matrix case red; file restored via git — 4821691
 
 ### Phase 3: Cookbook and gate
 
 #### Automated
 
-- [ ] 3.1 No TBD left in §6.3 and §6.4 of `test-plan.md`
-- [ ] 3.2 Suite still green: `php bin/phpunit`
+- [x] 3.1 No TBD left in §6.3 and §6.4 of `test-plan.md`
+- [x] 3.2 Suite still green: `php bin/phpunit`
 
 #### Manual
 
-- [ ] 3.3 §6.3 and §6.4 are enough to add an ownership test and a privacy test without other help
+- [x] 3.3 §6.3 and §6.4 are enough to add an ownership test and a privacy test without other help
