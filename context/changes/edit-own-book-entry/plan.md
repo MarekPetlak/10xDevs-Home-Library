@@ -279,9 +279,9 @@ Jedna migracja dodaje nullable kolumnę `book.updated_at` (bez backfillu: `null`
 
 #### Automated
 
-- [x] 3.1 Wszystkie testy przechodzą: `vendor/bin/phpunit`
-- [x] 3.2 Analiza statyczna przechodzi: `vendor/bin/phpstan analyse --no-progress --memory-limit=1G`
+- [x] 3.1 Wszystkie testy przechodzą: `vendor/bin/phpunit` — c123c53
+- [x] 3.2 Analiza statyczna przechodzi: `vendor/bin/phpstan analyse --no-progress --memory-limit=1G` — c123c53
 
 #### Manual
 
-- [x] 3.3 Przegląd, że wiersze w `PrivacyMatrixTest` jasno opisują regułę własności
+- [x] 3.3 Przegląd, że wiersze w `PrivacyMatrixTest` jasno opisują regułę własności — c123c53
