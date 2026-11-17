@@ -47,7 +47,7 @@ Użytkownik nie pamięta, jakie książki ma w domowej bibliotece i które przec
 | S-04  | home-recommendations           | user can see up to three recommended books on the home page             | S-03          | FR-010, US-01 | done |
 | S-05  | browse-and-search-books        | anyone can browse and search books by title, author and category        | S-02          | FR-003        | done |
 | S-06  | duplicate-book-warning         | user is warned about a duplicate before adding a book                   | S-02          | FR-005, US-01 | done |
-| S-07  | edit-own-book-entry            | user can edit a book they added, after confirmation                     | S-02          | FR-006        | in-progress |
+| S-07  | edit-own-book-entry            | user can edit a book they added, after confirmation                     | S-02          | FR-006        | done |
 | S-08  | soft-delete-own-book           | user can delete a book they added without losing others' ratings        | S-02, S-03    | FR-007        | proposed |
 | S-09  | reader-comments-privacy           | comment author can mark a reader comment public or private                    | S-03          | FR-009        | proposed |
 | S-10  | filter-books-by-tag            | anyone can open a tag page from a book's tag and see books with that tag | S-02          | FR-003        | done |
@@ -159,7 +159,7 @@ Brak. Warstwy oznaczone w Baseline jako `partial` (dane, auth, interfejs) są wp
 - **Blockers:** —
 - **Unknowns:** —
 - **Risk:** Wymaga sprawdzenia, że tylko autor wpisu może edytować; edycja nie może gubić ocen i komentarzy (guardrail).
-- **Status:** in-progress
+- **Status:** done
 
 ### S-08: Usuwanie własnej książki
 
@@ -258,3 +258,4 @@ Brak. Warstwy oznaczone w Baseline jako `partial` (dane, auth, interfejs) są wp
 - **S-05: anyone, also when not logged in, can browse and search books by title, author and category (bez ocen, komentarzy i statusu przeczytania).** — Archived 2026-11-12 → `context/archive/2026-11-12-browse-and-search-books/`. Lesson: —.
 - **S-06: user is warned about a duplicate (tytuł i autor bez względu na wielkość liter i zbędne spacje, oraz ISBN) before a book is saved, and decides whether to add it anyway.** — Archived 2026-11-14 → `context/archive/2026-11-14-duplicate-book-warning/`. Lesson: —.
 - **S-10: anyone, also when not logged in, can open a tag page from a tag on a book's detail page and see the books with that tag (strona `/tags/{slug}`, jeden tag, ta sama tabela i paginacja co lista książek, bez danych osobistych).** — Archived 2026-11-14 → `context/archive/2026-11-14-filter-books-by-tag/`. Lesson: —.
+- **S-07: user can edit a book they added, after confirming the change; other users cannot edit it.** — Archived 2026-11-17 → `context/archive/2026-11-17-edit-own-book-entry/`. Lesson: —.
