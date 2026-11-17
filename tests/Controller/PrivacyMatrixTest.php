@@ -184,7 +184,7 @@ final class PrivacyMatrixTest extends WebTestCase
         $card = $this->client->getCrawler()->filter('#recommendations')->text();
         self::assertStringContainsString('Solaris', $card, $where);
         self::assertStringContainsString('2,5', $card, $where.' average of 4 and 1');
-        self::assertStringContainsString('2', $cards->eq(0)->text(), $where.' rating count');
+        self::assertStringContainsString('Średnia ocena: 2,5 (liczba ocen: 2)', $cards->eq(0)->text(), $where.' average and rating count');
         foreach ([self::ANNA_EMAIL, self::ANNA_MASKED, self::OLA_EMAIL, self::OLA_MASKED, self::MARKER, self::ANNA_RATING, self::OLA_RATING] as $needle) {
             self::assertStringNotContainsString($needle, $this->client->getCrawler()->filter('#recommendations')->html(), sprintf('%s must not leak "%s"', $where, $needle));
         }

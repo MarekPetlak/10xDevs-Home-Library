@@ -113,7 +113,7 @@ Jak dodawać testy w tym projekcie. Każda podsekcja jest wypełniana po dostarc
 - TBD — see §3 Phase 2 (wzorzec dla zapytań z bazą i zachowania danych po soft delete).
 
 ### 6.3 Adding an ownership / authorization test
-- **Gdzie:** `tests/Controller/`, w pliku kontrolera, którego trasę chroni test (dla rekordów przeczytania: `ReadBookControllerTest.php`). Nazwa: `test<Akcja>By<Rola>...` opisująca, kto próbuje i co ma zostać nietknięte.
+- **Gdzie:** `tests/Controller/`, w pliku kontrolera, którego trasę chroni test (dla rekordów przeczytania: `ReadBookControllerTest.php`). Nazwa zaczyna się od `test` i mówi, kto działa i co ma zostać nietknięte (np. `testRemoveByUserWithoutOwnRecordLeavesAnotherUsersRecordUntouched`).
 - **Wzorzec:** dwóch użytkowników (`UserManager::create`), użytkownik A ma rekord, użytkownik B wykonuje żądanie z poprawnym tokenem CSRF. Asercje: przekierowanie albo odmowa (kod odpowiedzi, nie tekst komunikatu) oraz stan bazy odczytany po `$em->clear()` — rekord A istnieje z niezmienionymi wartościami.
 - **Test referencyjny:** `ReadBookControllerTest::testRemoveByUserWithoutOwnRecordLeavesAnotherUsersRecordUntouched` (uzupełnia `testRemoveOnlyAffectsTheCurrentUsersOwnRecord`).
 - **Uruchomienie:** `php bin/phpunit tests/Controller/ReadBookControllerTest.php`
