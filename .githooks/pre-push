@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+# Pre-push gate: PHPStan over the whole project (src, tests; phpstan-baseline.neon applies).
+# Same command as the "Static analysis (PHPStan)" step in .github/workflows/deploy.yml.
+# Enable once per clone: git config core.hooksPath .githooks
+set -e
+cd "$(git rev-parse --show-toplevel)"
+export NO_COLOR=1
+# PHPStan's Symfony extension reads the dev container XML; build it if missing.
+php bin/console cache:warmup --env=dev --no-interaction >/dev/null
+php vendor/bin/phpstan analyse --no-progress --memory-limit=1G
