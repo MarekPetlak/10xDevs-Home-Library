@@ -296,18 +296,18 @@ Instant nullable ADD COLUMN on MariaDB 10.3+ plus an in-place index build (produ
 
 #### Automated
 
-- [x] 3.1 Controller tests pass: `php bin/phpunit tests/Controller`
-- [x] 3.2 Whole suite passes: `php bin/phpunit`
-- [x] 3.3 Static analysis passes: `php vendor/bin/phpstan analyse --no-progress --memory-limit=1G`
-- [x] 3.4 Twig lint passes: `php bin/console lint:twig templates`
-- [x] 3.5 YAML lint passes: `php bin/console lint:yaml translations config`
-- [x] 3.6 Container lint passes: `php bin/console lint:container`
-- [x] 3.7 Schema valid: `php bin/console doctrine:schema:validate`
-- [x] 3.8 UI token-scan grep from AGENTS.md prints nothing for `templates/book/*`
+- [x] 3.1 Controller tests pass: `php bin/phpunit tests/Controller` — 26c7c3f
+- [x] 3.2 Whole suite passes: `php bin/phpunit` — 26c7c3f
+- [x] 3.3 Static analysis passes: `php vendor/bin/phpstan analyse --no-progress --memory-limit=1G` — 26c7c3f
+- [x] 3.4 Twig lint passes: `php bin/console lint:twig templates` — 26c7c3f
+- [x] 3.5 YAML lint passes: `php bin/console lint:yaml translations config` — 26c7c3f
+- [x] 3.6 Container lint passes: `php bin/console lint:container` — 26c7c3f
+- [x] 3.7 Schema valid: `php bin/console doctrine:schema:validate` — 26c7c3f
+- [x] 3.8 UI token-scan grep from AGENTS.md prints nothing for `templates/book/*` — 26c7c3f
 
 #### Manual
 
-- [x] 3.9 As the owner: the "Usuń" button appears, cancelling the dialog does nothing, confirming returns to the list with the success flash and the book is gone
-- [x] 3.10 As another user: no delete button on someone else's book; a second user's rating and comment on the deleted book still exist in the database
-- [x] 3.11 Anonymous visitor sees no delete button
-- [x] 3.12 Optional: `npm run e2e` locally; owner-visible `detail-*` baselines are not updated without explaining the visual change
+- [x] 3.9 As the owner: the "Usuń" button appears, cancelling the dialog does nothing, confirming returns to the list with the success flash and the book is gone — 26c7c3f
+- [x] 3.10 As another user: no delete button on someone else's book; a second user's rating and comment on the deleted book still exist in the database — 26c7c3f
+- [x] 3.11 Anonymous visitor sees no delete button — 26c7c3f
+- [x] 3.12 Optional: `npm run e2e` locally; owner-visible `detail-*` baselines are not updated without explaining the visual change — 26c7c3f
