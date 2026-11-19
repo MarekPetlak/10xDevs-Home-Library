@@ -32,7 +32,7 @@ class BookRepository extends ServiceEntityRepository
      * One page of the book list, newest first, authors loaded in the same query. Text filters are
      * "contains", ignoring case but not accents (the title and author columns are *_as_ci); % and _ in
      * the input match literally. The author filter is an EXISTS subquery, so a matching book still
-     * lists all of its authors. The single place where a future soft-delete filter (S-08) belongs.
+     * lists all of its authors. Soft-deleted books are never listed.
      *
      * @return Paginator<Book>
      */
@@ -41,6 +41,7 @@ class BookRepository extends ServiceEntityRepository
         $qb = $this->createQueryBuilder('b')
             ->addSelect('a')
             ->leftJoin('b.authors', 'a')
+            ->where('b.deletedAt IS NULL')
             ->orderBy('b.createdAt', 'DESC')
             ->addOrderBy('b.id', 'DESC')
             ->setFirstResult(($search->page - 1) * self::PER_PAGE)
@@ -70,7 +71,7 @@ class BookRepository extends ServiceEntityRepository
      * forms, OR the title is equal (trimmed; case ignored, accents not, by the *_as_ci column collation)
      * AND the book shares at least one of the given authors. No authors means the title rule cannot match;
      * no ISBNs means the ISBN rule cannot match. Both EXISTS-style, so the limit applies to books, not
-     * book-author rows. The S-08 soft-delete filter must be added here too (search() documents the same).
+     * book-author rows. Soft-deleted books are never returned, whatever the rules or excludeBookId say.
      *
      * @param list<Author> $authors persisted authors
      * @param list<string> $isbns   every spelling of the ISBN (see IsbnForms)
@@ -106,6 +107,7 @@ class BookRepository extends ServiceEntityRepository
             return [];
         }
         $qb->andWhere($qb->expr()->orX(...$rules));
+        $qb->andWhere('b.deletedAt IS NULL');
         if (null !== $excludeBookId) {
             $qb->andWhere('b.id != :excludeId')->setParameter('excludeId', $excludeBookId);
         }
@@ -116,8 +118,8 @@ class BookRepository extends ServiceEntityRepository
 
     /**
      * One page of the books carrying a tag, same order, paging and eager loading as search(). The tag
-     * condition is an EXISTS subquery, so each listed book still carries all of its authors. Also a
-     * place for the future soft-delete filter (S-08), like search().
+     * condition is an EXISTS subquery, so each listed book still carries all of its authors. Soft-deleted
+     * books are never listed.
      *
      * @return Paginator<Book>
      */
@@ -130,6 +132,7 @@ class BookRepository extends ServiceEntityRepository
             ->addOrderBy('b.id', 'DESC')
             ->setFirstResult((max(1, $page) - 1) * self::PER_PAGE)
             ->setMaxResults(self::PER_PAGE);
+        $qb->andWhere('b.deletedAt IS NULL');
         $qb->andWhere($qb->expr()->exists(
             'SELECT tb.id FROM '.Book::class.' tb JOIN tb.tags tt WHERE tb.id = b.id AND tt.id = :tag',
         ))->setParameter('tag', $tag->getId());
@@ -145,8 +148,7 @@ class BookRepository extends ServiceEntityRepository
     /**
      * Recommendable books of one category, best first: rated by anyone, not read by the user.
      * Ranked by average rating, then rating count, then title, then id (determinism only).
-     * Books nobody rated never appear. The single place where the soft-delete filter (S-08) belongs
-     * for recommendations.
+     * Books nobody rated never appear; soft-deleted books are never recommended.
      *
      * @return list<RecommendationView>
      */
@@ -159,6 +161,7 @@ class BookRepository extends ServiceEntityRepository
             ->select(sprintf('NEW %s(b.id, b.title, b.category, AVG(r.rating), COUNT(r.id))', RecommendationView::class))
             ->join(ReadBook::class, 'r', 'WITH', 'r.book = b')
             ->where('b.category = :category')
+            ->andWhere('b.deletedAt IS NULL')
             ->andWhere($qb->expr()->notIn('b.id', 'SELECT IDENTITY(own.book) FROM '.ReadBook::class.' own WHERE own.user = :user'))
             ->setParameter('category', $category)
             ->setParameter('user', $user)
@@ -175,7 +178,7 @@ class BookRepository extends ServiceEntityRepository
     }
 
     /**
-     * One book for the detail page with authors and tags loaded. Soft-delete filter (S-08) goes here too.
+     * One book for the detail page with authors and tags loaded; a soft-deleted book is not found.
      */
     public function findForDetail(int $id): ?Book
     {
@@ -184,6 +187,20 @@ class BookRepository extends ServiceEntityRepository
             ->leftJoin('b.authors', 'a')
             ->leftJoin('b.tags', 't')
             ->where('b.id = :id')
+            ->andWhere('b.deletedAt IS NULL')
+            ->setParameter('id', $id)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
+
+    /**
+     * One book by id, or null when it does not exist or is soft-deleted.
+     */
+    public function findActive(int $id): ?Book
+    {
+        return $this->createQueryBuilder('b')
+            ->where('b.id = :id')
+            ->andWhere('b.deletedAt IS NULL')
             ->setParameter('id', $id)
             ->getQuery()
             ->getOneOrNullResult();

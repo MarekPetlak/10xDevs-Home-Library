@@ -121,7 +121,7 @@ final class BookController extends AbstractController
     #[IsGranted('ROLE_USER')]
     public function edit(int $id, Request $request, BookRepository $bookRepository, BookManager $bookManager, DuplicateFinder $duplicateFinder, TranslatorInterface $translator): Response
     {
-        $book = $bookRepository->find($id) ?? throw $this->createNotFoundException();
+        $book = $bookRepository->findActive($id) ?? throw $this->createNotFoundException();
         $this->denyAccessUnlessGranted(BookVoter::EDIT, $book);
 
         $form = $this->createForm(BookType::class, NewBook::fromBook($book), ['confirm_label' => 'book.form.confirm_duplicate_edit']);
@@ -157,5 +157,22 @@ final class BookController extends AbstractController
         $response = new Response(status: $form->isSubmitted() ? Response::HTTP_BAD_REQUEST : Response::HTTP_OK);
 
         return $this->render('book/edit.html.twig', ['book' => $book, 'form' => $form], $response);
+    }
+
+    #[Route('/books/{id}/delete', name: 'book_delete', requirements: ['id' => '\d+'], methods: ['POST'])]
+    #[IsGranted('ROLE_USER')]
+    public function delete(int $id, Request $request, BookRepository $bookRepository, BookManager $bookManager, TranslatorInterface $translator): Response
+    {
+        $book = $bookRepository->findActive($id) ?? throw $this->createNotFoundException();
+        $this->denyAccessUnlessGranted(BookVoter::DELETE, $book);
+
+        if (!$this->isCsrfTokenValid('book_delete', (string) $request->request->get('_token'))) {
+            return new Response($translator->trans('book.error.invalid_token'), Response::HTTP_BAD_REQUEST);
+        }
+
+        $bookManager->delete($book);
+        $this->addFlash('success', $translator->trans('book.flash.deleted'));
+
+        return $this->redirectToRoute('book_index');
     }
 }

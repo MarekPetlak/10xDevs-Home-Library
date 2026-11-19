@@ -7,6 +7,7 @@ namespace App\Tests\Service;
 use App\Dto\NewBook;
 use App\Entity\Author;
 use App\Entity\Book;
+use App\Entity\ReadBook;
 use App\Entity\Tag;
 use App\Entity\User;
 use App\Enum\Category;
@@ -249,6 +250,63 @@ final class BookManagerTest extends KernelTestCase
         $this->expectException(BookConflictException::class);
 
         $manager->update(new Book(), $this->input());
+    }
+
+    public function testDeletingAnAlreadyDeletedBookKeepsTheFirstDeletionTime(): void
+    {
+        $book = $this->bookManager->add($this->input(), $this->user);
+        $bookId = $book->getId();
+
+        Clock::set(new MockClock('2026-11-19 09:15:00', 'Europe/Warsaw'));
+        $this->bookManager->delete($book);
+        Clock::set(new MockClock('2026-11-20 18:30:00', 'Europe/Warsaw'));
+        $this->bookManager->delete($book);
+
+        $this->entityManager->clear();
+        $stored = $this->entityManager->getRepository(Book::class)->find($bookId);
+        self::assertNotNull($stored);
+        self::assertSame((new \DateTimeImmutable('2026-11-19 09:15:00 Europe/Warsaw'))->getTimestamp(), $stored->getDeletedAt()?->getTimestamp());
+    }
+
+    public function testDeleteStampsDeletedAtAndLeavesEverythingElseUnchanged(): void
+    {
+        $book = $this->bookManager->add($this->input(authors: 'Adam Mickiewicz, Anna Nowak', tags: 'poezja, klasyka'), $this->user);
+        $bookId = $book->getId();
+        $other = self::getContainer()->get(UserManager::class)->create('jan@example.com', 'secret-pass');
+        $read = (new ReadBook())
+            ->setUser($other)
+            ->setBook($book)
+            ->setRating(4)
+            ->setReadOn(new \DateTimeImmutable('2026-11-10'))
+            ->setComment('Dobra.');
+        $this->entityManager->persist($read);
+        $this->entityManager->flush();
+        $readId = $read->getId();
+
+        Clock::set(new MockClock('2026-11-19 09:15:00', 'Europe/Warsaw'));
+        $this->bookManager->delete($book);
+
+        $this->entityManager->clear();
+        $stored = $this->entityManager->getRepository(Book::class)->find($bookId);
+
+        self::assertNotNull($stored);
+        self::assertTrue($stored->isDeleted());
+        self::assertSame((new \DateTimeImmutable('2026-11-19 09:15:00 Europe/Warsaw'))->getTimestamp(), $stored->getDeletedAt()?->getTimestamp());
+        self::assertSame('Dziady', $stored->getTitle());
+        self::assertSame(1822, $stored->getPublicationYear());
+        self::assertNull($stored->getUpdatedAt());
+        self::assertSame('anna@example.com', $stored->getAddedBy()->getEmail());
+        self::assertEqualsCanonicalizing(['Adam Mickiewicz', 'Anna Nowak'], $stored->getAuthors()->map(static fn (Author $a): string => $a->getFullName())->toArray());
+        self::assertEqualsCanonicalizing(['poezja', 'klasyka'], $stored->getTags()->map(static fn (Tag $t): string => $t->getName())->toArray());
+        self::assertCount(2, $this->entityManager->getRepository(Author::class)->findAll());
+        self::assertCount(2, $this->entityManager->getRepository(Tag::class)->findAll());
+
+        $storedRead = $this->entityManager->getRepository(ReadBook::class)->find($readId);
+        self::assertNotNull($storedRead);
+        self::assertSame(4, $storedRead->getRating());
+        self::assertSame('Dobra.', $storedRead->getComment());
+        self::assertSame($bookId, $storedRead->getBook()->getId());
+        self::assertSame('jan@example.com', $storedRead->getUser()->getEmail());
     }
 
     private function input(

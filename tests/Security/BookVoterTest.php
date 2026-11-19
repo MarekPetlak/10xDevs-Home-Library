@@ -53,6 +53,28 @@ final class BookVoterTest extends TestCase
         self::assertSame(VoterInterface::ACCESS_DENIED, $this->vote($this->token($unsaved), $book));
     }
 
+    public function testOwnerMayDelete(): void
+    {
+        $owner = $this->user(1);
+        $book = (new Book())->setAddedBy($owner);
+
+        self::assertSame(VoterInterface::ACCESS_GRANTED, $this->vote($this->token($owner), $book, BookVoter::DELETE));
+    }
+
+    public function testOtherUserMayNotDelete(): void
+    {
+        $book = (new Book())->setAddedBy($this->user(1));
+
+        self::assertSame(VoterInterface::ACCESS_DENIED, $this->vote($this->token($this->user(2)), $book, BookVoter::DELETE));
+    }
+
+    public function testAnonymousMayNotDelete(): void
+    {
+        $book = (new Book())->setAddedBy($this->user(1));
+
+        self::assertSame(VoterInterface::ACCESS_DENIED, $this->vote(new NullToken(), $book, BookVoter::DELETE));
+    }
+
     public function testAbstainsOnOtherAttributesAndSubjects(): void
     {
         $voter = new BookVoter();
@@ -60,11 +82,12 @@ final class BookVoterTest extends TestCase
 
         self::assertSame(VoterInterface::ACCESS_ABSTAIN, $voter->vote($token, new Book(), ['SOMETHING_ELSE']));
         self::assertSame(VoterInterface::ACCESS_ABSTAIN, $voter->vote($token, new \stdClass(), [BookVoter::EDIT]));
+        self::assertSame(VoterInterface::ACCESS_ABSTAIN, $voter->vote($token, new \stdClass(), [BookVoter::DELETE]));
     }
 
-    private function vote(TokenInterface $token, Book $book): int
+    private function vote(TokenInterface $token, Book $book, string $attribute = BookVoter::EDIT): int
     {
-        return (new BookVoter())->vote($token, $book, [BookVoter::EDIT]);
+        return (new BookVoter())->vote($token, $book, [$attribute]);
     }
 
     private function token(User $user): TokenInterface

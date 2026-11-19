@@ -11,17 +11,18 @@ use Symfony\Component\Security\Core\Authorization\Voter\Vote;
 use Symfony\Component\Security\Core\Authorization\Voter\Voter;
 
 /**
- * The single rule for who may change a book entry: only the user who added it.
+ * The single rule for who may change or delete a book entry: only the user who added it.
  *
  * @extends Voter<string, Book>
  */
 final class BookVoter extends Voter
 {
     public const EDIT = 'BOOK_EDIT';
+    public const DELETE = 'BOOK_DELETE';
 
     protected function supports(string $attribute, mixed $subject): bool
     {
-        return self::EDIT === $attribute && $subject instanceof Book;
+        return \in_array($attribute, [self::EDIT, self::DELETE], true) && $subject instanceof Book;
     }
 
     protected function voteOnAttribute(string $attribute, mixed $subject, TokenInterface $token, ?Vote $vote = null): bool

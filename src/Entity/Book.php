@@ -15,6 +15,7 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Table(name: 'book')]
 #[ORM\Index(name: 'IDX_BOOK_ISBN', columns: ['isbn'])]
 #[ORM\Index(name: 'IDX_BOOK_CREATED_AT_ID', columns: ['created_at', 'id'])]
+#[ORM\Index(name: 'IDX_BOOK_DELETED_AT', columns: ['deleted_at'])]
 class Book
 {
     #[ORM\Id]
@@ -44,6 +45,10 @@ class Book
     // Null means the entry was never edited.
     #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $updatedAt = null;
+
+    // Null means the entry is active.
+    #[ORM\Column(nullable: true)]
+    private ?\DateTimeImmutable $deletedAt = null;
 
     #[ORM\ManyToOne(targetEntity: User::class)]
     #[ORM\JoinColumn(nullable: false, onDelete: 'RESTRICT')]
@@ -146,6 +151,23 @@ class Book
         $this->updatedAt = $updatedAt;
 
         return $this;
+    }
+
+    public function getDeletedAt(): ?\DateTimeImmutable
+    {
+        return $this->deletedAt;
+    }
+
+    public function setDeletedAt(?\DateTimeImmutable $deletedAt): static
+    {
+        $this->deletedAt = $deletedAt;
+
+        return $this;
+    }
+
+    public function isDeleted(): bool
+    {
+        return null !== $this->deletedAt;
     }
 
     public function getAddedBy(): User

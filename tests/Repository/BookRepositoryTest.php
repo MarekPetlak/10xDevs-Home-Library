@@ -428,6 +428,90 @@ final class BookRepositoryTest extends KernelTestCase
         }
     }
 
+    public function testSearchSkipsADeletedBookAndKeepsAnIdenticalActiveOne(): void
+    {
+        $this->book('Solaris', Category::Novel);
+        $this->softDelete($this->book('Solaris', Category::Novel));
+
+        $result = $this->repository->search(new BookSearch(title: 'Solaris'));
+
+        self::assertSame(['Solaris'], $this->searchTitles($result));
+        self::assertCount(1, $result);
+        self::assertSame(['Solaris'], $this->searchTitles($this->repository->search(new BookSearch(category: Category::Novel))));
+    }
+
+    public function testFindByTagSkipsADeletedBookAndKeepsAnIdenticalActiveOne(): void
+    {
+        $tag = $this->tag('Klasyka');
+        $active = $this->book('Solaris', Category::Novel, tags: [$tag]);
+        $this->softDelete($this->book('Solaris', Category::Novel, tags: [$tag]));
+
+        $result = $this->repository->findByTag($tag, 1);
+
+        self::assertSame([$active], iterator_to_array($result, false));
+        self::assertCount(1, $result);
+    }
+
+    public function testRecommendationCandidatesSkipADeletedBookAndKeepAnIdenticalActiveOne(): void
+    {
+        $active = $this->book('Solaris', Category::Novel);
+        $deleted = $this->book('Solaris', Category::Novel);
+        foreach ([$active, $deleted] as $book) {
+            $this->rate($book, $this->ola, 5);
+            $this->rate($book, $this->ewa, 5);
+        }
+        $this->softDelete($deleted);
+
+        $result = $this->repository->findRecommendationCandidates($this->anna, Category::Novel, 10);
+
+        self::assertSame([$active->getId()], $this->ids($result));
+        self::assertSame(2, $result[0]->ratingCount);
+    }
+
+    public function testDuplicatesByIsbnSkipADeletedBookAndKeepAnIdenticalActiveOne(): void
+    {
+        $active = $this->book('Dziady', Category::Poetry);
+        $active->setIsbn('9788373271890');
+        $deleted = $this->book('Dziady', Category::Poetry);
+        $deleted->setIsbn('9788373271890');
+        $this->entityManager->flush();
+        $this->softDelete($deleted);
+
+        self::assertSame([$active], $this->repository->findDuplicates('Inny tytuł', [], ['9788373271890']));
+        self::assertSame([$active], $this->repository->findDuplicates('Inny tytuł', [], ['9788373271890'], 3, 999999));
+
+        $this->softDelete($active);
+        self::assertSame([], $this->repository->findDuplicates('Inny tytuł', [], ['9788373271890']));
+    }
+
+    public function testDuplicatesByTitleAndAuthorSkipADeletedBookAndKeepAnIdenticalActiveOne(): void
+    {
+        $adam = $this->author('Adam', 'Mickiewicz');
+        $active = $this->book('Dziady', Category::Poetry, authors: [$adam]);
+        $this->softDelete($this->book('Dziady', Category::Poetry, authors: [$adam]));
+
+        self::assertSame([$active], $this->repository->findDuplicates('Dziady', [$adam], []));
+    }
+
+    public function testFindForDetailAndFindActiveSkipADeletedBookAndFindAnIdenticalActiveOne(): void
+    {
+        $active = $this->book('Solaris', Category::Novel, authors: [$this->author('Stanisław', 'Lem')], tags: [$this->tag('Klasyka')]);
+        $deleted = $this->book('Solaris', Category::Novel);
+        $this->softDelete($deleted);
+
+        self::assertSame($active, $this->repository->findForDetail((int) $active->getId()));
+        self::assertSame($active, $this->repository->findActive((int) $active->getId()));
+        self::assertNull($this->repository->findForDetail((int) $deleted->getId()));
+        self::assertNull($this->repository->findActive((int) $deleted->getId()));
+        self::assertNull($this->repository->findActive(999999));
+    }
+
+    private function softDelete(Book $book): void
+    {
+        $book->setDeletedAt(new \DateTimeImmutable('2026-11-01 10:00:00'));
+        $this->entityManager->flush();
+    }
+
     /**
      * @param list<Author> $authors
      * @param list<Tag>    $tags

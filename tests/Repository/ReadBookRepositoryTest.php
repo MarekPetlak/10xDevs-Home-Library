@@ -149,6 +149,27 @@ final class ReadBookRepositoryTest extends KernelTestCase
         self::assertSame([], $this->repository->countByCategorySince($this->anna, new \DateTimeImmutable('2026-01-01')));
     }
 
+    public function testReadsOfADeletedBookAreNotCountedButAnIdenticalActiveBookIs(): void
+    {
+        $active = $this->bookIn('Kryminał A', Category::Crime, '9788308000028');
+        $deleted = $this->bookIn('Kryminał A', Category::Crime, '9788308000035');
+        $this->readOn($this->anna, $active, '2026-05-10');
+        $this->readOn($this->anna, $deleted, '2026-08-20');
+        $deleted->setDeletedAt(new \DateTimeImmutable('2026-09-01 10:00:00'));
+        $this->entityManager->flush();
+
+        $rows = $this->repository->countByCategorySince($this->anna, new \DateTimeImmutable('2026-01-01'));
+
+        self::assertCount(1, $rows);
+        self::assertSame(Category::Crime, $rows[0]['category']);
+        self::assertSame(1, $rows[0]['count']);
+        self::assertSame('2026-05-10', $rows[0]['lastReadOn']->format('Y-m-d'));
+
+        $active->setDeletedAt(new \DateTimeImmutable('2026-09-02 10:00:00'));
+        $this->entityManager->flush();
+        self::assertSame([], $this->repository->countByCategorySince($this->anna, new \DateTimeImmutable('2026-01-01')));
+    }
+
     private function bookIn(string $title, Category $category, string $isbn): Book
     {
         $book = (new Book())

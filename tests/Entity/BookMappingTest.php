@@ -75,6 +75,35 @@ final class BookMappingTest extends KernelTestCase
         self::assertEqualsWithDelta($book->getCreatedAt()->getTimestamp(), $stored->getCreatedAt()->getTimestamp(), 1);
     }
 
+    public function testDeletedAtIsNullByDefaultAndPersisted(): void
+    {
+        $user = (new User())->setEmail('deleted-at@example.com')->setPassword('hash');
+        $book = (new Book())->setTitle('Solaris')->setIsbn('9788308049532')->setPublicationYear(1961)->setAddedBy($user);
+
+        self::assertNull($book->getDeletedAt());
+        self::assertFalse($book->isDeleted());
+
+        $this->entityManager->persist($user);
+        $this->entityManager->persist($book);
+        $this->entityManager->flush();
+        $bookId = $book->getId();
+        $this->entityManager->clear();
+
+        $active = $this->entityManager->find(Book::class, $bookId);
+        self::assertNotNull($active);
+        self::assertNull($active->getDeletedAt());
+        self::assertFalse($active->isDeleted());
+
+        $active->setDeletedAt(new \DateTimeImmutable('2026-11-19 10:00:00'));
+        $this->entityManager->flush();
+        $this->entityManager->clear();
+
+        $deleted = $this->entityManager->find(Book::class, $bookId);
+        self::assertNotNull($deleted);
+        self::assertTrue($deleted->isDeleted());
+        self::assertSame((new \DateTimeImmutable('2026-11-19 10:00:00'))->getTimestamp(), $deleted->getDeletedAt()?->getTimestamp());
+    }
+
     public function testAuthorNameIsUniqueIgnoringCase(): void
     {
         $this->entityManager->persist((new Author())->setFirstName('Olga')->setLastName('Tokarczuk'));

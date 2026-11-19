@@ -270,6 +270,38 @@ final class RecommendationServiceTest extends KernelTestCase
         self::assertSame(['Kryminał', 'Powieść'], $this->titles($result));
     }
 
+    public function testADeletedWellRatedBookIsNeverRecommendedWhileAnIdenticalActiveOneIs(): void
+    {
+        $this->readBy($this->anna, Category::Novel, '2026-03-01');
+        $this->candidate('Powieść', Category::Novel, [3]);
+        $deleted = $this->candidate('Powieść', Category::Novel, [5, 5, 5]);
+        $deleted->setDeletedAt(new \DateTimeImmutable('2026-11-01 10:00:00'));
+        $this->entityManager->flush();
+
+        $result = $this->service->forUser($this->anna);
+
+        self::assertCount(1, $result);
+        self::assertSame('Powieść', $result[0]->title);
+        self::assertSame(3.0, $result[0]->averageRating);
+        self::assertNotSame($deleted->getId(), $result[0]->bookId);
+    }
+
+    public function testReadsOfADeletedBookDoNotMakeItsCategoryRecent(): void
+    {
+        $this->readBy($this->anna, Category::Novel, '2026-03-01');
+        $crime = $this->book('Przeczytany kryminał', Category::Crime);
+        $this->rate($crime, $this->anna, 4, '2026-10-01');
+        $this->rate($crime, $this->raters[0], 4, '2026-10-01');
+        $crime->setDeletedAt(new \DateTimeImmutable('2026-11-01 10:00:00'));
+        $this->entityManager->flush();
+        $this->candidate('Powieść', Category::Novel, [3]);
+        $this->candidate('Kryminał', Category::Crime, [5]);
+
+        $result = $this->service->forUser($this->anna);
+
+        self::assertSame(['Powieść'], $this->titles($result));
+    }
+
     /**
      * A book the user read in the given category on the given day.
      */

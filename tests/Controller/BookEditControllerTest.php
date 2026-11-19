@@ -285,6 +285,25 @@ final class BookEditControllerTest extends WebTestCase
         self::assertResponseStatusCodeSame(404);
     }
 
+    public function testDeletedBookReturns404EvenForItsOwner(): void
+    {
+        static::getContainer()->get(EntityManagerInterface::class)->getConnection()
+            ->executeStatement('UPDATE book SET deleted_at = ? WHERE id = ?', ['2026-11-09 10:00:00', $this->book->getId()]);
+
+        $this->client->request('GET', $this->editUrl());
+        self::assertResponseStatusCodeSame(404);
+
+        $this->client->request('POST', $this->editUrl(), ['book' => [
+            'title' => 'Przejęta',
+            'authors' => 'Adam Mickiewicz',
+            'isbn' => '9788373271890',
+            'publicationYear' => '1822',
+            'category' => 'poetry',
+        ]]);
+        self::assertResponseStatusCodeSame(404);
+        self::assertSame('Dziady', $this->storedBook()->getTitle());
+    }
+
     /**
      * Opens the real edit form and submits it with the given field overrides.
      *

@@ -57,8 +57,8 @@ final class ReadBookController extends AbstractController
     #[IsGranted('ROLE_USER')]
     public function remove(int $id, Request $request, BookRepository $bookRepository, ReadingManager $readingManager, TranslatorInterface $translator): Response
     {
-        // Only the existence of the book matters here, so no authors or tags are joined.
-        $book = $bookRepository->find($id) ?? throw $this->createNotFoundException();
+        // Only the existence of an active (not soft-deleted) book matters here, so no authors or tags are joined.
+        $book = $bookRepository->findActive($id) ?? throw $this->createNotFoundException();
         $user = $this->getUser();
         \assert($user instanceof User);
 
