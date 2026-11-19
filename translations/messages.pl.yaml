@@ -44,7 +44,10 @@ book:
     show:
         back: Wróć do listy książek
         edit: Edytuj
+        delete: Usuń
         updated: Zaktualizowano
+    delete:
+        confirm: Książka zniknie ze wszystkich list. Oceny i komentarze innych użytkowników zostaną zachowane. Kontynuować?
     new:
         title: Dodaj książkę
         heading: Dodaj książkę do wspólnej kolekcji
@@ -75,9 +78,11 @@ book:
             title_author: ten sam tytuł i autor
     error:
         conflict: Nie udało się zapisać książki, bo ktoś równocześnie dodał tego samego autora lub tag. Spróbuj ponownie.
+        invalid_token: Nie udało się usunąć książki, bo strona jest nieaktualna. Odśwież stronę i spróbuj ponownie.
     flash:
         added: Książka została dodana do kolekcji.
         updated: Zmiany w książce zostały zapisane.
+        deleted: Książka została usunięta.
     category:
         novel: Powieść
         crime: Kryminał

@@ -190,6 +190,26 @@ final class PrivacyMatrixTest extends WebTestCase
         self::assertSelectorNotExists('a[href="'.$this->url('edit').'"]');
     }
 
+    public function testDeleteButtonIsShownOnlyToTheOwnerOfTheBook(): void
+    {
+        $selector = 'form[action="/books/'.$this->book->getId().'/delete"] button[type="submit"]';
+
+        $this->actAs('author');
+        $this->client->request('GET', $this->url('show'));
+        self::assertResponseStatusCodeSame(200);
+        self::assertSelectorTextContains($selector, 'Usuń');
+
+        $this->actAs('other');
+        $this->client->request('GET', $this->url('show'));
+        self::assertResponseStatusCodeSame(200);
+        self::assertSelectorNotExists('form[action$="/delete"]');
+
+        $this->client->getCookieJar()->clear();
+        $this->client->request('GET', $this->url('show'));
+        self::assertResponseStatusCodeSame(200);
+        self::assertSelectorNotExists('form[action$="/delete"]');
+    }
+
     public function testAnonymousIsSentToLoginFromTheEditPage(): void
     {
         $this->client->request('GET', $this->url('edit'));

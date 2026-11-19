@@ -7,9 +7,17 @@
 
     <div class="d-flex flex-wrap justify-content-between align-items-start gap-2 mb-1">
         <h1 class="h3 mb-0">{{ book.title }}</h1>
-        {% if is_granted('BOOK_EDIT', book) %}
-            <a class="btn btn-primary btn-sm" href="{{ path('book_edit', {id: book.id}) }}">{{ 'book.show.edit'|trans }}</a>
-        {% endif %}
+        <div class="d-flex flex-wrap align-items-start gap-2">
+            {% if is_granted('BOOK_EDIT', book) %}
+                <a class="btn btn-primary btn-sm" href="{{ path('book_edit', {id: book.id}) }}">{{ 'book.show.edit'|trans }}</a>
+            {% endif %}
+            {% if is_granted('BOOK_DELETE', book) %}
+                <form method="post" action="{{ path('book_delete', {id: book.id}) }}" onsubmit="return confirm({{ 'book.delete.confirm'|trans|json_encode(constant('JSON_UNESCAPED_UNICODE')) }});">
+                    <input type="hidden" name="_token" value="{{ csrf_token('book_delete') }}">
+                    <button type="submit" class="btn btn-outline-danger btn-sm">{{ 'book.show.delete'|trans }}</button>
+                </form>
+            {% endif %}
+        </div>
     </div>
     <p class="text-body-secondary">{{ book.authors|map(a => a.fullName)|join(', ') }}</p>
 

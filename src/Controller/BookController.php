@@ -158,4 +158,21 @@ final class BookController extends AbstractController
 
         return $this->render('book/edit.html.twig', ['book' => $book, 'form' => $form], $response);
     }
+
+    #[Route('/books/{id}/delete', name: 'book_delete', requirements: ['id' => '\d+'], methods: ['POST'])]
+    #[IsGranted('ROLE_USER')]
+    public function delete(int $id, Request $request, BookRepository $bookRepository, BookManager $bookManager, TranslatorInterface $translator): Response
+    {
+        $book = $bookRepository->findActive($id) ?? throw $this->createNotFoundException();
+        $this->denyAccessUnlessGranted(BookVoter::DELETE, $book);
+
+        if (!$this->isCsrfTokenValid('book_delete', (string) $request->request->get('_token'))) {
+            return new Response($translator->trans('book.error.invalid_token'), Response::HTTP_BAD_REQUEST);
+        }
+
+        $bookManager->delete($book);
+        $this->addFlash('success', $translator->trans('book.flash.deleted'));
+
+        return $this->redirectToRoute('book_index');
+    }
 }

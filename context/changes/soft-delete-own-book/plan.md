@@ -283,31 +283,31 @@ Instant nullable ADD COLUMN on MariaDB 10.3+ plus an in-place index build (produ
 
 #### Automated
 
-- [x] 2.1 Phase 2 tests pass: `php bin/phpunit tests/Repository tests/Service tests/Controller`
-- [x] 2.2 Whole suite passes: `php bin/phpunit`
-- [x] 2.3 Static analysis passes: `php vendor/bin/phpstan analyse --no-progress --memory-limit=1G`
-- [x] 2.4 A book soft-deleted with a raw SQL `UPDATE book SET deleted_at = ...` (not through `BookManager`) is absent from `/books`, its tag page and the recommendations, and its `/books/{id}` URL returns 404: `php bin/phpunit tests/Controller/DeletedBookVisibilityTest.php`
+- [x] 2.1 Phase 2 tests pass: `php bin/phpunit tests/Repository tests/Service tests/Controller` — 0674aa3
+- [x] 2.2 Whole suite passes: `php bin/phpunit` — 0674aa3
+- [x] 2.3 Static analysis passes: `php vendor/bin/phpstan analyse --no-progress --memory-limit=1G` — 0674aa3
+- [x] 2.4 A book soft-deleted with a raw SQL `UPDATE book SET deleted_at = ...` (not through `BookManager`) is absent from `/books`, its tag page and the recommendations, and its `/books/{id}` URL returns 404: `php bin/phpunit tests/Controller/DeletedBookVisibilityTest.php` — 0674aa3
 
 #### Manual
 
-- [x] 2.5 Removing a temporary filter makes at least one new test fail (test protects the behaviour)
+- [x] 2.5 Removing a temporary filter makes at least one new test fail (test protects the behaviour) — 0674aa3
 
 ### Phase 3: Delete route and UI
 
 #### Automated
 
-- [ ] 3.1 Controller tests pass: `php bin/phpunit tests/Controller`
-- [ ] 3.2 Whole suite passes: `php bin/phpunit`
-- [ ] 3.3 Static analysis passes: `php vendor/bin/phpstan analyse --no-progress --memory-limit=1G`
-- [ ] 3.4 Twig lint passes: `php bin/console lint:twig templates`
-- [ ] 3.5 YAML lint passes: `php bin/console lint:yaml translations config`
-- [ ] 3.6 Container lint passes: `php bin/console lint:container`
-- [ ] 3.7 Schema valid: `php bin/console doctrine:schema:validate`
-- [ ] 3.8 UI token-scan grep from AGENTS.md prints nothing for `templates/book/*`
+- [x] 3.1 Controller tests pass: `php bin/phpunit tests/Controller`
+- [x] 3.2 Whole suite passes: `php bin/phpunit`
+- [x] 3.3 Static analysis passes: `php vendor/bin/phpstan analyse --no-progress --memory-limit=1G`
+- [x] 3.4 Twig lint passes: `php bin/console lint:twig templates`
+- [x] 3.5 YAML lint passes: `php bin/console lint:yaml translations config`
+- [x] 3.6 Container lint passes: `php bin/console lint:container`
+- [x] 3.7 Schema valid: `php bin/console doctrine:schema:validate`
+- [x] 3.8 UI token-scan grep from AGENTS.md prints nothing for `templates/book/*`
 
 #### Manual
 
-- [ ] 3.9 As the owner: the "Usuń" button appears, cancelling the dialog does nothing, confirming returns to the list with the success flash and the book is gone
-- [ ] 3.10 As another user: no delete button on someone else's book; a second user's rating and comment on the deleted book still exist in the database
-- [ ] 3.11 Anonymous visitor sees no delete button
-- [ ] 3.12 Optional: `npm run e2e` locally; owner-visible `detail-*` baselines are not updated without explaining the visual change
+- [x] 3.9 As the owner: the "Usuń" button appears, cancelling the dialog does nothing, confirming returns to the list with the success flash and the book is gone
+- [x] 3.10 As another user: no delete button on someone else's book; a second user's rating and comment on the deleted book still exist in the database
+- [x] 3.11 Anonymous visitor sees no delete button
+- [x] 3.12 Optional: `npm run e2e` locally; owner-visible `detail-*` baselines are not updated without explaining the visual change
