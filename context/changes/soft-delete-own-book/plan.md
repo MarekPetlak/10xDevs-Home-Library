@@ -273,24 +273,24 @@ Instant nullable ADD COLUMN on MariaDB 10.3+ plus an in-place index build (produ
 
 #### Automated
 
-- [x] 1.1 Migration applies and schema matches: `php bin/console doctrine:migrations:migrate --no-interaction` then `php bin/console doctrine:schema:validate`
-- [x] 1.2 Phase 1 tests pass: `php bin/phpunit tests/Entity/BookMappingTest.php tests/Security/BookVoterTest.php tests/Service/BookManagerTest.php`
-- [x] 1.3 Static analysis passes: `php bin/console cache:warmup --env=dev` then `php vendor/bin/phpstan analyse --no-progress --memory-limit=1G`
-- [x] 1.4 Container lint passes: `php bin/console lint:container`
-- [x] 1.5 Migration `down()` then `up()` runs cleanly and the schema stays valid: `php bin/console doctrine:migrations:execute --down "DoctrineMigrations\Version20261119100000" --no-interaction`, then `php bin/console doctrine:migrations:execute --up "DoctrineMigrations\Version20261119100000" --no-interaction`, then `php bin/console doctrine:schema:validate`
+- [x] 1.1 Migration applies and schema matches: `php bin/console doctrine:migrations:migrate --no-interaction` then `php bin/console doctrine:schema:validate` — 8920638
+- [x] 1.2 Phase 1 tests pass: `php bin/phpunit tests/Entity/BookMappingTest.php tests/Security/BookVoterTest.php tests/Service/BookManagerTest.php` — 8920638
+- [x] 1.3 Static analysis passes: `php bin/console cache:warmup --env=dev` then `php vendor/bin/phpstan analyse --no-progress --memory-limit=1G` — 8920638
+- [x] 1.4 Container lint passes: `php bin/console lint:container` — 8920638
+- [x] 1.5 Migration `down()` then `up()` runs cleanly and the schema stays valid: `php bin/console doctrine:migrations:execute --down "DoctrineMigrations\Version20261119100000" --no-interaction`, then `php bin/console doctrine:migrations:execute --up "DoctrineMigrations\Version20261119100000" --no-interaction`, then `php bin/console doctrine:schema:validate` — 8920638
 
 ### Phase 2: Hide deleted books everywhere
 
 #### Automated
 
-- [ ] 2.1 Phase 2 tests pass: `php bin/phpunit tests/Repository tests/Service tests/Controller`
-- [ ] 2.2 Whole suite passes: `php bin/phpunit`
-- [ ] 2.3 Static analysis passes: `php vendor/bin/phpstan analyse --no-progress --memory-limit=1G`
-- [ ] 2.4 A book soft-deleted with a raw SQL `UPDATE book SET deleted_at = ...` (not through `BookManager`) is absent from `/books`, its tag page and the recommendations, and its `/books/{id}` URL returns 404: `php bin/phpunit tests/Controller/DeletedBookVisibilityTest.php`
+- [x] 2.1 Phase 2 tests pass: `php bin/phpunit tests/Repository tests/Service tests/Controller`
+- [x] 2.2 Whole suite passes: `php bin/phpunit`
+- [x] 2.3 Static analysis passes: `php vendor/bin/phpstan analyse --no-progress --memory-limit=1G`
+- [x] 2.4 A book soft-deleted with a raw SQL `UPDATE book SET deleted_at = ...` (not through `BookManager`) is absent from `/books`, its tag page and the recommendations, and its `/books/{id}` URL returns 404: `php bin/phpunit tests/Controller/DeletedBookVisibilityTest.php`
 
 #### Manual
 
-- [ ] 2.5 Removing a temporary filter makes at least one new test fail (test protects the behaviour)
+- [x] 2.5 Removing a temporary filter makes at least one new test fail (test protects the behaviour)
 
 ### Phase 3: Delete route and UI
 

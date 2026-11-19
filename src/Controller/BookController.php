@@ -121,7 +121,7 @@ final class BookController extends AbstractController
     #[IsGranted('ROLE_USER')]
     public function edit(int $id, Request $request, BookRepository $bookRepository, BookManager $bookManager, DuplicateFinder $duplicateFinder, TranslatorInterface $translator): Response
     {
-        $book = $bookRepository->find($id) ?? throw $this->createNotFoundException();
+        $book = $bookRepository->findActive($id) ?? throw $this->createNotFoundException();
         $this->denyAccessUnlessGranted(BookVoter::EDIT, $book);
 
         $form = $this->createForm(BookType::class, NewBook::fromBook($book), ['confirm_label' => 'book.form.confirm_duplicate_edit']);

@@ -218,6 +218,22 @@ final class ReadBookControllerTest extends WebTestCase
         self::assertResponseStatusCodeSame(404);
     }
 
+    public function testDeletedBookReturns404ForShowReadAndReadRemove(): void
+    {
+        static::getContainer()->get(EntityManagerInterface::class)->getConnection()
+            ->executeStatement('UPDATE book SET deleted_at = ? WHERE id = ?', ['2026-11-09 10:00:00', $this->book->getId()]);
+
+        $this->client->request('GET', $this->showUrl());
+        self::assertResponseStatusCodeSame(404);
+
+        $this->client->request('POST', $this->readUrl(), ['mark_read' => ['rating' => '4', 'readOn' => '2026-10-01', 'comment' => '']]);
+        self::assertResponseStatusCodeSame(404);
+
+        $this->client->request('POST', $this->readUrl().'/remove', ['_token' => 'any']);
+        self::assertResponseStatusCodeSame(404);
+        self::assertCount(0, $this->entityManager()->getRepository(ReadBook::class)->findAll());
+    }
+
     public function testOthersRatingNeverAppearsOnMyListOrDetailPage(): void
     {
         $this->submit(['mark_read[rating]' => '5', 'mark_read[comment]' => 'Tajny komentarz Anny']);

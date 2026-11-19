@@ -82,7 +82,7 @@ class ReadBookRepository extends ServiceEntityRepository
 
     /**
      * The user's reads since a date (inclusive), grouped by book category: how many and the latest read day.
-     * Unordered on purpose: the recommendation service owns the tie-break rule.
+     * Reads of soft-deleted books are not counted. Unordered on purpose: the recommendation service owns the tie-break rule.
      *
      * @return list<array{category: Category, count: int, lastReadOn: \DateTimeImmutable}>
      */
@@ -94,6 +94,7 @@ class ReadBookRepository extends ServiceEntityRepository
             ->join('r.book', 'b')
             ->where('r.user = :user')
             ->andWhere('r.readOn >= :since')
+            ->andWhere('b.deletedAt IS NULL')
             ->setParameter('user', $user)
             ->setParameter('since', $since, Types::DATE_IMMUTABLE)
             ->groupBy('b.category')

@@ -119,6 +119,29 @@ final class DuplicateFinderTest extends KernelTestCase
         self::assertSame([], $this->finder->find($this->input('Dziady', 'Adam Mickiewicz', '9788373271890')));
     }
 
+    public function testReAddingADeletedBooksIsbnOrTitleAndAuthorGivesNoWarning(): void
+    {
+        $deleted = $this->stored('Dziady', 'Adam Mickiewicz', '9788373271890');
+        $deleted->setDeletedAt(new \DateTimeImmutable('2026-11-01 10:00:00'));
+        $this->entityManager->flush();
+
+        self::assertSame([], $this->finder->find($this->input('Dziady', 'Adam Mickiewicz', '9788373271890')));
+        self::assertSame([], $this->finder->find($this->input('Inna', 'Jan Kowalski', '8373271899')));
+    }
+
+    public function testADeletedBookDoesNotHideAnIdenticalActiveOne(): void
+    {
+        $deleted = $this->stored('Dziady', 'Adam Mickiewicz', '9788373271890');
+        $active = $this->stored('Dziady', 'Jan Kowalski', '9788373271890');
+        $deleted->setDeletedAt(new \DateTimeImmutable('2026-11-01 10:00:00'));
+        $this->entityManager->flush();
+
+        $matches = $this->finder->find($this->input('Dziady', 'Adam Mickiewicz', '9788373271890'));
+
+        self::assertCount(1, $matches);
+        self::assertSame($active, $matches[0]->book);
+    }
+
     private function stored(string $title, string $authorName, string $isbn): Book
     {
         [$first, $last] = explode(' ', $authorName, 2);
