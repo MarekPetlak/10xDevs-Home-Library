@@ -55,6 +55,7 @@ The owner sees a "Usuń" button on their book, confirms, and lands on the book l
 - A user cannot clear their own read mark on a deleted book; the data stays in the database.
 - Re-adding a deleted book creates a new row; reads stay on the old hidden row.
 - Owner-visible `detail-*` e2e baselines may change; e2e is local-only and not a gate.
+- Accepted race (impl-review F2): a concurrent mark-read or edit can land on a book deleted a moment earlier; the row is invisible everywhere and there is no restore, so no guard was added.
 
 ## Success Criteria (Summary)
 

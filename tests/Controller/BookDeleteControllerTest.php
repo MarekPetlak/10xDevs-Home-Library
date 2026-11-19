@@ -132,6 +132,32 @@ final class BookDeleteControllerTest extends WebTestCase
         $this->assertNotDeleted($this->book);
     }
 
+    public function testSignedInNonOwnerGets404ForAnotherUsersDeletedBookJustLikeForAnUnknownId(): void
+    {
+        // Raw SQL, so the test does not depend on BookManager. Ola must not learn that Anna's book ever existed.
+        $this->em()->getConnection()->executeStatement(
+            'UPDATE book SET deleted_at = :at WHERE id = :id',
+            ['at' => '2026-11-01 10:00:00', 'id' => $this->book->getId()],
+        );
+        $this->client->loginUser($this->ola);
+        $token = $this->tokenFromDetailPage($this->olaBook);
+
+        $this->client->request('POST', $this->deleteUrl($this->book), ['_token' => $token]);
+        self::assertResponseStatusCodeSame(404);
+        $this->client->request('GET', '/books/'.$this->book->getId());
+        self::assertResponseStatusCodeSame(404);
+        $this->client->request('GET', '/books/'.$this->book->getId().'/edit');
+        self::assertResponseStatusCodeSame(404);
+
+        // The same three requests for an id that never existed give the same status.
+        $this->client->request('POST', '/books/999999/delete', ['_token' => $token]);
+        self::assertResponseStatusCodeSame(404);
+        $this->client->request('GET', '/books/999999');
+        self::assertResponseStatusCodeSame(404);
+        $this->client->request('GET', '/books/999999/edit');
+        self::assertResponseStatusCodeSame(404);
+    }
+
     public function testMissingCsrfTokenGives400AndTheBookIsUntouched(): void
     {
         $this->client->loginUser($this->anna);

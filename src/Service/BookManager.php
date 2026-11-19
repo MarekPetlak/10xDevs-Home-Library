@@ -65,9 +65,14 @@ final class BookManager
 
     /**
      * Soft delete: stamps deletedAt. Authors, tags and other users' read records are left untouched.
+     * Deleting an already deleted book is a no-op, so the first deletion time is kept.
      */
     public function delete(Book $book): void
     {
+        if ($book->isDeleted()) {
+            return;
+        }
+
         $this->entityManager->wrapInTransaction(function () use ($book): void {
             $book->setDeletedAt(Clock::get()->now());
             $this->entityManager->flush();

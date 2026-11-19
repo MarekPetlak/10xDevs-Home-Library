@@ -252,6 +252,22 @@ final class BookManagerTest extends KernelTestCase
         $manager->update(new Book(), $this->input());
     }
 
+    public function testDeletingAnAlreadyDeletedBookKeepsTheFirstDeletionTime(): void
+    {
+        $book = $this->bookManager->add($this->input(), $this->user);
+        $bookId = $book->getId();
+
+        Clock::set(new MockClock('2026-11-19 09:15:00', 'Europe/Warsaw'));
+        $this->bookManager->delete($book);
+        Clock::set(new MockClock('2026-11-20 18:30:00', 'Europe/Warsaw'));
+        $this->bookManager->delete($book);
+
+        $this->entityManager->clear();
+        $stored = $this->entityManager->getRepository(Book::class)->find($bookId);
+        self::assertNotNull($stored);
+        self::assertSame((new \DateTimeImmutable('2026-11-19 09:15:00 Europe/Warsaw'))->getTimestamp(), $stored->getDeletedAt()?->getTimestamp());
+    }
+
     public function testDeleteStampsDeletedAtAndLeavesEverythingElseUnchanged(): void
     {
         $book = $this->bookManager->add($this->input(authors: 'Adam Mickiewicz, Anna Nowak', tags: 'poezja, klasyka'), $this->user);

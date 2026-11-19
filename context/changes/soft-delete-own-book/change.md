@@ -1,7 +1,7 @@
 ---
 change_id: soft-delete-own-book
 title: Soft-delete own book
-status: implemented
+status: impl_reviewed
 created: 2026-11-19
 updated: 2026-11-19
 archived_at: null

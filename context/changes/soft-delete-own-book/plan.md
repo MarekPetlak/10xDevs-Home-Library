@@ -35,7 +35,7 @@ Verified by: PHPUnit (repository, service, controller, voter, mapping tests), PH
 - A separate confirmation page (JS `confirm()` chosen).
 - Deciding what happens to books when their author's account is deleted (roadmap non-blocking unknown).
 - Orphan author/tag cleanup (parked as `cleanup-orphan-authors-tags`, `roadmap.md:244`); soft delete keeps the author/tag links.
-- Changing `ReadingManager` internals; the controller 404 guard is the protection.
+- Changing `ReadingManager` internals; the controller 404 guard is the protection. Accepted risk (impl-review F2): a delete committed between a controller's load and the flush of `ReadingManager::markRead` or `BookManager::update` can leave a read record or an edit on a deleted book; it is invisible on every read path and there is no restore, so it is not guarded.
 - New e2e scenarios or screenshot baseline updates (test-plan §7: e2e is local, not a gate).
 
 ## Implementation Approach
