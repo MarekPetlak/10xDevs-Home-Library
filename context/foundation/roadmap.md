@@ -3,7 +3,7 @@ project: "My home library"
 version: 1
 status: draft
 created: 2026-11-02
-updated: 2026-11-17
+updated: 2026-11-19
 prd_version: 3
 main_goal: speed
 top_blocker: decisions
@@ -48,7 +48,7 @@ Użytkownik nie pamięta, jakie książki ma w domowej bibliotece i które przec
 | S-05  | browse-and-search-books        | anyone can browse and search books by title, author and category        | S-02          | FR-003        | done |
 | S-06  | duplicate-book-warning         | user is warned about a duplicate before adding a book                   | S-02          | FR-005, US-01 | done |
 | S-07  | edit-own-book-entry            | user can edit a book they added, after confirmation                     | S-02          | FR-006        | done |
-| S-08  | soft-delete-own-book           | user can delete a book they added without losing others' ratings        | S-02, S-03    | FR-007        | proposed |
+| S-08  | soft-delete-own-book           | user can delete a book they added without losing others' ratings        | S-02, S-03    | FR-007        | in-progress |
 | S-09  | reader-comments-privacy           | comment author can mark a reader comment public or private                    | S-03          | FR-009        | proposed |
 | S-10  | filter-books-by-tag            | anyone can open a tag page from a book's tag and see books with that tag | S-02          | FR-003        | done |
 
@@ -172,7 +172,7 @@ Brak. Warstwy oznaczone w Baseline jako `partial` (dane, auth, interfejs) są wp
 - **Unknowns:**
   - Co dzieje się z książkami, gdy konto ich autora zostanie usunięte — Owner: user. Block: no.
 - **Risk:** Wymaga S-03, żeby dało się zweryfikować, że cudze oceny przetrwały usunięcie; usunięta książka nie może wpływać na rekomendacje.
-- **Status:** proposed
+- **Status:** in-progress
 
 ### S-09: Prywatność komentarzy czytelników
 

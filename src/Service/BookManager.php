@@ -17,7 +17,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Clock\Clock;
 
 /**
- * Creates and updates a Book from already validated input.
+ * Creates, updates and soft-deletes a Book from already validated input.
  */
 final class BookManager
 {
@@ -61,6 +61,17 @@ final class BookManager
             // Doctrine closed the EntityManager, so nothing may use it after this point.
             throw new BookConflictException(previous: $e);
         }
+    }
+
+    /**
+     * Soft delete: stamps deletedAt. Authors, tags and other users' read records are left untouched.
+     */
+    public function delete(Book $book): void
+    {
+        $this->entityManager->wrapInTransaction(function () use ($book): void {
+            $book->setDeletedAt(Clock::get()->now());
+            $this->entityManager->flush();
+        });
     }
 
     private function save(NewBook $input, User $user): Book
