@@ -22,5 +22,9 @@ RUN APP_SECRET=$BUILD_APP_SECRET DATABASE_URL=$BUILD_DATABASE_URL TRUSTED_PROXIE
         sh -c 'php bin/console importmap:install --env=prod && php bin/console asset-map:compile --env=prod && php bin/console cache:warmup --env=prod' \
     && chmod +x bin/console && mkdir -p var/cache var/log && chown -R www-data:www-data var
 
+# Declared after the cache warmup on purpose: a new commit SHA must not invalidate the cached build layers above.
+ARG SENTRY_RELEASE
+ENV SENTRY_RELEASE=$SENTRY_RELEASE
+
 EXPOSE 8080
 CMD ["supervisord", "-c", "/etc/supervisord.conf"]

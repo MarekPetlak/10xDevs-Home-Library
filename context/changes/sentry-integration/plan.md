@@ -293,23 +293,23 @@ No data or schema changes. The SDK is disabled while `SENTRY_DSN` is empty, so p
 
 #### Automated
 
-- [x] 3.1 New logging tests fail first, then pass
-- [x] 3.2 Full PHPUnit suite passes
-- [x] 3.3 PHPStan passes
+- [x] 3.1 New logging tests fail first, then pass — 61b5bdd
+- [x] 3.2 Full PHPUnit suite passes — 61b5bdd
+- [x] 3.3 PHPStan passes — 61b5bdd
 
 #### Manual
 
-- [x] 3.4 A forged delete still shows the same 400 text and now leaves an `error` line on stderr locally
-- [x] 3.5 No log context contains an e-mail address or password
+- [x] 3.4 A forged delete still shows the same 400 text and now leaves an `error` line on stderr locally — 61b5bdd
+- [x] 3.5 No log context contains an e-mail address or password — 61b5bdd
 
 ### Phase 4: Release tag, CI and rollout
 
 #### Automated
 
-- [ ] 4.1 Full PHPUnit suite passes
-- [ ] 4.2 PHPStan passes
-- [ ] 4.3 Image builds the prod cache with the new build argument
-- [ ] 4.4 Workflow file is valid YAML
+- [x] 4.1 Full PHPUnit suite passes
+- [x] 4.2 PHPStan passes
+- [x] 4.3 Image builds the prod cache with the new build argument
+- [x] 4.4 Workflow file is valid YAML
 
 #### Manual
 

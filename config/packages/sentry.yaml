@@ -7,6 +7,8 @@ sentry:
         enabled: false
     options:
         environment: '%kernel.environment%'
+        # The deployed git SHA (build arg in the deploy workflow); a build without it simply has no release.
+        release: '%env(default::SENTRY_RELEASE)%'
         # No e-mail, IP, cookies or request bodies; the user id alone is attached by App\Security\SentryUserContext.
         send_default_pii: false
         enable_tracing: false
