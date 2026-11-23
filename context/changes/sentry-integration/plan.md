@@ -306,10 +306,10 @@ No data or schema changes. The SDK is disabled while `SENTRY_DSN` is empty, so p
 
 #### Automated
 
-- [x] 4.1 Full PHPUnit suite passes
-- [x] 4.2 PHPStan passes
-- [x] 4.3 Image builds the prod cache with the new build argument
-- [x] 4.4 Workflow file is valid YAML
+- [x] 4.1 Full PHPUnit suite passes — 8b77299
+- [x] 4.2 PHPStan passes — 8b77299
+- [x] 4.3 Image builds the prod cache with the new build argument — 8b77299
+- [x] 4.4 Workflow file is valid YAML — 8b77299
 
 #### Manual
 
