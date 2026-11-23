@@ -1,59 +1,33 @@
 <!-- BEGIN @przeprogramowani/10x-cli -->
 
-## Zestaw narzędzi AI 10xDevs - Moduł 3, Lekcja 3 (10xDevs 4.0 Hooks)
+## Zestaw narzędzi AI 10xDevs — moduł 3, lekcja 5 (debugowanie)
 
-Traktuj hook jako **bramkę jakości uruchamianą przez harness dla agenta**, a nie skrypt, który według ciebie agent zauważy. Hooki działają poza modelem, więc przetrwają kompresję kontekstu i zapomniane instrukcje — ale tylko hook, którego sygnał faktycznie dociera do agenta, zamyka pętlę:
+Zamień awarię w poprawkę, której agent może bronić: najpierw dowody, potem nieprzechodzący test, a następnie poprawka.
 
 ```
-test-plan.md "Quality Gates" -> pick the moment per gate -> /10x-configure-hook -> prove with sample JSON -> watch the agent fix a deliberate error
+signal (monitoring | log | flaky E2E | stack trace) -> gather evidence -> reproduce -> failing test -> fix -> verify
 ```
 
-### Router zadań - Od czego zacząć
+### Router zadań — od czego zacząć
 
 | Umiejętność | Użyj jej, gdy |
 | --- | --- |
-| `/10x-configure-hook` | Przekształcasz bramki z `context/foundation/test-plan.md` w hooki agenta, naprawiasz hooki, które się uruchamiają, ale agent nigdy nie reaguje, albo audytujesz istniejącą konfigurację hooków. Wykrywa harness na podstawie repozytorium i zawiera datowane referencje dla każdego harness. |
-| `/10x-test-plan --status` | Odczytujesz aktualne bramki i stan wdrożenia. Zmiana tego, które bramki istnieją, należy do Lekcji 1, nie tutaj. |
-| `/10x-new` -> `/10x-research` -> `/10x-plan` -> `/10x-implement` | Hook ujawnił awarię, której agent nie może naprawić trywialną korektą (błędna logika biznesowa, niestabilna integracja). Otwórz zmianę zamiast zapętlać hook. |
+| `/10x-frame` | Zgłoszenie przychodzi jako „bug + proponowana poprawka”. Sprawdź, czy zaobserwowany objaw i podana przyczyna rzeczywiście do siebie pasują, zanim ktokolwiek cokolwiek naprawi. |
+| `/10x-new` -> `/10x-research` -> `/10x-plan` -> `/10x-implement` | Poprawka to coś więcej niż jednolinijkowa zmiana. Research zbiera dowody; plan zaczyna się od nieprzechodzącego testu regresji. |
+| `/10x-tdd` | Pisanie testu regresji, który odtwarza błąd przed wprowadzeniem poprawki. |
+| `/10x-e2e` | Błąd pojawia się tylko w uruchomionej aplikacji. Odtwórz go w przeglądarce i zachowaj ten test. |
+| `/10x-observability-audit` | Błędy są nieobecne, zaszumione lub niemożliwe do zdiagnozowania na produkcji. Audytuje krytyczne przepływy pod kątem kodu ukrywającego awarie i zapisuje raport z datą w `context/audits/observability/`. Użyj `--verify <report>`, aby ponownie sprawdzić wcześniejszy raport po poprawkach. |
 
-### Cykl życia hooka
+### Twarde zasady
 
-1. **Wyzwalacz** — zdarzenie w harness: narzędzie zakończyło edycję pliku, agent zaraz zakończy swoją turę.
-2. **Matcher** — zawęża, na które wywołania narzędzi lub pliki reaguje hook. Nie każdy harness obsługuje matchery w ten sam sposób.
-3. **Handler** — zwykle polecenie powłoki lub skrypt, który odczytuje ładunek zdarzenia jako JSON ze standardowego wejścia.
-4. **Sygnał** — co zwraca hook. Kod wyjścia, stderr, stdout i pola JSON oznaczają różne rzeczy w różnych harness, a tylko jeden kanał na zdarzenie faktycznie dociera do agenta. **Kanał sygnału różni się zależnie od harness — przed napisaniem lub przeglądem hooka sprawdź referencje umiejętności.**
-
-Hook, który się uruchamia, ale wysyła komunikat niewłaściwym kanałem, jest najczęstszą awarią: użytkownik widzi „hook error”, agent nie widzi niczego i kontynuuje.
-
-### Momenty i warstwy
-
-Im wolniejsza kontrola, tym rzadszy moment:
-
-| Moment | Typowe kontrole | Dociera do agenta? |
-| --- | --- | --- |
-| Przy każdej edycji | Lint/formatowanie **tylko edytowanego pliku**; powiązane testy, jeśli są szybkie | Tak, w trakcie pracy |
-| Koniec tury (Stop lub odpowiednik) | Lint + testy dla każdego pliku zmienionego w tej turze, typecheck całego projektu | Tak, zanim agent przekaże wynik |
-| Pre-commit (git) | Lint + testy dla plików w stagingu; wyłapuje edycje wykonane bez agenta | Nie — blokuje commit |
-| Pre-push (git) | Cięższe zestawy, e2e uruchamiane lokalnie | Nie — blokuje push |
-| CI | Integracja, współdzielony stan, infrastruktura niedostępna lokalnie | Nie — feedback dla PR |
-
-Lokalne warstwy nie zastępują CI; każda z nich oszczędza jeden cykl zwrotny CI. Zacznij od jednego hooka lint przy każdej edycji i jednego typechecka na koniec tury, a następnie dodawaj warstwy, gdy zobaczysz, co się przedostaje.
-
-### Kontrakt
-
-- Odczytaj bramki z sekcji „Quality Gates” w `context/foundation/test-plan.md` (według tytułu, nie numeru sekcji). Bramka, którą plan wyraźnie odkłada, pozostaje odłożona, chyba że użytkownik to zmieni — cytuj odroczenie, gdy pytasz.
-- Hooki przy każdej edycji sprawdzają tylko edytowany plik. Nigdy nie uruchamiaj `--fix` ani lintera dla całego projektu przy każdej edycji.
-- Hooki końca tury, które mogą odesłać agenta z powrotem, muszą zatrzymać się po jednej próbie ponowienia (flaga harness „already continued” lub odpowiednik), aby nienaprawialny błąd nie tworzył pętli.
-- Hooki przy każdej edycji widzą tylko narzędzia edycji harness; plik nadpisany za pomocą polecenia powłoki je omija. Hook końca tury ponownie sprawdza każdy plik zmieniony w tej turze (`git diff`), więc stanowi zabezpieczenie dla tych edycji.
-- Limity czasu są zwykle podawane w **sekundach**. Sprawdź jednostkę przed skopiowaniem liczby.
-- Udowodnij działanie każdego hooka, zanim mu zaufasz: uruchom skrypt z przykładowym ładunkiem na celowo uszkodzonym pliku i na czystym, a następnie cofnij błąd.
-- Nigdy nie nadpisuj po cichu istniejącej konfiguracji hooków. Przeprowadź audyt, nazwij defekty, scal i pokaż diff.
+- **Dowody przed hipotezą.** Korzystaj z tego, co pokazują tracker błędów, logi, odtworzenie problemu i kod. Nigdy nie zgaduj przyczyny wyłącznie na podstawie stack trace.
+- **Błąd najpierw staje się nieprzechodzącym testem.** Poprawka jest gotowa, gdy ten test przechodzi z czerwonego na zielony i pozostaje w zestawie testów.
+- **Nigdy nie ukrywaj dowodów.** Żadnych pustych `catch`, żadnych ignorowanych odrzuceń promise'ów, żadnego zamieniania awarii w przekierowania lub `200`, żadnego porzucania przyczyn błędów. Jeśli poprawka wymaga `catch`, loguje lub raportuje błąd wraz z jego przyczyną.
+- **Napraw przyczynę, nie test.** Nie edytuj asercji, aby pasowała do nowego zachowania, chyba że zmieniło się samo wymaganie.
 
 ### Granice lekcji
 
-- Nie zmieniaj strategii ryzyka ani definicji bramek — to Lekcja 1 (`/10x-test-plan`).
-- Nie pisz tutaj nowych testów — hooki uruchamiają tylko testy utworzone w Lekcji 2.
-- Nie pisz scenariuszy E2E ani weryfikacji w przeglądarce — to Lekcja 4.
-- Nie twórz potoków CI ani nie instaluj bez pytania menedżerów git-hooków; rekomenduj bramki pre-commit/pre-push i pozwól użytkownikowi zdecydować.
+- `/10x-observability-audit` czyta kod i zapisuje raport. Nigdy nie zmienia audytowanego kodu. Naprawianie tego, co znajdzie, przechodzi przez łańcuch zmian.
+- Wybór dostawcy monitoringu należy do `/10x-infra-research`, a nie do tej lekcji.
 
 <!-- END @przeprogramowani/10x-cli -->
