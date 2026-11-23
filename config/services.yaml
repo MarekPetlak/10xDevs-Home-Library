@@ -23,6 +23,12 @@ services:
 
     # Sessions live in MariaDB and reuse the app's single native PDO connection
     # (cyberfolks limits outside connections per user).
+    # Forwards error-level log records to Sentry (wired in config/packages/monolog.yaml).
+    Sentry\Monolog\Handler:
+        arguments:
+            $hub: '@Sentry\State\HubInterface'
+            $level: error
+
     session.handler.pdo:
         class: Symfony\Component\HttpFoundation\Session\Storage\Handler\PdoSessionHandler
         arguments:

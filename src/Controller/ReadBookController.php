@@ -10,6 +10,7 @@ use App\Exception\AlreadyReadException;
 use App\Form\MarkReadType;
 use App\Repository\BookRepository;
 use App\Repository\ReadBookRepository;
+use App\Service\DomainFailureLogger;
 use App\Service\ReadingManager;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -55,7 +56,7 @@ final class ReadBookController extends AbstractController
 
     #[Route('/books/{id}/read/remove', name: 'book_read_remove', requirements: ['id' => '\d+'], methods: ['POST'])]
     #[IsGranted('ROLE_USER')]
-    public function remove(int $id, Request $request, BookRepository $bookRepository, ReadingManager $readingManager, TranslatorInterface $translator): Response
+    public function remove(int $id, Request $request, BookRepository $bookRepository, ReadingManager $readingManager, TranslatorInterface $translator, DomainFailureLogger $failures): Response
     {
         // Only the existence of an active (not soft-deleted) book matters here, so no authors or tags are joined.
         $book = $bookRepository->findActive($id) ?? throw $this->createNotFoundException();
@@ -63,6 +64,8 @@ final class ReadBookController extends AbstractController
         \assert($user instanceof User);
 
         if (!$this->isCsrfTokenValid('read_remove', (string) $request->request->get('_token'))) {
+            $failures->invalidCsrfToken('book_read_remove', $user->getId(), $book->getId());
+
             return new Response($translator->trans('reading.error.invalid_token'), Response::HTTP_BAD_REQUEST);
         }
 

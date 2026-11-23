@@ -19,6 +19,12 @@ when@dev:
 when@test:
     monolog:
         handlers:
+            # Explicit error logs (readiness failure, domain failures) go to Sentry. Not behind fingers_crossed, and the
+            # `request` channel is skipped: uncaught exceptions are already reported by the SDK error listener.
+            sentry:
+                type: service
+                id: Sentry\Monolog\Handler
+                channels: ["!request", "!event"]
             main:
                 type: fingers_crossed
                 action_level: error
@@ -33,6 +39,12 @@ when@test:
 when@prod:
     monolog:
         handlers:
+            # Explicit error logs (readiness failure, domain failures) go to Sentry. Not behind fingers_crossed, and the
+            # `request` channel is skipped: uncaught exceptions are already reported by the SDK error listener.
+            sentry:
+                type: service
+                id: Sentry\Monolog\Handler
+                channels: ["!request", "!event"]
             main:
                 type: fingers_crossed
                 action_level: error

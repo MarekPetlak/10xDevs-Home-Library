@@ -15,6 +15,7 @@ use App\Repository\BookRepository;
 use App\Repository\ReadBookRepository;
 use App\Security\BookVoter;
 use App\Service\BookManager;
+use App\Service\DomainFailureLogger;
 use App\Service\DuplicateFinder;
 use App\Service\RecommendationService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -78,7 +79,7 @@ final class BookController extends AbstractController
 
     #[Route('/books/new', name: 'book_new', methods: ['GET', 'POST'])]
     #[IsGranted('ROLE_USER')]
-    public function new(Request $request, BookManager $bookManager, DuplicateFinder $duplicateFinder, TranslatorInterface $translator): Response
+    public function new(Request $request, BookManager $bookManager, DuplicateFinder $duplicateFinder, TranslatorInterface $translator, DomainFailureLogger $failures): Response
     {
         $form = $this->createForm(BookType::class, new NewBook());
         $form->handleRequest($request);
@@ -99,7 +100,8 @@ final class BookController extends AbstractController
 
             try {
                 $bookManager->add($form->getData(), $user);
-            } catch (BookConflictException) {
+            } catch (BookConflictException $e) {
+                $failures->bookConflict('add', $user->getId(), null, $e);
                 // A concurrent request created the same author or tag first: keep the input, ask to retry.
                 $form->addError(new FormError($translator->trans('book.error.conflict')));
 
@@ -119,7 +121,7 @@ final class BookController extends AbstractController
 
     #[Route('/books/{id}/edit', name: 'book_edit', requirements: ['id' => '\d+'], methods: ['GET', 'POST'])]
     #[IsGranted('ROLE_USER')]
-    public function edit(int $id, Request $request, BookRepository $bookRepository, BookManager $bookManager, DuplicateFinder $duplicateFinder, TranslatorInterface $translator): Response
+    public function edit(int $id, Request $request, BookRepository $bookRepository, BookManager $bookManager, DuplicateFinder $duplicateFinder, TranslatorInterface $translator, DomainFailureLogger $failures): Response
     {
         $book = $bookRepository->findActive($id) ?? throw $this->createNotFoundException();
         $this->denyAccessUnlessGranted(BookVoter::EDIT, $book);
@@ -141,7 +143,9 @@ final class BookController extends AbstractController
 
             try {
                 $bookManager->update($book, $form->getData());
-            } catch (BookConflictException) {
+            } catch (BookConflictException $e) {
+                $user = $this->getUser();
+                $failures->bookConflict('edit', $user instanceof User ? $user->getId() : null, $book->getId(), $e);
                 // A concurrent request created the same author or tag first: keep the input, ask to retry.
                 $form->addError(new FormError($translator->trans('book.error.conflict')));
 
@@ -161,12 +165,15 @@ final class BookController extends AbstractController
 
     #[Route('/books/{id}/delete', name: 'book_delete', requirements: ['id' => '\d+'], methods: ['POST'])]
     #[IsGranted('ROLE_USER')]
-    public function delete(int $id, Request $request, BookRepository $bookRepository, BookManager $bookManager, TranslatorInterface $translator): Response
+    public function delete(int $id, Request $request, BookRepository $bookRepository, BookManager $bookManager, TranslatorInterface $translator, DomainFailureLogger $failures): Response
     {
         $book = $bookRepository->findActive($id) ?? throw $this->createNotFoundException();
         $this->denyAccessUnlessGranted(BookVoter::DELETE, $book);
 
         if (!$this->isCsrfTokenValid('book_delete', (string) $request->request->get('_token'))) {
+            $user = $this->getUser();
+            $failures->invalidCsrfToken('book_delete', $user instanceof User ? $user->getId() : null, $book->getId());
+
             return new Response($translator->trans('book.error.invalid_token'), Response::HTTP_BAD_REQUEST);
         }
 
