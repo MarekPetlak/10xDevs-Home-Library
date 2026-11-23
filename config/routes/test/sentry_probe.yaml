@@ -1,0 +1,4 @@
+# Test environment only: routes that fail on purpose for tests/Sentry.
+sentry_probe:
+    resource: ../../../tests/Support/ProbeController.php
+    type: attribute

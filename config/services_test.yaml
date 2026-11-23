@@ -1,0 +1,8 @@
+# Test environment only (loaded by the kernel after services.yaml).
+services:
+    App\Tests\Support\SpyTransport:
+        public: true
+
+    App\Tests\Support\ProbeController:
+        autowire: true
+        tags: ['controller.service_arguments']
