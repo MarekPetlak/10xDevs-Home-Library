@@ -41,9 +41,10 @@ export default defineConfig({
       dependencies: ['setup'],
     },
     // Visual suite (e2e/): tests sign in themselves and load their own fixtures; no shared session.
-    { name: 'desktop', use: { ...devices['Desktop Chrome'], viewport: { width: 1280, height: 900 } } },
+    // Both suites share one database and the visual fixtures purge it, so the visual projects run after 'chromium'.
+    { name: 'desktop', use: { ...devices['Desktop Chrome'], viewport: { width: 1280, height: 900 } }, dependencies: ['chromium'] },
     // One mobile width (390 px), same engine, so a baseline difference is a layout difference.
-    { name: 'mobile', use: { ...devices['Desktop Chrome'], viewport: { width: 390, height: 844 } } },
+    { name: 'mobile', use: { ...devices['Desktop Chrome'], viewport: { width: 390, height: 844 } }, dependencies: ['chromium'] },
   ],
 
   webServer: {
