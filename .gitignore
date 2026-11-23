@@ -37,3 +37,4 @@ node_modules/
 !/.claude/hooks/
 /.claude/prompts/
 /.claude/.10x-cli-manifest.json
+.playwright-cli/

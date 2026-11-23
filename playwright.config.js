@@ -8,7 +8,8 @@ import { defineConfig, devices } from '@playwright/test';
  * `app_teste2e`), so loading fixtures can neither touch the development database (`app`)
  * nor leave data behind for PHPUnit (`app_test`). See e2e/support/fixtures.js.
  */
-const PORT = 8081;
+// 8081 was set by the existing visual suite; E2E_PORT overrides it when the port is taken on this machine.
+const PORT = Number(process.env.E2E_PORT ?? 8081);
 
 export default defineConfig({
   testDir: './e2e',
@@ -26,9 +27,20 @@ export default defineConfig({
     baseURL: `http://127.0.0.1:${PORT}`,
     locale: 'pl-PL',
     trace: 'on-first-retry',
+    screenshot: 'only-on-failure',
   },
 
   projects: [
+    // Behavioural E2E (tests/e2e): sign in once as the fixture reader, then every spec loads the saved session.
+    { name: 'setup', testDir: './tests/e2e', testMatch: /.*\.setup\.js/ },
+    {
+      name: 'chromium',
+      testDir: './tests/e2e',
+      testIgnore: /.*\.setup\.js/,
+      use: { ...devices['Desktop Chrome'], storageState: 'playwright/.auth/user.json' },
+      dependencies: ['setup'],
+    },
+    // Visual suite (e2e/): tests sign in themselves and load their own fixtures; no shared session.
     { name: 'desktop', use: { ...devices['Desktop Chrome'], viewport: { width: 1280, height: 900 } } },
     // One mobile width (390 px), same engine, so a baseline difference is a layout difference.
     { name: 'mobile', use: { ...devices['Desktop Chrome'], viewport: { width: 390, height: 844 } } },
