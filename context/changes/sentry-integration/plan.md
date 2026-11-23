@@ -281,26 +281,26 @@ No data or schema changes. The SDK is disabled while `SENTRY_DSN` is empty, so p
 
 #### Automated
 
-- [x] 2.1 Listener tests pass
-- [x] 2.2 Full PHPUnit suite passes
-- [x] 2.3 PHPStan passes
+- [x] 2.1 Listener tests pass — 038a894
+- [x] 2.2 Full PHPUnit suite passes — 038a894
+- [x] 2.3 PHPStan passes — 038a894
 
 #### Manual
 
-- [x] 2.4 The listener never touches the scope for anonymous requests and never sends the e-mail
+- [x] 2.4 The listener never touches the scope for anonymous requests and never sends the e-mail — 038a894
 
 ### Phase 3: Domain failures reach the error stream
 
 #### Automated
 
-- [ ] 3.1 New logging tests fail first, then pass
-- [ ] 3.2 Full PHPUnit suite passes
-- [ ] 3.3 PHPStan passes
+- [x] 3.1 New logging tests fail first, then pass
+- [x] 3.2 Full PHPUnit suite passes
+- [x] 3.3 PHPStan passes
 
 #### Manual
 
-- [ ] 3.4 A forged delete still shows the same 400 text and now leaves an `error` line on stderr locally
-- [ ] 3.5 No log context contains an e-mail address or password
+- [x] 3.4 A forged delete still shows the same 400 text and now leaves an `error` line on stderr locally
+- [x] 3.5 No log context contains an e-mail address or password
 
 ### Phase 4: Release tag, CI and rollout
 
