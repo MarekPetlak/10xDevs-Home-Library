@@ -266,28 +266,28 @@ No data or schema changes. The SDK is disabled while `SENTRY_DSN` is empty, so p
 
 #### Automated
 
-- [x] 1.1 New Sentry tests fail first, then pass
-- [x] 1.2 Full PHPUnit suite passes
-- [x] 1.3 PHPStan passes
-- [x] 1.4 Prod container compiles (`lint:container --env=prod`)
-- [x] 1.5 YAML config is valid
+- [x] 1.1 New Sentry tests fail first, then pass — 2297ec5
+- [x] 1.2 Full PHPUnit suite passes — 2297ec5
+- [x] 1.3 PHPStan passes — 2297ec5
+- [x] 1.4 Prod container compiles (`lint:container --env=prod`) — 2297ec5
+- [x] 1.5 YAML config is valid — 2297ec5
 
 #### Manual
 
-- [x] 1.6 With an empty DSN, `sentry:test` reports the missing DSN and the app boots in dev and prod modes
-- [x] 1.7 `monolog.yaml` shows the `sentry` handler outside `fingers_crossed` and excluding `request`
+- [x] 1.6 With an empty DSN, `sentry:test` reports the missing DSN and the app boots in dev and prod modes — 2297ec5
+- [x] 1.7 `monolog.yaml` shows the `sentry` handler outside `fingers_crossed` and excluding `request` — 2297ec5
 
 ### Phase 2: User id on events
 
 #### Automated
 
-- [ ] 2.1 Listener tests pass
-- [ ] 2.2 Full PHPUnit suite passes
-- [ ] 2.3 PHPStan passes
+- [x] 2.1 Listener tests pass
+- [x] 2.2 Full PHPUnit suite passes
+- [x] 2.3 PHPStan passes
 
 #### Manual
 
-- [ ] 2.4 The listener never touches the scope for anonymous requests and never sends the e-mail
+- [x] 2.4 The listener never touches the scope for anonymous requests and never sends the e-mail
 
 ### Phase 3: Domain failures reach the error stream
 
