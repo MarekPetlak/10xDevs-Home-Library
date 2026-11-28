@@ -313,7 +313,7 @@ No data or schema changes. The SDK is disabled while `SENTRY_DSN` is empty, so p
 
 #### Manual
 
-- [ ] 4.5 Sentry project created and `SENTRY_DSN` Fly secret set by the owner
-- [ ] 4.6 After deploy, `sentry:test` succeeds and the event shows environment `prod` and the commit SHA
-- [ ] 4.7 A deliberate production error shows the user id and no e-mail, IP or cookies; a 404 opens no issue
-- [ ] 4.8 `/10x-observability-audit --verify` run and recorded
+- [x] 4.5 Sentry project created and `SENTRY_DSN` Fly secret set by the owner
+- [x] 4.6 After deploy, `sentry:test` succeeds and the event shows environment `prod` and the commit SHA
+- [x] 4.7 A deliberate production error shows the user id and no e-mail, IP or cookies; a 404 opens no issue
+- [x] 4.8 `/10x-observability-audit --verify` run and recorded (context/audits/observability/2026-11-28_verify-add-edit-book-mark-read-delete-login.md)
