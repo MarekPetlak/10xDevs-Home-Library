@@ -1,9 +1,9 @@
 ---
 change_id: sentry-integration
 title: Sentry integration
-status: implementing
+status: impl_reviewed
 created: 2026-11-23
-updated: 2026-11-23
+updated: 2026-11-28
 archived_at: null
 ---
 

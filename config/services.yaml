@@ -21,14 +21,14 @@ services:
         # Demo fixtures need doctrine/doctrine-fixtures-bundle (require-dev); they are registered below for dev and test only.
         exclude: '../src/DataFixtures/'
 
-    # Sessions live in MariaDB and reuse the app's single native PDO connection
-    # (cyberfolks limits outside connections per user).
     # Forwards error-level log records to Sentry (wired in config/packages/monolog.yaml).
     Sentry\Monolog\Handler:
         arguments:
             $hub: '@Sentry\State\HubInterface'
             $level: error
 
+    # Sessions live in MariaDB and reuse the app's single native PDO connection
+    # (cyberfolks limits outside connections per user).
     session.handler.pdo:
         class: Symfony\Component\HttpFoundation\Session\Storage\Handler\PdoSessionHandler
         arguments:
