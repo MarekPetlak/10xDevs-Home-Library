@@ -9,8 +9,11 @@ sentry:
         environment: '%kernel.environment%'
         # The deployed git SHA (build arg in the deploy workflow); a build without it simply has no release.
         release: '%env(default::SENTRY_RELEASE)%'
-        # No e-mail, IP, cookies or request bodies; the user id alone is attached by App\Security\SentryUserContext.
+        # No e-mail, IP, cookies or request bodies (see max_request_body_size); the user id alone is attached by App\Security\SentryUserContext.
         send_default_pii: false
+        # send_default_pii does not cover request bodies: without this the SDK attaches the parsed POST body
+        # (login _password, _csrf_token) to an event whose request failed.
+        max_request_body_size: none
         enable_tracing: false
         # The SDK sends while the request finishes: bound the wait so an unreachable Sentry cannot hang an error page.
         http_connect_timeout: 1

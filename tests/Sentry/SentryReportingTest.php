@@ -7,6 +7,7 @@ namespace App\Tests\Sentry;
 use App\Tests\Support\SpyTransport;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Sentry\Event;
+use Sentry\State\HubInterface;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
@@ -76,6 +77,19 @@ final class SentryReportingTest extends WebTestCase
         self::assertArrayNotHasKey('cookies', $request);
         self::assertStringNotContainsString('secret', json_encode($request, JSON_THROW_ON_ERROR));
         self::assertStringNotContainsString('203.0.113.9', json_encode($request, JSON_THROW_ON_ERROR));
+    }
+
+    /**
+     * `send_default_pii: false` does not stop the SDK from attaching a POST body (_password, _csrf_token) to an event:
+     * only `max_request_body_size` does. Asserting the option keeps this independent of test order, because the SDK
+     * attaches request data only for the first kernel booted in a process.
+     */
+    public function testRequestBodiesAreNeverCollected(): void
+    {
+        $options = self::getContainer()->get(HubInterface::class)->getClient()?->getOptions();
+
+        self::assertNotNull($options);
+        self::assertSame('none', $options->getMaxRequestBodySize());
     }
 
     /** @return list<Event> */

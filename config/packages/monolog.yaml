@@ -20,11 +20,11 @@ when@test:
     monolog:
         handlers:
             # Explicit error logs (readiness failure, domain failures) go to Sentry. Not behind fingers_crossed, and the
-            # `request` channel is skipped: uncaught exceptions are already reported by the SDK error listener.
+            # `request`, `console` and `php` channels are skipped: uncaught HTTP, CLI and fatal errors are already reported by the SDK listeners.
             sentry:
                 type: service
                 id: Sentry\Monolog\Handler
-                channels: ["!request", "!event"]
+                channels: ["!request", "!event", "!console", "!php"]
             main:
                 type: fingers_crossed
                 action_level: error
@@ -40,11 +40,11 @@ when@prod:
     monolog:
         handlers:
             # Explicit error logs (readiness failure, domain failures) go to Sentry. Not behind fingers_crossed, and the
-            # `request` channel is skipped: uncaught exceptions are already reported by the SDK error listener.
+            # `request`, `console` and `php` channels are skipped: uncaught HTTP, CLI and fatal errors are already reported by the SDK listeners.
             sentry:
                 type: service
                 id: Sentry\Monolog\Handler
-                channels: ["!request", "!event"]
+                channels: ["!request", "!event", "!console", "!php"]
             main:
                 type: fingers_crossed
                 action_level: error

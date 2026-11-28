@@ -358,10 +358,10 @@ Data at risk: household ratings and read-status.
 
 Change: `context/changes/sentry-integration/plan.md`.
 
-- [ ] **HUMAN** Set the DSN as a Fly secret (value from the Sentry project settings, never committed): `fly secrets set SENTRY_DSN=<dsn from the Sentry project> -a 10xdevs-home-library`.
+- [x] **HUMAN** Set the DSN as a Fly secret (value from the Sentry project settings, never committed): `fly secrets set SENTRY_DSN=<dsn from the Sentry project> -a 10xdevs-home-library`.
 - `SENTRY_DSN` is empty locally, in CI and in tests, which disables the SDK: nothing leaves the machine.
 - The release is the git SHA: the deploy workflow passes `--build-arg SENTRY_RELEASE=${{ github.sha }}` to `flyctl deploy`, and the Dockerfile exposes it as the runtime env var `SENTRY_RELEASE`. A manual `fly deploy` without `--build-arg SENTRY_RELEASE=$(git rev-parse HEAD)` leaves the release empty.
-- [ ] **HUMAN** Smoke test after the deploy: `fly ssh console -C "php bin/console sentry:test"`, then check that the event appears in Sentry with the release set.
+- [x] **HUMAN** Smoke test after the deploy: `fly ssh console -C "php bin/console sentry:test"`, then check that the event appears in Sentry with the release set.
 
 ---
 
